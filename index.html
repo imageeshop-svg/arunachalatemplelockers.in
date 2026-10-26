@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arunachala Digital Luggage Lockers | Tiruvannamalai</title>
+<meta name="description" content="Safe luggage, helmet and mobile lockers near Arunachaleswarar Temple, 52 A Car Street, Tiruvannamalai. Open daily 7 AM – 9 PM. Pay by UPI.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%237a1f2b'/%3E%3Crect x='18' y='26' width='28' height='24' rx='4' fill='none' stroke='%23f4b942' stroke-width='5'/%3E%3Cpath d='M24 26v-6a8 8 0 0 1 16 0v6' fill='none' stroke='%23f4b942' stroke-width='5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&family=Noto+Sans+Tamil:wght@400;600&family=Noto+Sans+Telugu:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fbf7f0; --surface:#ffffff; --ink:#2a1a14; --muted:#6b5a50;
+    --maroon:#7a1f2b; --maroon-dark:#5c1520; --saffron:#f4b942; --line:#eadfd2;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:Inter,"Noto Sans Tamil","Noto Sans Telugu",system-ui,sans-serif;line-height:1.6}
+  body.ta{font-family:"Noto Sans Tamil",Inter,system-ui,sans-serif}
+  body.te{font-family:"Noto Sans Telugu",Inter,system-ui,sans-serif}
+  a{color:var(--maroon)}
+  .wrap{max-width:960px;margin:0 auto;padding:0 16px}
+  header.top{position:sticky;top:0;z-index:10;background:rgba(251,247,240,.94);
+    backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:600;color:var(--maroon);text-decoration:none}
+  .brand svg{flex:none}
+  .brand span{font-size:15px;line-height:1.2}
+  .langs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px}
+  .langs button{border:0;background:transparent;font:inherit;font-size:13px;padding:6px 10px;border-radius:999px;cursor:pointer;color:var(--muted)}
+  .langs button[aria-pressed="true"]{background:var(--maroon);color:#fff}
+  .hero{background:var(--maroon);color:#fff;position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;inset:auto -10% -60% auto;width:420px;height:420px;border-radius:50%;
+    background:radial-gradient(circle,rgba(244,185,66,.28),transparent 65%)}
+  .hero .wrap{padding:48px 16px 44px;position:relative;z-index:1}
+  .hero h1{font-family:Fraunces,"Noto Sans Tamil","Noto Sans Telugu",serif;font-size:clamp(28px,6vw,46px);line-height:1.15;margin:0 0 12px}
+  body.ta .hero h1, body.te .hero h1{font-family:inherit;font-weight:600}
+  .hero p{margin:0 0 6px;font-size:17px;opacity:.95;max-width:620px}
+  .hero p.slogan{color:var(--saffron);font-weight:600;font-size:clamp(18px,3.6vw,22px);line-height:1.4;margin:10px 0 4px;opacity:1}
+  .hours{display:inline-block;margin-top:14px;background:var(--saffron);color:var(--maroon-dark);font-weight:600;
+    padding:6px 14px;border-radius:999px;font-size:15px}
+  .cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+  .btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:600;
+    padding:12px 18px;border-radius:12px;font-size:15px}
+  .btn.primary{background:#fff;color:var(--maroon)}
+  .btn.ghost{border:1.5px solid rgba(255,255,255,.7);color:#fff}
+  section{padding:40px 0}
+  h2{font-family:Fraunces,"Noto Sans Tamil","Noto Sans Telugu",serif;color:var(--maroon);font-size:clamp(22px,4.5vw,30px);margin:0 0 18px}
+  body.ta h2, body.te h2{font-family:inherit;font-weight:600}
+  .steps{list-style:none;padding:0;margin:0;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .steps li{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;position:relative}
+  .steps .n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;
+    background:var(--saffron);color:var(--maroon-dark);font-weight:700;margin-bottom:8px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:4px 18px}
+  table{width:100%;border-collapse:collapse}
+  td{padding:14px 0;border-bottom:1px solid var(--line)}
+  tr:last-child td{border-bottom:0}
+  td.price{text-align:right;font-weight:700;font-size:20px;color:var(--maroon);white-space:nowrap}
+  .note{color:var(--muted);font-size:15px;margin:12px 2px 0}
+  .pay{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px}
+  .policy{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px}
+  .policy h3{margin:0 0 8px;font-size:18px;color:var(--maroon)}
+  .policy ul{margin:0;padding-left:20px}
+  .policy p{margin:0}
+  .contact{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .contact div{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .contact b{display:block;color:var(--muted);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+  body.ta .contact b, body.te .contact b{text-transform:none;letter-spacing:0}
+  footer{border-top:1px solid var(--line);padding:22px 0 30px;color:var(--muted);font-size:14px;text-align:center}
+  @media (max-width:520px){ .brand span{font-size:13px} .langs button{padding:6px 8px} }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="#">
+      <svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#7a1f2b"/><rect x="18" y="26" width="28" height="24" rx="4" fill="none" stroke="#f4b942" stroke-width="5"/><path d="M24 26v-6a8 8 0 0 1 16 0v6" fill="none" stroke="#f4b942" stroke-width="5"/></svg>
+      <span data-i18n="brand">Arunachala Digital<br>Luggage Lockers</span>
+    </a>
+    <div class="langs" role="group" aria-label="Language">
+      <button type="button" data-lang="en" aria-pressed="true">EN</button>
+      <button type="button" data-lang="ta" aria-pressed="false">தமிழ்</button>
+      <button type="button" data-lang="te" aria-pressed="false">తెలుగు</button>
+    </div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <h1 data-i18n="title">Arunachala Digital Luggage Lockers</h1>
+    <p class="slogan" data-i18n="tagline2">Explore Arunachalam. Carry memories, not worries.<br>Leave your bags with us.</p>
+    <p data-i18n="tagline">Safe luggage, helmet and mobile lockers near Arunachaleswarar Temple, Tiruvannamalai.</p>
+    <span class="hours" data-i18n="hours">Open daily · 7 AM – 9 PM</span>
+    <div class="cta">
+      <a class="btn primary" href="tel:+918838075040">📞 <span data-i18n="call">Call</span> 88380 75040</a>
+      <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&query=52+A+Car+Street+Tiruvannamalai+606601" target="_blank" rel="noopener">📍 <span data-i18n="directions">Get directions</span></a>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section id="how">
+    <h2 data-i18n="howTitle">How it works</h2>
+    <ol class="steps">
+      <li><span class="n">1</span><div data-i18n="step1">Come to our shop and tell us your mobile number and number of bags.</div></li>
+      <li><span class="n">2</span><div data-i18n="step2">Pay by UPI — scan the QR code or use the payment link sent to your phone.</div></li>
+      <li><span class="n">3</span><div data-i18n="step3">Your locker is assigned and your receipt is sent on WhatsApp.</div></li>
+      <li><span class="n">4</span><div data-i18n="step4">Come back and collect your belongings. Any extra hours are paid at checkout.</div></li>
+    </ol>
+  </section>
+
+  <section id="charges">
+    <h2 data-i18n="chargesTitle">Charges</h2>
+    <div class="card">
+      <table>
+        <tr><td data-i18n="medium">Medium bag</td><td class="price">₹50</td></tr>
+        <tr><td data-i18n="helmet">Helmet</td><td class="price">₹50</td></tr>
+        <tr><td data-i18n="jumbo">Jumbo suitcase</td><td class="price">₹100</td></tr>
+      </table>
+    </div>
+    <p class="note" data-i18n="perItem">Per item, for up to 10 hours.</p>
+    <p class="note" data-i18n="extra">After 10 hours: ₹10 for each extra hour (part of an hour is counted as a full hour).</p>
+    <div class="pay">
+      <span class="chip" data-i18n="payUpi">Pay by UPI</span>
+      <span class="chip">Google Pay</span><span class="chip">PhonePe</span><span class="chip">Paytm</span>
+    </div>
+  </section>
+
+  <section id="policies">
+    <h2 data-i18n="policiesTitle">Policies</h2>
+    <div class="policy" id="refund">
+      <h3 data-i18n="refundTitle">Refund policy</h3>
+      <ul>
+        <li data-i18n="refund1">No refund once a locker has been assigned or used.</li>
+        <li data-i18n="refund2">If money was deducted but no locker was given, the full amount will be refunded within 5–7 working days.</li>
+      </ul>
+    </div>
+    <div class="policy" id="terms">
+      <h3 data-i18n="termsTitle">Terms and conditions</h3>
+      <ul>
+        <li data-i18n="term1">Lockers are for short-term storage of personal luggage, helmets and mobile phones.</li>
+        <li data-i18n="term2">Do not store illegal, dangerous, flammable or perishable items.</li>
+        <li data-i18n="term3">Please do not leave cash, jewellery or other valuables in the locker.</li>
+        <li data-i18n="term4">Charges are as listed above. Extra hours are payable at checkout.</li>
+      </ul>
+    </div>
+    <div class="policy" id="privacy">
+      <h3 data-i18n="privacyTitle">Privacy policy</h3>
+      <p data-i18n="privacy">We collect your name and mobile number only to assign your locker, send your receipt and booking messages by WhatsApp or SMS, and keep business records. UPI payments are processed by your UPI app and our payment provider; we never see or store your UPI PIN or bank details. We do not sell or share your details with anyone, except where required by law.</p>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2 data-i18n="contactTitle">Contact us</h2>
+    <div class="contact">
+      <div><b data-i18n="addressLbl">Address</b>52 A Car Street,<br>Tiruvannamalai, Tamil Nadu – 606601</div>
+      <div><b data-i18n="phoneLbl">Phone</b><a href="tel:+918838075040">+91 88380 75040</a></div>
+      <div><b data-i18n="emailLbl">Email</b><a href="mailto:imageeshop@gmail.com">imageeshop@gmail.com</a></div>
+      <div><b data-i18n="hoursLbl">Hours</b><span data-i18n="hoursVal">Every day, 7 AM – 9 PM</span></div>
+      <div><b data-i18n="ownerLbl">Proprietor</b>M N Sridhar</div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">© 2026 Arunachala Digital Luggage Lockers · Tiruvannamalai</div>
+</footer>
+
+<script>
+(function(){
+  var T = {
+    ta: {
+      brand:"அருணாசல டிஜிட்டல்<br>லக்கேஜ் லாக்கர்கள்",
+      title:"அருணாசல டிஜிட்டல் லக்கேஜ் லாக்கர்கள்",
+      tagline:"திருவண்ணாமலை அருணாசலேஸ்வரர் கோயில் அருகே பாதுகாப்பான லக்கேஜ், ஹெல்மெட் மற்றும் மொபைல் லாக்கர்கள்.",
+      tagline2:"அருணாசலத்தைச் சுற்றிப் பாருங்கள். நினைவுகளைச் சுமந்து செல்லுங்கள், கவலைகளை அல்ல.<br>உங்கள் பைகளை எங்களிடம் விட்டுச் செல்லுங்கள்.",
+      hours:"தினமும் · காலை 7 – இரவு 9",
+      call:"அழைக்க", directions:"வழி காட்டி",
+      howTitle:"எப்படி பயன்படுத்துவது",
+      step1:"எங்கள் கடைக்கு வந்து உங்கள் மொபைல் எண் மற்றும் பைகளின் எண்ணிக்கையைத் தெரிவிக்கவும்.",
+      step2:"UPI மூலம் பணம் செலுத்தவும் — QR குறியீட்டை ஸ்கேன் செய்யவும் அல்லது உங்கள் போனுக்கு அனுப்பப்படும் இணைப்பைப் பயன்படுத்தவும்.",
+      step3:"உங்களுக்கு லாக்கர் ஒதுக்கப்படும்; ரசீது WhatsApp-இல் அனுப்பப்படும்.",
+      step4:"திரும்பி வந்து உங்கள் உடைமைகளை எடுத்துக்கொள்ளுங்கள். கூடுதல் நேரக் கட்டணம் வெளியேறும்போது செலுத்த வேண்டும்.",
+      chargesTitle:"கட்டணங்கள்",
+      medium:"நடுத்தர பை", helmet:"ஹெல்மெட்", jumbo:"பெரிய (ஜம்போ) சூட்கேஸ்",
+      perItem:"ஒரு பொருளுக்கு, 10 மணி நேரம் வரை.",
+      extra:"10 மணி நேரத்திற்குப் பிறகு: ஒவ்வொரு கூடுதல் மணி நேரத்திற்கும் ₹10 (ஒரு மணி நேரத்தின் பகுதியும் முழு மணி நேரமாகக் கணக்கிடப்படும்).",
+      payUpi:"UPI மூலம் செலுத்தலாம்",
+      policiesTitle:"கொள்கைகள்",
+      refundTitle:"பணம் திருப்பித் தரும் கொள்கை",
+      refund1:"லாக்கர் ஒதுக்கப்பட்ட அல்லது பயன்படுத்தப்பட்ட பிறகு பணம் திருப்பித் தரப்படாது.",
+      refund2:"பணம் கழிக்கப்பட்டு லாக்கர் வழங்கப்படவில்லை என்றால், 5–7 வேலை நாட்களுக்குள் முழுத் தொகையும் திருப்பித் தரப்படும்.",
+      termsTitle:"விதிமுறைகள் மற்றும் நிபந்தனைகள்",
+      term1:"லாக்கர்கள் தனிப்பட்ட லக்கேஜ், ஹெல்மெட் மற்றும் மொபைல் போன்களைக் குறுகிய காலம் வைப்பதற்கு மட்டுமே.",
+      term2:"சட்டவிரோதமான, ஆபத்தான, எளிதில் தீப்பற்றக்கூடிய அல்லது கெட்டுப்போகும் பொருட்களை வைக்கக் கூடாது.",
+      term3:"பணம், நகைகள் அல்லது விலைமதிப்புள்ள பொருட்களை லாக்கரில் வைக்க வேண்டாம்.",
+      term4:"கட்டணங்கள் மேலே குறிப்பிட்டபடி. கூடுதல் நேரக் கட்டணம் வெளியேறும்போது செலுத்த வேண்டும்.",
+      privacyTitle:"தனியுரிமைக் கொள்கை",
+      privacy:"உங்களுக்கு லாக்கர் ஒதுக்கவும், ரசீது மற்றும் முன்பதிவுச் செய்திகளை WhatsApp அல்லது SMS மூலம் அனுப்பவும், வணிகப் பதிவுகளுக்காகவும் மட்டுமே உங்கள் பெயர் மற்றும் மொபைல் எண்ணைச் சேகரிக்கிறோம். UPI கட்டணங்கள் உங்கள் UPI செயலி மற்றும் எங்கள் கட்டணச் சேவை வழங்குநர் மூலம் செயலாக்கப்படுகின்றன; உங்கள் UPI PIN அல்லது வங்கி விவரங்களை நாங்கள் பார்ப்பதோ சேமிப்பதோ இல்லை. சட்டப்படி தேவைப்படும் இடங்களைத் தவிர, உங்கள் விவரங்களை யாருக்கும் விற்பதோ பகிர்வதோ இல்லை.",
+      contactTitle:"தொடர்புக்கு",
+      addressLbl:"முகவரி", phoneLbl:"தொலைபேசி", emailLbl:"மின்னஞ்சல்", hoursLbl:"நேரம்",
+      hoursVal:"தினமும், காலை 7 – இரவு 9", ownerLbl:"உரிமையாளர்"
+    },
+    te: {
+      brand:"అరుణాచల డిజిటల్<br>లగేజ్ లాకర్లు",
+      title:"అరుణాచల డిజిటల్ లగేజ్ లాకర్లు",
+      tagline:"తిరువణ్ణామలై అరుణాచలేశ్వర ఆలయం సమీపంలో సురక్షితమైన లగేజ్, హెల్మెట్ మరియు మొబైల్ లాకర్లు.",
+      tagline2:"అరుణాచలాన్ని అన్వేషించండి. జ్ఞాపకాలను మోసుకెళ్ళండి, చింతలను కాదు.<br>మీ బ్యాగులను మా వద్ద వదిలివేయండి.",
+      hours:"ప్రతిరోజూ · ఉదయం 7 – రాత్రి 9",
+      call:"కాల్ చేయండి", directions:"దారి చూపించు",
+      howTitle:"ఎలా ఉపయోగించాలి",
+      step1:"మా దుకాణానికి వచ్చి మీ మొబైల్ నంబర్ మరియు బ్యాగుల సంఖ్యను తెలియజేయండి.",
+      step2:"UPI ద్వారా చెల్లించండి — QR కోడ్ స్కాన్ చేయండి లేదా మీ ఫోన్‌కు పంపిన చెల్లింపు లింక్‌ను ఉపయోగించండి.",
+      step3:"మీకు లాకర్ కేటాయించబడుతుంది; రసీదు WhatsApp ద్వారా పంపబడుతుంది.",
+      step4:"తిరిగి వచ్చి మీ వస్తువులను తీసుకోండి. అదనపు గంటల చార్జీలు బయలుదేరేటప్పుడు చెల్లించాలి.",
+      chargesTitle:"చార్జీలు",
+      medium:"మధ్యస్థ బ్యాగ్", helmet:"హెల్మెట్", jumbo:"పెద్ద (జంబో) సూట్‌కేస్",
+      perItem:"ఒక్కో వస్తువుకు, 10 గంటల వరకు.",
+      extra:"10 గంటల తర్వాత: ప్రతి అదనపు గంటకు ₹10 (గంటలో కొంత భాగాన్ని కూడా పూర్తి గంటగా లెక్కిస్తారు).",
+      payUpi:"UPI ద్వారా చెల్లించవచ్చు",
+      policiesTitle:"విధానాలు",
+      refundTitle:"రీఫండ్ విధానం",
+      refund1:"లాకర్ కేటాయించిన లేదా ఉపయోగించిన తర్వాత రీఫండ్ ఉండదు.",
+      refund2:"డబ్బు కట్ అయి లాకర్ ఇవ్వకపోతే, 5–7 పని దినాల్లో పూర్తి మొత్తం తిరిగి చెల్లించబడుతుంది.",
+      termsTitle:"నిబంధనలు మరియు షరతులు",
+      term1:"లాకర్లు వ్యక్తిగత లగేజ్, హెల్మెట్లు మరియు మొబైల్ ఫోన్లను కొద్దిసేపు ఉంచడానికి మాత్రమే.",
+      term2:"చట్టవిరుద్ధమైన, ప్రమాదకరమైన, సులభంగా మండే లేదా పాడైపోయే వస్తువులను ఉంచకూడదు.",
+      term3:"నగదు, ఆభరణాలు లేదా విలువైన వస్తువులను లాకర్‌లో ఉంచవద్దు.",
+      term4:"చార్జీలు పైన తెలిపిన విధంగా. అదనపు గంటల చార్జీలు బయలుదేరేటప్పుడు చెల్లించాలి.",
+      privacyTitle:"గోప్యతా విధానం",
+      privacy:"మీకు లాకర్ కేటాయించడానికి, రసీదు మరియు బుకింగ్ సందేశాలను WhatsApp లేదా SMS ద్వారా పంపడానికి, వ్యాపార రికార్డుల కోసం మాత్రమే మీ పేరు మరియు మొబైల్ నంబర్‌ను సేకరిస్తాము. UPI చెల్లింపులు మీ UPI యాప్ మరియు మా చెల్లింపు సేవా ప్రదాత ద్వారా జరుగుతాయి; మీ UPI PIN లేదా బ్యాంక్ వివరాలను మేము చూడము, నిల్వ చేయము. చట్టప్రకారం అవసరమైన సందర్భాలు తప్ప, మీ వివరాలను ఎవరికీ అమ్మము లేదా పంచుకోము.",
+      contactTitle:"సంప్రదించండి",
+      addressLbl:"చిరునామా", phoneLbl:"ఫోన్", emailLbl:"ఇమెయిల్", hoursLbl:"సమయం",
+      hoursVal:"ప్రతిరోజూ, ఉదయం 7 – రాత్రి 9", ownerLbl:"యజమాని"
+    }
+  };
+  var nodes = document.querySelectorAll('[data-i18n]');
+  var EN = {};
+  nodes.forEach(function(n){ EN[n.getAttribute('data-i18n')] = n.innerHTML; });
+  T.en = EN;
+  function setLang(l){
+    if(!T[l]) l = 'en';
+    nodes.forEach(function(n){
+      var k = n.getAttribute('data-i18n');
+      if (T[l][k] != null) n.innerHTML = T[l][k];
+    });
+    document.documentElement.lang = l;
+    document.body.className = l === 'en' ? '' : l;
+    document.querySelectorAll('.langs button').forEach(function(b){
+      b.setAttribute('aria-pressed', b.getAttribute('data-lang') === l ? 'true' : 'false');
+    });
+    try { localStorage.setItem('lang', l); } catch(e) {}
+  }
+  document.querySelectorAll('.langs button').forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.getAttribute('data-lang')); });
+  });
+  var start = 'en';
+  var q = (location.search.match(/[?&]lang=(en|ta|te)/) || [])[1];
+  if (q) start = q;
+  else { try { start = localStorage.getItem('lang') || 'en'; } catch(e) {} }
+  setLang(start);
+})();
+</script>
+</body>
+</html>
