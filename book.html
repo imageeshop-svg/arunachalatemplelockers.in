@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Book a Locker – Arunachala Digital Luggage Lockers</title>
+<meta name="description" content="Book a luggage locker near Arunachaleswarar Temple, Tiruvannamalai. Pay by UPI.">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<style>
+  :root{--brand:#8a3b12;--ink:#1f1f1f;--muted:#5b5b5b;--line:#e3ddd6;--bg:#fbf8f4;--ok:#1b7a3a;--warn:#a86a00;--err:#b3261e}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Tamil","Noto Sans Telugu",sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+  header{background:var(--brand);color:#fff;padding:18px 16px}
+  header a{color:#fff;text-decoration:none;font-size:14px;opacity:.9}
+  header h1{margin:6px 0 0;font-size:22px}
+  main{max-width:520px;margin:0 auto;padding:16px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  label{display:block;font-weight:600;margin:12px 0 4px}
+  input{width:100%;padding:12px;font-size:16px;border:1px solid #cfc7bd;border-radius:8px}
+  .items{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:8px}
+  .step{display:flex;align-items:center;gap:8px}
+  .step button{width:40px;height:40px;font-size:20px;border:1px solid #cfc7bd;background:#fff;border-radius:8px}
+  .step span{min-width:24px;text-align:center;font-weight:700;font-size:18px}
+  .price{color:var(--muted);font-size:14px}
+  .total{display:flex;justify-content:space-between;font-size:18px;font-weight:700;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+  .btn{display:block;width:100%;padding:14px;font-size:17px;font-weight:700;border:0;border-radius:10px;background:var(--brand);color:#fff;margin-top:16px;cursor:pointer;text-align:center;text-decoration:none}
+  .btn:disabled{opacity:.5}
+  .btn.alt{background:#fff;color:var(--brand);border:2px solid var(--brand)}
+  .msg{padding:12px;border-radius:8px;margin-top:12px;font-size:15px}
+  .msg.err{background:#fdecea;color:var(--err)} .msg.info{background:#fff6e0;color:var(--warn)} .msg.ok{background:#e8f6ec;color:var(--ok)}
+  .center{text-align:center} #qr img{width:220px;height:220px;image-rendering:pixelated}
+  .big{font-size:26px;font-weight:800;letter-spacing:1px}
+  .small{font-size:13px;color:var(--muted)}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+  <a href="/">← Arunachala Digital Luggage Lockers</a>
+  <h1>Book a Locker Online</h1>
+</header>
+<main>
+  <div id="closed" class="card hidden"><div class="msg info" id="closedMsg"></div></div>
+
+  <!-- Step 1: booking form -->
+  <form id="form" class="card" autocomplete="on">
+    <div id="avail" class="small">Checking free lockers…</div>
+    <label for="name">Your name</label>
+    <input id="name" name="name" required maxlength="60" autocomplete="name">
+    <label for="mobile">Mobile number (WhatsApp)</label>
+    <input id="mobile" name="mobile" required inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" placeholder="10-digit mobile" autocomplete="tel-national">
+
+    <label>Items to store</label>
+    <div class="items">
+      <div>Medium bag <div class="price" data-p="bag"></div></div>
+      <div class="step"><button type="button" data-k="bags" data-d="-1">−</button><span id="bags">1</span><button type="button" data-k="bags" data-d="1">+</button></div>
+      <div>Helmet <div class="price" data-p="helmet"></div></div>
+      <div class="step"><button type="button" data-k="helmets" data-d="-1">−</button><span id="helmets">0</span><button type="button" data-k="helmets" data-d="1">+</button></div>
+      <div>Jumbo suitcase <div class="price" data-p="jumbo"></div></div>
+      <div class="step"><button type="button" data-k="jumbo" data-d="-1">−</button><span id="jumbo">0</span><button type="button" data-k="jumbo" data-d="1">+</button></div>
+    </div>
+    <div class="total"><span>Pay now</span><span id="total">₹0</span></div>
+    <div class="small" id="hoursNote"></div>
+    <button class="btn" id="bookBtn" type="submit">Book &amp; Pay by UPI</button>
+    <div id="formMsg"></div>
+  </form>
+
+  <!-- Step 2: pay -->
+  <section id="pay" class="card hidden center">
+    <div class="small">Booking ref</div>
+    <div class="big" id="pRef"></div>
+    <p>Locker <b id="pLocker"></b> is held for you.<br>Pay <b id="pAmt"></b> before <b id="pBy"></b>.</p>
+    <a class="btn" id="upiBtn" href="#">Pay with UPI app (GPay / PhonePe / Paytm)</a>
+    <p class="small" style="margin-top:14px">Or scan this QR from another phone:</p>
+    <div id="qr"></div>
+    <p class="small">UPI ID: <span id="pUpi"></span><br>Keep the booking ref in the payment note.</p>
+    <div id="statusMsg" class="msg info">Waiting for the shop to confirm your payment…</div>
+    <p class="small">Please keep this page open. Show the booking ref at the shop.</p>
+  </section>
+</main>
+
+<script>
+/* Public booking API on the shop PC (Cloudflare tunnel). */
+const API = "https://book.arunachalatemplelockers.in";
+const counts = {bags:1, helmets:0, jumbo:0};
+let tariff = {bag:50, helmet:50, jumbo:100, extra_hour:10}, baseHours = 10, maxItems = 6;
+const $ = id => document.getElementById(id);
+
+function rupee(n){ return "₹" + n; }
+function render(){
+  for (const k in counts) $(k).textContent = counts[k];
+  const total = counts.bags*tariff.bag + counts.helmets*tariff.helmet + counts.jumbo*tariff.jumbo;
+  $("total").textContent = rupee(total);
+  document.querySelectorAll("[data-p]").forEach(el => el.textContent = rupee(tariff[el.dataset.p]) + " for " + baseHours + " hours");
+  $("hoursNote").textContent = "Covers " + baseHours + " hours. Extra time ₹" + tariff.extra_hour + " per hour, paid at the shop.";
+  $("bookBtn").disabled = total === 0;
+}
+document.querySelectorAll(".step button").forEach(b => b.addEventListener("click", () => {
+  const k = b.dataset.k, d = +b.dataset.d;
+  const sum = counts.bags + counts.helmets + counts.jumbo;
+  if (d > 0 && sum >= maxItems) return;
+  counts[k] = Math.max(0, counts[k] + d); render();
+}));
+
+function showMsg(el, cls, text){ el.innerHTML = ""; const d = document.createElement("div"); d.className = "msg " + cls; d.textContent = text; el.appendChild(d); }
+
+async function loadStatus(){
+  try {
+    const r = await fetch(API + "/api/status", {cache:"no-store"});
+    const s = await r.json();
+    tariff = s.tariff; baseHours = s.base_hours; render();
+    $("avail").textContent = "Free now: " + s.free_medium + " medium, " + s.free_large + " large lockers.";
+    if (!s.open_now){ $("closed").classList.remove("hidden"); $("closedMsg").textContent = "Online booking is open 7 AM – 9 PM. Please come back during shop hours."; $("bookBtn").disabled = true; }
+  } catch (e) {
+    $("closed").classList.remove("hidden");
+    $("closedMsg").textContent = "Online booking is unavailable right now. Please visit the shop at 52 A Car Street or call 8838075040.";
+    $("bookBtn").disabled = true; $("avail").textContent = "";
+  }
+}
+
+$("form").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const body = {name:$("name").value.trim(), mobile:$("mobile").value.trim(), ...counts};
+  $("bookBtn").disabled = true; $("formMsg").innerHTML = "";
+  try {
+    const r = await fetch(API + "/api/book", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+    const d = await r.json();
+    if (!r.ok) { showMsg($("formMsg"), "err", d.error || "Booking failed."); $("bookBtn").disabled = false; return; }
+    showPay(d, body.mobile);
+  } catch (e) {
+    showMsg($("formMsg"), "err", "Could not reach the shop. Please try again or call 8838075040.");
+    $("bookBtn").disabled = false;
+  }
+});
+
+function showPay(d, mobile){
+  $("form").classList.add("hidden");
+  $("pay").classList.remove("hidden");
+  $("pRef").textContent = d.ref; $("pLocker").textContent = d.locker_no;
+  $("pAmt").textContent = rupee(d.amount); $("pBy").textContent = d.pay_before;
+  $("pUpi").textContent = d.upi_id; $("upiBtn").href = d.upi_link;
+  const qr = qrcode(0, "M"); qr.addData(d.upi_link); qr.make();
+  $("qr").innerHTML = qr.createImgTag(6, 8);
+  try { localStorage.setItem("lastBooking", JSON.stringify({ref:d.ref, mobile})); } catch(e) {}
+  poll(d.ref, mobile);
+}
+
+async function poll(ref, mobile){
+  try {
+    const r = await fetch(API + "/api/booking?ref=" + encodeURIComponent(ref) + "&mobile=" + encodeURIComponent(mobile), {cache:"no-store"});
+    const d = await r.json();
+    if (d.status === "CONFIRMED") { $("statusMsg").className = "msg ok"; $("statusMsg").textContent = "Payment confirmed. Locker " + d.locker_no + " is booked. Show ref " + ref + " at the shop."; return; }
+    if (d.status === "EXPIRED" || d.status === "CANCELLED") { $("statusMsg").className = "msg err"; $("statusMsg").textContent = "This booking is " + d.status.toLowerCase() + ". If you already paid, please call 8838075040 with ref " + ref + "."; return; }
+  } catch (e) {}
+  setTimeout(() => poll(ref, mobile), 10000);
+}
+
+render(); loadStatus();
+</script>
+</body>
+</html>
