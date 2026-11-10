@@ -3,159 +3,324 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Book a Locker – Arunachala Digital Luggage Lockers</title>
-<meta name="description" content="Book a luggage locker near Arunachaleswarar Temple, Tiruvannamalai. Pay by UPI.">
+<title>Tiruvannamalai Temple Luggage Locker System</title>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 <style>
-  :root{--brand:#8a3b12;--ink:#1f1f1f;--muted:#5b5b5b;--line:#e3ddd6;--bg:#fbf8f4;--ok:#1b7a3a;--warn:#a86a00;--err:#b3261e}
+  :root{--navy:#0f2d5a;--bg:#161f3a;--panel:#1b2647;--gold:#f4c430;--red:#e8445a;--grey:#8a8a8a;
+        --pend:#e09b2d;--text:#fff;--muted:#b9c0d4;--ok:#2e9e55}
   *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Tamil","Noto Sans Telugu",sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
-  header{background:var(--brand);color:#fff;padding:18px 16px}
-  header a{color:#fff;text-decoration:none;font-size:14px;opacity:.9}
-  header h1{margin:6px 0 0;font-size:22px}
-  main{max-width:520px;margin:0 auto;padding:16px}
-  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
-  label{display:block;font-weight:600;margin:12px 0 4px}
-  input{width:100%;padding:12px;font-size:16px;border:1px solid #cfc7bd;border-radius:8px}
-  .items{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:8px}
-  .step{display:flex;align-items:center;gap:8px}
-  .step button{width:40px;height:40px;font-size:20px;border:1px solid #cfc7bd;background:#fff;border-radius:8px}
-  .step span{min-width:24px;text-align:center;font-weight:700;font-size:18px}
-  .price{color:var(--muted);font-size:14px}
-  .total{display:flex;justify-content:space-between;font-size:18px;font-weight:700;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
-  .btn{display:block;width:100%;padding:14px;font-size:17px;font-weight:700;border:0;border-radius:10px;background:var(--brand);color:#fff;margin-top:16px;cursor:pointer;text-align:center;text-decoration:none}
-  .btn:disabled{opacity:.5}
-  .btn.alt{background:#fff;color:var(--brand);border:2px solid var(--brand)}
-  .msg{padding:12px;border-radius:8px;margin-top:12px;font-size:15px}
-  .msg.err{background:#fdecea;color:var(--err)} .msg.info{background:#fff6e0;color:var(--warn)} .msg.ok{background:#e8f6ec;color:var(--ok)}
-  .center{text-align:center} #qr img{width:220px;height:220px;image-rendering:pixelated}
-  .big{font-size:26px;font-weight:800;letter-spacing:1px}
-  .small{font-size:13px;color:var(--muted)}
+  body{margin:0;font-family:"Segoe UI",system-ui,"Noto Sans Tamil","Noto Sans Telugu",sans-serif;background:var(--bg);color:var(--text)}
+  header{background:var(--navy);text-align:center;padding:14px 10px 10px}
+  header h1{margin:0;color:var(--gold);font-size:clamp(17px,3.2vw,24px)}
+  header .sub{color:var(--muted);font-size:12px;margin-top:4px}
+  nav{display:flex;gap:4px;padding:8px 8px 0;border-bottom:2px solid #e9edf5;flex-wrap:wrap}
+  nav button{background:var(--navy);color:#fff;border:1px solid #3a4a72;border-bottom:0;padding:10px 16px;font-size:15px;font-weight:700;cursor:pointer}
+  nav button.on{background:var(--red)}
+  main{padding:14px;max-width:1000px;margin:0 auto}
+  h2{color:var(--red);font-size:17px;margin:4px 0 8px;letter-spacing:.3px}
+  .legend{display:flex;gap:16px;font-size:13px;color:var(--muted);margin-bottom:10px;flex-wrap:wrap;align-items:center}
+  .legend i{display:inline-block;width:12px;height:16px;margin-right:6px;vertical-align:middle}
+  .grid{display:grid;gap:2px;width:100%;max-width:780px;margin:0 auto;aspect-ratio:1.9;min-height:260px}
+  .cell{border:0;font-weight:700;font-size:clamp(11px,2.2vw,17px);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:2px}
+  .cell small{font-weight:400;font-size:clamp(9px,1.5vw,12px);opacity:.9}
+  .FREE{background:var(--grey)} .OCCUPIED{background:var(--red)} .PENDING{background:var(--pend)}
+  .cell.sel{outline:4px solid var(--gold);outline-offset:-4px}
+  .cell.FREE:hover{filter:brightness(1.15)}
+  .tablet{background:var(--navy);color:var(--gold);font-size:clamp(9px,1.6vw,13px);cursor:default;text-align:center}
+  .card{background:var(--panel);border:1px solid #2c3a63;border-radius:10px;padding:16px;margin:14px auto;max-width:520px}
+  label{display:block;font-weight:600;margin:10px 0 4px;color:var(--muted);font-size:14px}
+  input{width:100%;padding:11px;font-size:16px;border-radius:7px;border:1px solid #3a4a72;background:#0f1730;color:#fff}
+  .items{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-top:6px}
+  .step{display:flex;gap:8px;align-items:center}
+  .step button{width:38px;height:38px;font-size:20px;border-radius:7px;border:1px solid #3a4a72;background:#0f1730;color:#fff;cursor:pointer}
+  .step span{min-width:22px;text-align:center;font-weight:700}
+  .price{font-size:12px;color:var(--muted)}
+  .total{display:flex;justify-content:space-between;font-size:18px;font-weight:700;border-top:1px solid #2c3a63;margin-top:12px;padding-top:10px}
+  .btn{display:block;width:100%;padding:13px;font-size:16px;font-weight:700;border:0;border-radius:8px;background:var(--red);color:#fff;margin-top:12px;cursor:pointer;text-align:center;text-decoration:none}
+  .btn.ok{background:var(--ok)} .btn.alt{background:transparent;border:2px solid var(--muted)} .btn:disabled{opacity:.5}
+  .row2{display:flex;gap:8px} .row2 .btn{flex:1}
+  .msg{padding:10px;border-radius:7px;margin-top:10px;font-size:14px}
+  .err{background:#4a1820;color:#ffb3bd} .info{background:#4a3a12;color:#ffd98a} .good{background:#123d22;color:#9be8b4}
+  .center{text-align:center} .big{font-size:26px;font-weight:800;letter-spacing:1px;color:var(--gold)}
+  #qr img{background:#fff;padding:8px;border-radius:6px;width:210px;height:210px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{border-bottom:1px solid #2c3a63;padding:7px 5px;text-align:left}
+  th{color:var(--muted)}
+  .tag{font-size:11px;padding:2px 6px;border-radius:4px;background:#2c3a63}
   .hidden{display:none}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-bottom:10px}
+  .toolbar input{width:auto}
+  .small{font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body>
 <header>
-  <a href="/">← Arunachala Digital Luggage Lockers</a>
-  <h1>Book a Locker Online</h1>
+  <h1>🛕 Tiruvannamalai Temple Luggage Locker System</h1>
+  <div class="sub" id="sub">23 Lockers · Arunachala Digital Luggage Lockers</div>
 </header>
+<nav id="tabs"></nav>
 <main>
-  <div id="closed" class="card hidden"><div class="msg info" id="closedMsg"></div></div>
-
-  <!-- Step 1: booking form -->
-  <form id="form" class="card" autocomplete="on">
-    <div id="avail" class="small">Checking free lockers…</div>
-    <label for="name">Your name</label>
-    <input id="name" name="name" required maxlength="60" autocomplete="name">
-    <label for="mobile">Mobile number (WhatsApp)</label>
-    <input id="mobile" name="mobile" required inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" placeholder="10-digit mobile" autocomplete="tel-national">
-
-    <label>Items to store</label>
-    <div class="items">
-      <div>Medium bag <div class="price" data-p="bag"></div></div>
-      <div class="step"><button type="button" data-k="bags" data-d="-1">−</button><span id="bags">1</span><button type="button" data-k="bags" data-d="1">+</button></div>
-      <div>Helmet <div class="price" data-p="helmet"></div></div>
-      <div class="step"><button type="button" data-k="helmets" data-d="-1">−</button><span id="helmets">0</span><button type="button" data-k="helmets" data-d="1">+</button></div>
-      <div>Jumbo suitcase <div class="price" data-p="jumbo"></div></div>
-      <div class="step"><button type="button" data-k="jumbo" data-d="-1">−</button><span id="jumbo">0</span><button type="button" data-k="jumbo" data-d="1">+</button></div>
+  <!-- LOCKER MAP (all modes) -->
+  <section id="t-map">
+    <div class="toolbar" style="justify-content:space-between">
+      <h2>LOCKER CABINET — TAP A COMPARTMENT</h2>
+      <button class="btn alt" style="width:auto;margin:0;padding:6px 14px" onclick="loadCabinet()">⟳ Refresh</button>
     </div>
-    <div class="total"><span>Pay now</span><span id="total">₹0</span></div>
-    <div class="small" id="hoursNote"></div>
-    <button class="btn" id="bookBtn" type="submit">Book &amp; Pay by UPI</button>
-    <div id="formMsg"></div>
-  </form>
+    <div class="legend"><span><i style="background:var(--grey)"></i>Available</span>
+      <span><i style="background:var(--pend)"></i>Awaiting payment</span>
+      <span><i style="background:var(--red)"></i>Occupied</span>
+      <span id="freeCount"></span></div>
+    <div id="notice"></div>
+    <div class="grid" id="grid"></div>
+    <div id="lockerPanel"></div>
+  </section>
 
-  <!-- Step 2: pay -->
-  <section id="pay" class="card hidden center">
-    <div class="small">Booking ref</div>
-    <div class="big" id="pRef"></div>
-    <p>Locker <b id="pLocker"></b> is held for you.<br>Pay <b id="pAmt"></b> before <b id="pBy"></b>.</p>
-    <a class="btn" id="upiBtn" href="#">Pay with UPI app (GPay / PhonePe / Paytm)</a>
-    <p class="small" style="margin-top:14px">Or scan this QR from another phone:</p>
-    <div id="qr"></div>
-    <p class="small">UPI ID: <span id="pUpi"></span><br>Keep the booking ref in the payment note.</p>
-    <div id="statusMsg" class="msg info">Waiting for the shop to confirm your payment…</div>
-    <p class="small">Please keep this page open. Show the booking ref at the shop.</p>
+  <!-- CHECK-IN / BOOK (all modes) -->
+  <section id="t-book" class="hidden">
+    <form id="bookForm" class="card" autocomplete="on">
+      <h2 id="bookTitle">BOOK LOCKER</h2>
+      <div class="small">Locker: <b id="bLocker">tap a locker on the map</b></div>
+      <label for="name">Name</label><input id="name" required maxlength="60" autocomplete="name">
+      <label for="mobile">Mobile number (WhatsApp)</label>
+      <input id="mobile" required inputmode="numeric" maxlength="10" placeholder="10-digit mobile" autocomplete="tel-national">
+      <div id="aadhaarBox" class="hidden"><label for="aadhaar">Aadhaar – last 4 digits</label>
+        <input id="aadhaar" inputmode="numeric" maxlength="4"></div>
+      <label>Items</label>
+      <div class="items">
+        <div>Medium bag <div class="price" data-p="bag"></div></div>
+        <div class="step"><button type="button" data-k="bags" data-d="-1">−</button><span id="bags">1</span><button type="button" data-k="bags" data-d="1">+</button></div>
+        <div>Helmet <div class="price" data-p="helmet"></div></div>
+        <div class="step"><button type="button" data-k="helmets" data-d="-1">−</button><span id="helmets">0</span><button type="button" data-k="helmets" data-d="1">+</button></div>
+        <div>Jumbo suitcase <div class="price" data-p="jumbo"></div></div>
+        <div class="step"><button type="button" data-k="jumbo" data-d="-1">−</button><span id="jumbo">0</span><button type="button" data-k="jumbo" data-d="1">+</button></div>
+      </div>
+      <div class="total"><span>Pay now</span><span id="total">₹0</span></div>
+      <div class="small" id="hoursNote"></div>
+      <button class="btn" id="bookBtn" type="submit">Book &amp; Pay by UPI</button>
+      <div id="bookMsg"></div>
+    </form>
+    <section id="pay" class="card center hidden">
+      <div class="small">Booking ref</div><div class="big" id="pRef"></div>
+      <p>Locker <b id="pLocker"></b> is held.<br>Pay <b id="pAmt"></b> before <b id="pBy"></b>.</p>
+      <a class="btn" id="upiBtn" href="#">Pay with UPI app (GPay / PhonePe / Paytm)</a>
+      <p class="small">Or scan this QR:</p><div id="qr"></div>
+      <p class="small">UPI ID: <span id="pUpi"></span> · keep the booking ref in the payment note</p>
+      <div id="payStatus" class="msg info">Waiting for the shop to confirm your payment…</div>
+      <div id="staffPayBtns" class="row2 hidden">
+        <button class="btn ok" onclick="staffConfirm(cur.ref)">✔ Payment received</button>
+        <button class="btn alt" onclick="staffCancel(cur.ref)">Cancel</button>
+      </div>
+      <button class="btn alt" onclick="resetBooking()">New booking</button>
+    </section>
+  </section>
+
+  <!-- CHECKOUT (staff) -->
+  <section id="t-out" class="hidden">
+    <div class="card">
+      <h2>CHECKOUT</h2>
+      <div class="small">Tap an occupied locker on the map, or search by mobile.</div>
+      <label for="outMobile">Mobile number</label>
+      <div class="row2"><input id="outMobile" inputmode="numeric" maxlength="10"><button class="btn" style="width:auto;margin:0" onclick="findForCheckout()">Find</button></div>
+      <div id="outResult"></div>
+    </div>
+  </section>
+
+  <!-- ALL BOOKINGS (staff) -->
+  <section id="t-all" class="hidden">
+    <div class="toolbar">
+      <div><label for="fDate">Date</label><input id="fDate" type="date"></div>
+      <div><label for="fMobile">Mobile</label><input id="fMobile" inputmode="numeric" maxlength="10"></div>
+      <button class="btn" style="width:auto;margin:0" onclick="loadAll()">Show</button>
+    </div>
+    <div id="allSummary" class="small"></div>
+    <table><thead><tr><th>Ref</th><th>Source</th><th>Locker</th><th>Name</th><th>Mobile</th><th>Items</th><th>₹</th><th>Status</th><th>Booked</th><th>Paid</th><th>Out</th></tr></thead>
+      <tbody id="allRows"></tbody></table>
   </section>
 </main>
 
 <script>
-/* Public booking API on the shop PC (Cloudflare tunnel). */
-const API = "https://book.arunachalatemplelockers.in";
-const counts = {bags:1, helmets:0, jumbo:0};
-let tariff = {bag:50, helmet:50, jumbo:100, extra_hour:10}, baseHours = 10, maxItems = 6;
-const $ = id => document.getElementById(id);
+/* ONE screen for every channel. MODE is "public" on the website/app; the shop PC server swaps it to "staff". */
+const MODE = "public";
+const STAFF = MODE === "staff";
+const API = STAFF ? "" : "https://book.arunachalatemplelockers.in";
+const SOURCE = (new URLSearchParams(location.search).get("source") || "").toUpperCase() === "APP" ? "APP" : "WEB";
 
-function rupee(n){ return "₹" + n; }
-function render(){
+let cab = null, selected = null, cur = null, pollTimer = null;
+const counts = {bags:1, helmets:0, jumbo:0};
+const $ = id => document.getElementById(id);
+const rupee = n => "₹" + n;
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- tabs ---------- */
+const TABS = STAFF ? [["map","🗺 Locker Map"],["book","✔ Check-In"],["out","⬜ Checkout"],["all","📋 All Bookings"]]
+                   : [["map","🗺 Locker Map"],["book","✔ Book Locker"]];
+$("tabs").innerHTML = TABS.map(([k,t]) => `<button data-t="${k}">${t}</button>`).join("");
+$("tabs").addEventListener("click", e => { const t = e.target.closest("button"); if (t) showTab(t.dataset.t); });
+function showTab(k){
+  TABS.forEach(([x]) => $("t-"+x).classList.toggle("hidden", x !== k));
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.t === k));
+  if (k === "all") loadAll();
+  if (k === "map") loadCabinet();
+}
+if (STAFF){ $("aadhaarBox").classList.remove("hidden"); $("bookTitle").textContent = "CHECK-IN (SHOP)"; $("sub").textContent = "Staff screen · 23 Lockers · Shop / App / Web bookings in one list"; }
+
+/* ---------- api ---------- */
+async function api(path, body){
+  const opt = body ? {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)} : {cache:"no-store"};
+  const r = await fetch(API + path, opt);
+  let d = {}; try { d = await r.json(); } catch(e) {}
+  if (!r.ok) throw Object.assign(new Error(d.error || ("Error " + r.status)), {data:d, status:r.status});
+  return d;
+}
+function msg(el, cls, text){ $(el).innerHTML = text ? `<div class="msg ${cls}">${esc(text)}</div>` : ""; }
+
+/* ---------- locker map ---------- */
+async function loadCabinet(){
+  try {
+    cab = await api("/api/cabinet");
+    drawGrid(); renderPrices();
+    $("freeCount").textContent = `Free: ${cab.free} of ${cab.total}`;
+    if (!STAFF && !cab.open_now) msg("notice","info","Online booking is open 7 AM – 9 PM. You can still view the lockers.");
+    else if (STAFF && cab.simulate_locks) msg("notice","info","Lock control is in SIMULATION mode – locks will not physically open.");
+    else msg("notice");
+  } catch(e) {
+    msg("notice","err", STAFF ? "Cannot reach the locker server." : "Online booking is unavailable right now. Please visit the shop at 52 A Car Street or call 8838075040.");
+  }
+}
+function drawGrid(){
+  const g = $("grid"); g.innerHTML = "";
+  g.style.gridTemplateColumns = `repeat(${cab.grid.cols},1fr)`;
+  g.style.gridTemplateRows = `repeat(${cab.grid.rows},1fr)`;
+  const t = cab.grid.tablet, tb = document.createElement("div");
+  tb.className = "cell tablet"; tb.innerHTML = "CONTROL<br>TABLET";
+  tb.style.gridColumn = `${t.col+1}`; tb.style.gridRow = `${t.row+1} / span ${t.span}`; g.appendChild(tb);
+  cab.lockers.forEach(l => {
+    const b = document.createElement("button");
+    b.className = `cell ${l.state}` + (selected === l.locker_no ? " sel" : "");
+    b.style.gridColumn = `${l.col+1}`; b.style.gridRow = `${l.row+1} / span ${l.span}`;
+    b.innerHTML = esc(l.locker_no) + (STAFF && l.booking ? `<small>${esc(l.booking.visitor_name).slice(0,12)}</small>` : "");
+    b.setAttribute("aria-label", `${l.locker_no} ${l.size} ${l.state}`);
+    b.onclick = () => tapLocker(l);
+    g.appendChild(b);
+  });
+}
+function tapLocker(l){
+  if (l.state === "FREE"){
+    selected = l.locker_no; $("bLocker").textContent = `${l.locker_no} (${l.size === "M" ? "Medium" : l.size === "L" ? "Large" : "Extra large"})`;
+    $("lockerPanel").innerHTML = ""; drawGrid(); resetBooking(true); showTab("book"); return;
+  }
+  if (!STAFF){ $("lockerPanel").innerHTML = `<div class="card msg info">Locker ${esc(l.locker_no)} is taken. Please choose a grey locker.</div>`; return; }
+  const b = l.booking; if (!b) return;
+  const items = itemText(b);
+  let html = `<div class="card"><h2>${esc(l.locker_no)} · ${esc(b.status)}</h2>
+    <div>${esc(b.visitor_name)} · ${esc(b.phone)} · <span class="tag">${esc(b.source)}</span></div>
+    <div class="small">Ref ${esc(b.ref)} · ${esc(items)} · Paid ${rupee(b.amount)} · Booked ${esc(b.created_at.slice(11,16))}</div>`;
+  if (b.status === "PENDING_PAYMENT"){
+    html += `<div class="small">Pay by ${esc((b.expires_at||"").slice(11,16))}. Check the Paytm app for ${rupee(b.amount)} with ref ${esc(b.ref)}.</div>
+      <div class="row2"><button class="btn ok" onclick="staffConfirm('${b.ref}')">✔ Payment received</button><button class="btn alt" onclick="staffCancel('${b.ref}')">Cancel</button></div>`;
+  } else {
+    html += `<div class="small">In use ${b.hours} h · Extra due: <b>${rupee(b.extra_due)}</b></div>
+      <div class="row2"><button class="btn" onclick="staffCheckout('${b.ref}', ${b.extra_due})">⬜ Checkout &amp; open locker</button>
+      <button class="btn alt" onclick="staffOpen('${l.locker_no}')">Open only</button></div>`;
+  }
+  $("lockerPanel").innerHTML = html + `<div id="panelMsg"></div></div>`;
+}
+const itemText = b => [["bag",b.bags],["helmet",b.helmets],["jumbo",b.jumbo]].filter(x=>x[1]).map(x=>x[1]+" "+x[0]).join(", ");
+
+/* ---------- booking form ---------- */
+function renderPrices(){
+  if (!cab) return;
+  const t = cab.tariff;
   for (const k in counts) $(k).textContent = counts[k];
-  const total = counts.bags*tariff.bag + counts.helmets*tariff.helmet + counts.jumbo*tariff.jumbo;
-  $("total").textContent = rupee(total);
-  document.querySelectorAll("[data-p]").forEach(el => el.textContent = rupee(tariff[el.dataset.p]) + " for " + baseHours + " hours");
-  $("hoursNote").textContent = "Covers " + baseHours + " hours. Extra time ₹" + tariff.extra_hour + " per hour, paid at the shop.";
-  $("bookBtn").disabled = total === 0;
+  $("total").textContent = rupee(counts.bags*t.bag + counts.helmets*t.helmet + counts.jumbo*t.jumbo);
+  document.querySelectorAll("[data-p]").forEach(el => el.textContent = rupee(t[el.dataset.p]) + " for " + cab.base_hours + " hours");
+  $("hoursNote").textContent = `Covers ${cab.base_hours} hours from payment. Extra ₹${t.extra_hour} per hour, paid at checkout.`;
 }
 document.querySelectorAll(".step button").forEach(b => b.addEventListener("click", () => {
-  const k = b.dataset.k, d = +b.dataset.d;
-  const sum = counts.bags + counts.helmets + counts.jumbo;
-  if (d > 0 && sum >= maxItems) return;
-  counts[k] = Math.max(0, counts[k] + d); render();
+  const sum = counts.bags + counts.helmets + counts.jumbo, d = +b.dataset.d;
+  if (d > 0 && cab && sum >= cab.max_items) return;
+  counts[b.dataset.k] = Math.max(0, counts[b.dataset.k] + d); renderPrices();
 }));
-
-function showMsg(el, cls, text){ el.innerHTML = ""; const d = document.createElement("div"); d.className = "msg " + cls; d.textContent = text; el.appendChild(d); }
-
-async function loadStatus(){
-  try {
-    const r = await fetch(API + "/api/status", {cache:"no-store"});
-    const s = await r.json();
-    tariff = s.tariff; baseHours = s.base_hours; render();
-    $("avail").textContent = "Free now: " + s.free_medium + " medium, " + s.free_large + " large lockers.";
-    if (!s.open_now){ $("closed").classList.remove("hidden"); $("closedMsg").textContent = "Online booking is open 7 AM – 9 PM. Please come back during shop hours."; $("bookBtn").disabled = true; }
-  } catch (e) {
-    $("closed").classList.remove("hidden");
-    $("closedMsg").textContent = "Online booking is unavailable right now. Please visit the shop at 52 A Car Street or call 8838075040.";
-    $("bookBtn").disabled = true; $("avail").textContent = "";
-  }
-}
-
-$("form").addEventListener("submit", async ev => {
+$("bookForm").addEventListener("submit", async ev => {
   ev.preventDefault();
-  const body = {name:$("name").value.trim(), mobile:$("mobile").value.trim(), ...counts};
-  $("bookBtn").disabled = true; $("formMsg").innerHTML = "";
+  if (!selected){ msg("bookMsg","err","Please tap a grey locker on the Locker Map first."); return; }
+  $("bookBtn").disabled = true; msg("bookMsg");
   try {
-    const r = await fetch(API + "/api/book", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
-    const d = await r.json();
-    if (!r.ok) { showMsg($("formMsg"), "err", d.error || "Booking failed."); $("bookBtn").disabled = false; return; }
-    showPay(d, body.mobile);
-  } catch (e) {
-    showMsg($("formMsg"), "err", "Could not reach the shop. Please try again or call 8838075040.");
-    $("bookBtn").disabled = false;
-  }
+    const d = await api("/api/book", {locker_no:selected, name:$("name").value.trim(), mobile:$("mobile").value.trim(),
+      aadhaar_last4: STAFF ? $("aadhaar").value.trim() : "", source: SOURCE, ...counts});
+    showPay(d, $("mobile").value.trim());
+  } catch(e) { msg("bookMsg","err", e.message); loadCabinet(); }
+  $("bookBtn").disabled = false;
 });
-
 function showPay(d, mobile){
-  $("form").classList.add("hidden");
-  $("pay").classList.remove("hidden");
-  $("pRef").textContent = d.ref; $("pLocker").textContent = d.locker_no;
-  $("pAmt").textContent = rupee(d.amount); $("pBy").textContent = d.pay_before;
-  $("pUpi").textContent = d.upi_id; $("upiBtn").href = d.upi_link;
-  const qr = qrcode(0, "M"); qr.addData(d.upi_link); qr.make();
-  $("qr").innerHTML = qr.createImgTag(6, 8);
-  try { localStorage.setItem("lastBooking", JSON.stringify({ref:d.ref, mobile})); } catch(e) {}
-  poll(d.ref, mobile);
+  cur = {ref:d.ref, mobile};
+  $("bookForm").classList.add("hidden"); $("pay").classList.remove("hidden");
+  $("pRef").textContent = d.ref; $("pLocker").textContent = d.locker_no; $("pAmt").textContent = rupee(d.amount);
+  $("pBy").textContent = d.pay_before; $("pUpi").textContent = d.upi_id; $("upiBtn").href = d.upi_link;
+  const q = qrcode(0,"M"); q.addData(d.upi_link); q.make(); $("qr").innerHTML = q.createImgTag(6,8);
+  $("payStatus").className = "msg info"; $("payStatus").textContent = STAFF ? "Show this QR to the customer. Press Payment received after checking the Paytm app." : "Waiting for the shop to confirm your payment…";
+  $("staffPayBtns").classList.toggle("hidden", !STAFF);
+  poll();
 }
-
-async function poll(ref, mobile){
+async function poll(){
+  clearTimeout(pollTimer); if (!cur) return;
   try {
-    const r = await fetch(API + "/api/booking?ref=" + encodeURIComponent(ref) + "&mobile=" + encodeURIComponent(mobile), {cache:"no-store"});
-    const d = await r.json();
-    if (d.status === "CONFIRMED") { $("statusMsg").className = "msg ok"; $("statusMsg").textContent = "Payment confirmed. Locker " + d.locker_no + " is booked. Show ref " + ref + " at the shop."; return; }
-    if (d.status === "EXPIRED" || d.status === "CANCELLED") { $("statusMsg").className = "msg err"; $("statusMsg").textContent = "This booking is " + d.status.toLowerCase() + ". If you already paid, please call 8838075040 with ref " + ref + "."; return; }
-  } catch (e) {}
-  setTimeout(() => poll(ref, mobile), 10000);
+    const d = await api(`/api/booking?ref=${encodeURIComponent(cur.ref)}&mobile=${encodeURIComponent(cur.mobile)}`);
+    if (d.status === "ACTIVE"){ $("payStatus").className="msg good"; $("payStatus").textContent=`Payment confirmed. Locker ${d.locker_no} is yours. Show ref ${cur.ref} at the shop.`; $("staffPayBtns").classList.add("hidden"); return; }
+    if (d.status === "EXPIRED" || d.status === "CANCELLED"){ $("payStatus").className="msg err"; $("payStatus").textContent=`This booking is ${d.status.toLowerCase()}. If you already paid, call 8838075040 with ref ${cur.ref}.`; $("staffPayBtns").classList.add("hidden"); return; }
+  } catch(e) {}
+  pollTimer = setTimeout(poll, 8000);
+}
+function resetBooking(keepLocker){
+  clearTimeout(pollTimer); cur = null;
+  $("pay").classList.add("hidden"); $("bookForm").classList.remove("hidden"); msg("bookMsg");
+  if (STAFF){ $("name").value = ""; $("mobile").value = ""; $("aadhaar").value = ""; }
+  counts.bags = 1; counts.helmets = 0; counts.jumbo = 0; renderPrices();
+  if (!keepLocker){ selected = null; $("bLocker").textContent = "tap a locker on the map"; showTab("map"); }
 }
 
-render(); loadStatus();
+/* ---------- staff actions ---------- */
+async function staffConfirm(ref){
+  try { const d = await api("/api/staff/confirm", {ref}); alertMsg(`Payment confirmed. Locker ${d.locker_no} ${d.lock_opened ? "opened" : "– open command FAILED, open manually"}.`, d.lock_opened); poll(); }
+  catch(e){ alertMsg(e.message, false); }
+  loadCabinet();
+}
+async function staffCancel(ref){
+  if (!confirm(`Cancel booking ${ref}?`)) return;
+  try { await api("/api/staff/cancel", {ref}); alertMsg(`Booking ${ref} cancelled.`, true); poll(); } catch(e){ alertMsg(e.message, false); }
+  loadCabinet();
+}
+async function staffCheckout(ref, extra){
+  if (extra > 0 && !confirm(`Collect extra ₹${extra} from the customer, then press OK.`)) return;
+  try { const d = await api("/api/staff/checkout", {ref, collect_extra: extra > 0}); alertMsg(`Checked out. Locker ${d.locker_no} ${d.lock_opened ? "opened" : "– open command FAILED, open manually"}.`, d.lock_opened); }
+  catch(e){ alertMsg(e.message, false); }
+  loadCabinet(); $("outResult").innerHTML = "";
+}
+async function staffOpen(locker_no){
+  if (!confirm(`Open locker ${locker_no} now?`)) return;
+  try { const d = await api("/api/staff/open", {locker_no}); alertMsg(d.ok ? `${locker_no} opened.` : `Open command failed.`, d.ok); } catch(e){ alertMsg(e.message, false); }
+}
+function alertMsg(t, ok){ const el = $("panelMsg") || $("outResult"); if (el) el.innerHTML = `<div class="msg ${ok?"good":"err"}">${esc(t)}</div>`; else alert(t); }
+async function findForCheckout(){
+  const m = $("outMobile").value.replace(/\D/g,"");
+  if (m.length !== 10){ $("outResult").innerHTML = `<div class="msg err">Enter a 10-digit mobile.</div>`; return; }
+  await loadCabinet();
+  const hits = cab.lockers.filter(l => l.booking && l.booking.phone === m && l.booking.status === "ACTIVE");
+  $("outResult").innerHTML = hits.length ? hits.map(l => `<div class="card"><b>${esc(l.locker_no)}</b> · ${esc(l.booking.visitor_name)} · ${esc(itemText(l.booking))}<div class="small">In use ${l.booking.hours} h · Extra due ${rupee(l.booking.extra_due)}</div>
+      <button class="btn" onclick="staffCheckout('${l.booking.ref}', ${l.booking.extra_due})">⬜ Checkout &amp; open ${esc(l.locker_no)}</button></div>`).join("")
+    : `<div class="msg info">No active locker for this mobile.</div>`;
+}
+async function loadAll(){
+  if (!$("fDate").value) $("fDate").value = new Date().toLocaleDateString("en-CA");
+  try {
+    const d = await api(`/api/staff/bookings?date=${$("fDate").value}&mobile=${encodeURIComponent($("fMobile").value)}`);
+    $("allSummary").textContent = `${d.count} bookings · collected ₹${d.collected}`;
+    $("allRows").innerHTML = d.bookings.map(b => `<tr><td>${esc(b.ref)}</td><td><span class="tag">${esc(b.source)}</span></td><td>${esc(b.locker_no)}</td><td>${esc(b.visitor_name)}</td><td>${esc(b.phone)}</td><td>${esc(itemText(b))}</td><td>${b.amount + b.extra_amount}</td><td>${esc(b.status)}</td><td>${esc(b.created_at.slice(11,16))}</td><td>${esc((b.paid_at||"").slice(11,16))}</td><td>${esc((b.checkout_time||"").slice(11,16))}</td></tr>`).join("");
+  } catch(e){ $("allSummary").textContent = e.message; }
+}
+
+showTab("map");
+setInterval(() => { if (!$("t-map").classList.contains("hidden")) loadCabinet(); }, STAFF ? 15000 : 30000);
 </script>
 </body>
 </html>
