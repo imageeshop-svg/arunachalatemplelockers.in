@@ -23,6 +23,7 @@
   .grid{display:grid;gap:2px;width:100%;max-width:780px;margin:0 auto;aspect-ratio:1.9;min-height:260px}
   .cell{border:0;font-weight:700;font-size:clamp(11px,2.2vw,17px);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:2px}
   .cell small{font-weight:400;font-size:clamp(9px,1.5vw,12px);opacity:.9}
+  .cell small.pre{font-weight:700;font-size:clamp(8px,1.3vw,11px);opacity:.75;letter-spacing:.5px;line-height:1}
   .FREE{background:var(--grey)} .OCCUPIED{background:var(--red)} .PENDING{background:var(--pend)}
   .cell.sel{outline:4px solid var(--gold);outline-offset:-4px}
   .cell.FREE:hover{filter:brightness(1.15)}
@@ -187,6 +188,11 @@ async function loadCabinet(){
     msg("notice","err", STAFF ? "Cannot reach the locker server." : "Online booking is unavailable right now. Please visit the shop at 52 A Car Street or call 8838075040.");
   }
 }
+/* "TVM-M108" -> small "TVM" line above "M108" so it fits in narrow boxes on phones */
+function cellLabel(id){
+  const i = String(id).indexOf("-");
+  return i > 0 ? `<small class="pre">${esc(id.slice(0,i))}</small>${esc(id.slice(i+1))}` : esc(id);
+}
 function drawGrid(){
   const g = $("grid"); g.innerHTML = "";
   g.style.gridTemplateColumns = `repeat(${cab.grid.cols},1fr)`;
@@ -198,7 +204,7 @@ function drawGrid(){
     const b = document.createElement("button");
     b.className = `cell ${l.state}` + (selected === l.locker_no ? " sel" : "");
     b.style.gridColumn = `${l.col+1}`; b.style.gridRow = `${l.row+1} / span ${l.span}`;
-    b.innerHTML = esc(l.locker_no) + (STAFF && l.booking ? `<small>${esc(l.booking.visitor_name).slice(0,12)}</small>` : "");
+    b.innerHTML = cellLabel(l.locker_no) + (STAFF && l.booking ? `<small>${esc(l.booking.visitor_name).slice(0,12)}</small>` : "");
     b.setAttribute("aria-label", `${l.locker_no} ${l.size} ${l.state}`);
     b.onclick = () => tapLocker(l);
     g.appendChild(b);
