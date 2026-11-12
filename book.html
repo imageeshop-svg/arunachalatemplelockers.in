@@ -120,10 +120,18 @@
     </form>
     <section id="pay" class="card center hidden">
       <div class="small">Booking ref</div><div class="big" id="pRef"></div>
-      <p>Locker <b id="pLocker"></b> is held.<br>Pay <b id="pAmt"></b> before <b id="pBy"></b>.</p>
-      <a class="btn" id="upiBtn" href="#">Pay with UPI app (GPay / PhonePe / Paytm)</a>
-      <p class="small">Or scan this QR:</p><div id="qr"></div>
-      <p class="small">UPI ID: <span id="pUpi"></span> · keep the booking ref in the payment note</p>
+      <div id="payOpts">
+        <p>Locker <b id="pLocker"></b> is held.<br>Pay <b id="pAmt"></b> before <b id="pBy"></b>.</p>
+        <a class="btn" id="upiBtn" href="#">Pay with UPI app (GPay / PhonePe / Paytm)</a>
+        <p class="small">Or scan this QR:</p><div id="qr"></div>
+        <p class="small">UPI ID: <span id="pUpi"></span> · keep the booking ref in the payment note</p>
+      </div>
+      <div id="paidBox" class="msg good hidden" style="font-size:16px">
+        <div style="font-size:22px;font-weight:800">✅ Payment successful</div>
+        <div>Booking ref <b id="paidRef"></b></div>
+        <div>Locker <b id="paidLocker"></b> · Amount paid <b id="paidAmt"></b></div>
+        <div class="small" style="color:inherit">Please do not pay again for this booking.</div>
+      </div>
       <div id="payStatus" class="msg info">Waiting for the shop to confirm your payment…</div>
       <button class="btn alt hidden" id="receiptBtn" type="button" onclick="printReceipt(lastStatus, cur && cur.mobile)">🧾 Print / Save receipt</button>
       <div id="staffPayBtns" class="row2 hidden">
@@ -314,18 +322,38 @@ function showPay(d, mobile){
   cur = {ref:d.ref, mobile};
   $("bookForm").classList.add("hidden"); $("pay").classList.remove("hidden");
   $("pRef").textContent = d.ref; $("pLocker").textContent = d.locker_no; $("pAmt").textContent = rupee(d.amount);
-  $("pBy").textContent = d.pay_before; $("pUpi").textContent = d.upi_id; $("upiBtn").href = d.upi_link;
-  const q = qrcode(0,"M"); q.addData(d.upi_link); q.make(); $("qr").innerHTML = q.createImgTag(6,8);
+  $("pBy").textContent = d.pay_before; $("pUpi").textContent = d.upi_id;
+  payable = true; $("upiBtn").href = d.upi_link;
+  $("payOpts").classList.remove("hidden"); $("paidBox").classList.add("hidden");
+  try { const q = qrcode(0,"M"); q.addData(d.upi_link); q.make(); $("qr").innerHTML = q.createImgTag(6,8); }
+  catch(e){ $("qr").innerHTML = ""; }     // QR library unavailable: UPI button + UPI ID still shown
   $("payStatus").className = "msg info"; $("payStatus").textContent = STAFF ? "Show this QR to the customer. Press Payment received after checking the Paytm app." : "Waiting for the shop to confirm your payment…";
   $("staffPayBtns").classList.toggle("hidden", !STAFF);
   poll();
 }
+/* Payment options are shown ONLY while the server says the booking can still be paid.
+   Paid -> options removed, "Payment successful". Expired/cancelled -> options removed (no retry). */
+let payable = false;
+function setPayView(d){
+  const paid = ["ACTIVE","CHECKED_OUT","NO_SHOW"].includes(d.status);
+  payable = d.status === "PENDING_PAYMENT" && d.can_pay !== false;
+  $("payOpts").classList.toggle("hidden", !payable);
+  if (!payable){ $("upiBtn").removeAttribute("href"); $("qr").innerHTML = ""; }
+  else if (d.upi_link && $("upiBtn").getAttribute("href") !== d.upi_link) $("upiBtn").href = d.upi_link;
+  $("paidBox").classList.toggle("hidden", !paid);
+  if (paid){ $("paidRef").textContent = d.ref; $("paidLocker").textContent = d.locker_no; $("paidAmt").textContent = rupee(d.amount); }
+}
+$("upiBtn").addEventListener("click", ev => { if (!payable) ev.preventDefault(); });
 async function poll(){
   clearTimeout(pollTimer); if (!cur) return;
   let next = 8000;
   try {
     const d = await api(`/api/booking?ref=${encodeURIComponent(cur.ref)}&mobile=${encodeURIComponent(cur.mobile)}`);
     lastStatus = d;
+    setPayView(d);
+    if (d.status === "PENDING_PAYMENT"){ $("payStatus").className = "msg info"; $("payStatus").textContent = STAFF
+      ? "Show this QR to the customer. Press Payment received after checking the Paytm app."
+      : `Payment not confirmed yet. Pay before ${d.pay_before || $("pBy").textContent}. If your payment failed, you can try again until then.`; }
     const paid = d.status === "ACTIVE" || d.status === "CHECKED_OUT";
     $("receiptBtn").classList.toggle("hidden", !paid);
     if (paid) $("staffPayBtns").classList.add("hidden");
@@ -348,6 +376,7 @@ async function poll(){
 }
 function resetBooking(keepLocker){
   clearTimeout(pollTimer); cur = null; lastStatus = null; $("receiptBtn").classList.add("hidden");
+  payable = false; $("paidBox").classList.add("hidden"); $("payOpts").classList.remove("hidden");
   $("pay").classList.add("hidden"); $("bookForm").classList.remove("hidden"); msg("bookMsg");
   if (STAFF){ $("name").value = ""; $("mobile").value = ""; $("aadhaar").value = ""; }
   counts.bags = 1; counts.helmets = 0; counts.jumbo = 0; renderPrices();
