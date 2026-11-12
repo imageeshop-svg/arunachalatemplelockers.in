@@ -52,6 +52,24 @@
   .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-bottom:10px}
   .toolbar input{width:auto}
   .small{font-size:12px;color:var(--muted)}
+  /* late-confirm dialog (staff) */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;padding:30px 10px;overflow:auto;z-index:10}
+  .overlay.hidden{display:none}
+  .overlay .card{width:100%;margin:0}
+  select{width:100%;padding:11px;font-size:16px;border-radius:7px;border:1px solid #3a4a72;background:#0f1730;color:#fff}
+  .check{display:flex;gap:8px;align-items:center;margin-top:12px;font-weight:600}
+  .check input{width:auto}
+  /* printable receipt */
+  #receiptWrap{display:none}
+  .rc{background:#fff;color:#111;max-width:420px;margin:0 auto;padding:18px;font-size:14px;line-height:1.45}
+  .rc h3{margin:0;font-size:18px} .rc .muted{color:#555;font-size:12px}
+  .rc table{font-size:14px;margin-top:10px} .rc th,.rc td{border-bottom:1px solid #ddd;color:#111;padding:5px 3px}
+  .rc td:last-child{text-align:right} .rc .ref{font-size:22px;font-weight:800;letter-spacing:1px}
+  @media print{
+    body > *:not(#receiptWrap){display:none !important}
+    body{background:#fff}
+    #receiptWrap{display:block !important}
+  }
 </style>
 </head>
 <body>
@@ -107,6 +125,7 @@
       <p class="small">Or scan this QR:</p><div id="qr"></div>
       <p class="small">UPI ID: <span id="pUpi"></span> · keep the booking ref in the payment note</p>
       <div id="payStatus" class="msg info">Waiting for the shop to confirm your payment…</div>
+      <button class="btn alt hidden" id="receiptBtn" type="button" onclick="printReceipt(lastStatus, cur && cur.mobile)">🧾 Print / Save receipt</button>
       <div id="staffPayBtns" class="row2 hidden">
         <button class="btn ok" onclick="staffConfirm(cur.ref)">✔ Payment received</button>
         <button class="btn alt" onclick="staffCancel(cur.ref)">Cancel</button>
@@ -134,10 +153,29 @@
       <button class="btn" style="width:auto;margin:0" onclick="loadAll()">Show</button>
     </div>
     <div id="allSummary" class="small"></div>
-    <table><thead><tr><th>Ref</th><th>Source</th><th>Locker</th><th>Name</th><th>Mobile</th><th>Items</th><th>₹</th><th>Status</th><th>Booked</th><th>Paid</th><th>Out</th></tr></thead>
+    <table><thead><tr><th>Ref</th><th>Source</th><th>Locker</th><th>Name</th><th>Mobile</th><th>Items</th><th>₹</th><th>Status</th><th>Booked</th><th>Paid</th><th>In</th><th>Out</th><th></th></tr></thead>
       <tbody id="allRows"></tbody></table>
   </section>
 </main>
+
+<!-- LATE CONFIRM (staff) -->
+<div id="lateBox" class="overlay hidden">
+  <form class="card" id="lateForm">
+    <h2 id="lateTitle">LATE CONFIRM</h2>
+    <div class="small" id="lateInfo"></div>
+    <label for="lateLocker">Locker (re-checked when you press Confirm)</label>
+    <select id="lateLocker"></select>
+    <label for="lateStaff">Staff ID / name</label><input id="lateStaff" maxlength="40" autocomplete="off">
+    <label for="lateReason">Reason</label><input id="lateReason" maxlength="300" placeholder="e.g. Paid 10:42 in Paytm, after hold expired">
+    <label class="check"><input type="checkbox" id="latePaid"> Payment verified in the Paytm app</label>
+    <div class="small">This does not open the locker or start the 10 hours. Use “Customer arrived – open locker” when the customer is here.</div>
+    <div class="row2"><button class="btn ok" type="submit" id="lateGo">Confirm</button><button class="btn alt" type="button" onclick="closeLate()">Close</button></div>
+    <div id="lateMsg"></div>
+  </form>
+</div>
+
+<!-- PRINTABLE RECEIPT (filled by printReceipt) -->
+<div id="receiptWrap"></div>
 
 <script>
 /* ONE screen for every channel. MODE is "public" on the website/app; the shop PC server swaps it to "staff". */
@@ -146,7 +184,15 @@ const STAFF = MODE === "staff";
 const API = STAFF ? "" : "https://book.arunachalatemplelockers.in";
 const SOURCE = (new URLSearchParams(location.search).get("source") || "").toUpperCase() === "APP" ? "APP" : "WEB";
 
-let cab = null, selected = null, cur = null, pollTimer = null;
+let cab = null, selected = null, cur = null, pollTimer = null, lastStatus = null, lastRows = {}, lateRef = null;
+/* "2026-11-12 21:00:00" -> "09:00 PM" (adds "13 Nov" when not today) */
+function fmtT(s){
+  if (!s) return "";
+  const d = s instanceof Date ? s : new Date(String(s).replace(" ", "T"));
+  if (isNaN(d)) return String(s);
+  const t = d.toLocaleTimeString("en-IN", {hour:"2-digit", minute:"2-digit", hour12:true});
+  return d.toDateString() === new Date().toDateString() ? t : t + ", " + d.toLocaleDateString("en-IN", {day:"numeric", month:"short"});
+}
 const counts = {bags:1, helmets:0, jumbo:0};
 const $ = id => document.getElementById(id);
 const rupee = n => "₹" + n;
@@ -217,6 +263,7 @@ function tapLocker(l){
   }
   if (!STAFF){ $("lockerPanel").innerHTML = `<div class="card msg info">Locker ${esc(l.locker_no)} is taken. Please choose a grey locker.</div>`; return; }
   const b = l.booking; if (!b) return;
+  lastRows[b.ref] = b;
   const items = itemText(b);
   let html = `<div class="card"><h2>${esc(l.locker_no)} · ${esc(b.status)}</h2>
     <div>${esc(b.visitor_name)} · ${esc(b.phone)} · <span class="tag">${esc(b.source)}</span></div>
@@ -224,10 +271,15 @@ function tapLocker(l){
   if (b.status === "PENDING_PAYMENT"){
     html += `<div class="small">Pay by ${esc((b.expires_at||"").slice(11,16))}. Check the Paytm app for ${rupee(b.amount)} with ref ${esc(b.ref)}.</div>
       <div class="row2"><button class="btn ok" onclick="staffConfirm('${b.ref}')">✔ Payment received</button><button class="btn alt" onclick="staffCancel('${b.ref}')">Cancel</button></div>`;
+  } else if (!b.checkin_at){
+    html += `<div class="msg info">Paid ${esc(fmtT(b.paid_at))} – waiting for the customer. Check in by <b>${esc(fmtT(b.valid_until))}</b>. The 10 hours start when the locker is opened.</div>
+      <div class="row2"><button class="btn ok" onclick="staffCheckin('${b.ref}')">✔ Customer arrived – open locker</button>
+      <button class="btn alt" onclick="printReceipt(lastRows['${b.ref}'], lastRows['${b.ref}'].phone)">🧾 Receipt</button></div>`;
   } else {
-    html += `<div class="small">In use ${b.hours} h · Extra due: <b>${rupee(b.extra_due)}</b></div>
+    html += `<div class="small">Checked in ${esc(fmtT(b.checkin_at))} · In use ${b.hours} h · Extra due: <b>${rupee(b.extra_due)}</b></div>
       <div class="row2"><button class="btn" onclick="staffCheckout('${b.ref}', ${b.extra_due})">⬜ Checkout &amp; open locker</button>
-      <button class="btn alt" onclick="staffOpen('${l.locker_no}')">Open only</button></div>`;
+      <button class="btn alt" onclick="staffOpen('${l.locker_no}')">Open only</button></div>
+      <button class="btn alt" onclick="printReceipt(lastRows['${b.ref}'], lastRows['${b.ref}'].phone)">🧾 Receipt</button>`;
   }
   $("lockerPanel").innerHTML = html + `<div id="panelMsg"></div></div>`;
 }
@@ -240,7 +292,7 @@ function renderPrices(){
   for (const k in counts) $(k).textContent = counts[k];
   $("total").textContent = rupee(counts.bags*t.bag + counts.helmets*t.helmet + counts.jumbo*t.jumbo);
   document.querySelectorAll("[data-p]").forEach(el => el.textContent = rupee(t[el.dataset.p]) + " for " + cab.base_hours + " hours");
-  $("hoursNote").textContent = `Covers ${cab.base_hours} hours from payment. Extra ₹${t.extra_hour} per hour, paid at checkout.`;
+  $("hoursNote").textContent = `Covers ${cab.base_hours} hours from check-in (when the locker is opened for you at the shop). Extra ₹${t.extra_hour} per hour, paid at checkout.`;
 }
 document.querySelectorAll(".step button").forEach(b => b.addEventListener("click", () => {
   const sum = counts.bags + counts.helmets + counts.jumbo, d = +b.dataset.d;
@@ -270,15 +322,32 @@ function showPay(d, mobile){
 }
 async function poll(){
   clearTimeout(pollTimer); if (!cur) return;
+  let next = 8000;
   try {
     const d = await api(`/api/booking?ref=${encodeURIComponent(cur.ref)}&mobile=${encodeURIComponent(cur.mobile)}`);
-    if (d.status === "ACTIVE"){ $("payStatus").className="msg good"; $("payStatus").textContent=`Payment confirmed. Locker ${d.locker_no} is yours. Show ref ${cur.ref} at the shop.`; $("staffPayBtns").classList.add("hidden"); return; }
-    if (d.status === "EXPIRED" || d.status === "CANCELLED"){ $("payStatus").className="msg err"; $("payStatus").textContent=`This booking is ${d.status.toLowerCase()}. If you already paid, call 8838075040 with ref ${cur.ref}.`; $("staffPayBtns").classList.add("hidden"); return; }
+    lastStatus = d;
+    const paid = d.status === "ACTIVE" || d.status === "CHECKED_OUT";
+    $("receiptBtn").classList.toggle("hidden", !paid);
+    if (paid) $("staffPayBtns").classList.add("hidden");
+    if (d.status === "ACTIVE" && d.checkin_at){
+      $("payStatus").className="msg good";
+      $("payStatus").textContent=`Checked in at ${fmtT(d.checkin_at)}. Locker ${d.locker_no} is yours for ${d.base_hours || 10} hours. Keep ref ${cur.ref} for collection.`;
+      return;
+    }
+    if (d.status === "ACTIVE"){
+      $("payStatus").className="msg good";
+      $("payStatus").textContent=`Payment confirmed. Locker ${d.locker_no} is reserved for you. Come to the shop at 52 A Car Street`
+        + (d.valid_until ? ` by ${fmtT(d.valid_until)}` : "") + ` and show ref ${cur.ref}. Your ${d.base_hours || 10} hours start when the locker is opened for you.`;
+      next = 30000;      // keep checking until the customer is checked in
+    }
+    if (d.status === "CHECKED_OUT"){ $("payStatus").className="msg good"; $("payStatus").textContent=`Collected at ${fmtT(d.checkout_time)}. Thank you!`; return; }
+    if (d.status === "NO_SHOW"){ $("payStatus").className="msg err"; $("payStatus").textContent=`The check-in time for this booking has passed. Please call 8838075040 with ref ${cur.ref}.`; return; }
+    if (d.status === "EXPIRED" || d.status === "CANCELLED"){ $("payStatus").className="msg err"; $("payStatus").textContent=`This booking is ${d.status.toLowerCase()}. If you already paid, come to the shop or call 8838075040 with ref ${cur.ref} – the shop can still confirm it.`; $("staffPayBtns").classList.add("hidden"); return; }
   } catch(e) {}
-  pollTimer = setTimeout(poll, 8000);
+  pollTimer = setTimeout(poll, next);
 }
 function resetBooking(keepLocker){
-  clearTimeout(pollTimer); cur = null;
+  clearTimeout(pollTimer); cur = null; lastStatus = null; $("receiptBtn").classList.add("hidden");
   $("pay").classList.add("hidden"); $("bookForm").classList.remove("hidden"); msg("bookMsg");
   if (STAFF){ $("name").value = ""; $("mobile").value = ""; $("aadhaar").value = ""; }
   counts.bags = 1; counts.helmets = 0; counts.jumbo = 0; renderPrices();
@@ -287,9 +356,20 @@ function resetBooking(keepLocker){
 
 /* ---------- staff actions ---------- */
 async function staffConfirm(ref){
-  try { const d = await api("/api/staff/confirm", {ref}); alertMsg(`Payment confirmed. Locker ${d.locker_no} ${d.lock_opened ? "opened" : "– open command FAILED, open manually"}.`, d.lock_opened); poll(); }
+  try {
+    const d = await api("/api/staff/confirm", {ref});
+    if (d.checked_in) alertMsg(`Payment confirmed and checked in. Locker ${d.locker_no} ${d.lock_opened ? "opened" : "– open command FAILED, open manually"}.`, d.lock_opened);
+    else alertMsg(`Payment confirmed. Locker ${d.locker_no} reserved until ${fmtT(d.valid_until)}. Press “Customer arrived – open locker” when the customer comes.`, true);
+    poll();
+  }
   catch(e){ alertMsg(e.message, false); }
   loadCabinet();
+}
+async function staffCheckin(ref){
+  if (!confirm(`Customer is at the counter with ref ${ref}? The locker will open and the 10 hours start now.`)) return;
+  try { const d = await api("/api/staff/checkin", {ref}); alertMsg(`Checked in at ${fmtT(d.checkin_at)}. Locker ${d.locker_no} ${d.lock_opened ? "opened" : "– open command FAILED, open manually"}.`, d.lock_opened); }
+  catch(e){ alertMsg(e.message, false); }
+  await loadCabinet(); if ($("outMobile").value) findForCheckout();
 }
 async function staffCancel(ref){
   if (!confirm(`Cancel booking ${ref}?`)) return;
@@ -312,7 +392,10 @@ async function findForCheckout(){
   if (m.length !== 10){ $("outResult").innerHTML = `<div class="msg err">Enter a 10-digit mobile.</div>`; return; }
   await loadCabinet();
   const hits = cab.lockers.filter(l => l.booking && l.booking.phone === m && l.booking.status === "ACTIVE");
-  $("outResult").innerHTML = hits.length ? hits.map(l => `<div class="card"><b>${esc(l.locker_no)}</b> · ${esc(l.booking.visitor_name)} · ${esc(itemText(l.booking))}<div class="small">In use ${l.booking.hours} h · Extra due ${rupee(l.booking.extra_due)}</div>
+  $("outResult").innerHTML = hits.length ? hits.map(l => !l.booking.checkin_at
+    ? `<div class="card"><b>${esc(l.locker_no)}</b> · ${esc(l.booking.visitor_name)} · ${esc(itemText(l.booking))}<div class="small">Paid – not checked in yet (check in by ${esc(fmtT(l.booking.valid_until))})</div>
+      <button class="btn ok" onclick="staffCheckin('${l.booking.ref}')">✔ Customer arrived – open ${esc(l.locker_no)}</button></div>`
+    : `<div class="card"><b>${esc(l.locker_no)}</b> · ${esc(l.booking.visitor_name)} · ${esc(itemText(l.booking))}<div class="small">Checked in ${esc(fmtT(l.booking.checkin_at))} · In use ${l.booking.hours} h · Extra due ${rupee(l.booking.extra_due)}</div>
       <button class="btn" onclick="staffCheckout('${l.booking.ref}', ${l.booking.extra_due})">⬜ Checkout &amp; open ${esc(l.locker_no)}</button></div>`).join("")
     : `<div class="msg info">No active locker for this mobile.</div>`;
 }
@@ -321,8 +404,81 @@ async function loadAll(){
   try {
     const d = await api(`/api/staff/bookings?date=${$("fDate").value}&mobile=${encodeURIComponent($("fMobile").value)}`);
     $("allSummary").textContent = `${d.count} bookings · collected ₹${d.collected}`;
-    $("allRows").innerHTML = d.bookings.map(b => `<tr><td>${esc(b.ref)}</td><td><span class="tag">${esc(b.source)}</span></td><td>${esc(b.locker_no)}</td><td>${esc(b.visitor_name)}</td><td>${esc(b.phone)}</td><td>${esc(itemText(b))}</td><td>${b.amount + b.extra_amount}</td><td>${esc(b.status)}</td><td>${esc(b.created_at.slice(11,16))}</td><td>${esc((b.paid_at||"").slice(11,16))}</td><td>${esc((b.checkout_time||"").slice(11,16))}</td></tr>`).join("");
+    d.bookings.forEach(b => lastRows[b.ref] = b);
+    $("allRows").innerHTML = d.bookings.map(b => {
+      const notes = (b.audit||[]).map(a => `<div class="small">${a.action === "LATE_CONFIRM" ? "Late confirm" : "Re-opened"} by ${esc(a.staff_id)} ${esc(a.at.slice(11,16))}${a.old_locker !== a.new_locker ? ` (${esc(a.old_locker)} → ${esc(a.new_locker)})` : ""}: ${esc(a.reason)}</div>`).join("");
+      const act = (b.status === "EXPIRED" || b.status === "NO_SHOW")
+        ? `<button class="btn alt" style="margin:0;padding:6px 10px;width:auto;font-size:13px" onclick="openLate('${b.ref}')">${b.status === "EXPIRED" ? "Late confirm" : "Re-open"}</button>`
+        : (["ACTIVE","CHECKED_OUT"].includes(b.status) ? `<button class="btn alt" style="margin:0;padding:6px 10px;width:auto;font-size:13px" onclick="printReceipt(lastRows['${b.ref}'], lastRows['${b.ref}'].phone)">🧾</button>` : "");
+      return `<tr><td>${esc(b.ref)}</td><td><span class="tag">${esc(b.source)}</span></td><td>${esc(b.locker_no)}</td><td>${esc(b.visitor_name)}</td><td>${esc(b.phone)}</td><td>${esc(itemText(b))}</td><td>${b.amount + b.extra_amount}</td><td>${esc(b.status)}${notes}</td><td>${esc(b.created_at.slice(11,16))}</td><td>${esc((b.paid_at||"").slice(11,16))}</td><td>${esc((b.checkin_at||"").slice(11,16))}</td><td>${esc((b.checkout_time||"").slice(11,16))}</td><td>${act}</td></tr>`;
+    }).join("");
   } catch(e){ $("allSummary").textContent = e.message; }
+}
+
+/* ---------- late confirm / re-open (staff) ---------- */
+async function openLate(ref){
+  const b = lastRows[ref]; if (!b) return;
+  lateRef = ref;
+  await loadCabinet();
+  const ok = l => l.state === "FREE" && (!b.jumbo || l.size !== "M");
+  const free = cab.lockers.filter(ok).map(l => l.locker_no);
+  const origFree = free.includes(b.locker_no);
+  $("lateTitle").textContent = b.status === "EXPIRED" ? "LATE CONFIRM – payment after hold expired" : "RE-OPEN – customer arrived after check-in time";
+  $("lateInfo").textContent = `Ref ${b.ref} · ${b.visitor_name} · ${b.phone} · ${itemText(b)} · ₹${b.amount} · original locker ${b.locker_no}` + (origFree ? " (still free)" : " – NOW TAKEN, choose another");
+  $("lateLocker").innerHTML = (origFree ? "" : `<option value="">– choose a free locker –</option>`)
+    + free.map(n => `<option value="${esc(n)}"${n === b.locker_no ? " selected" : ""}>${esc(n)}${n === b.locker_no ? " (original)" : ""}</option>`).join("");
+  $("lateReason").value = ""; $("latePaid").checked = false; $("lateMsg").innerHTML = "";
+  $("lateBox").classList.remove("hidden");
+}
+function closeLate(){ $("lateBox").classList.add("hidden"); lateRef = null; }
+$("lateForm").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  if (!$("lateLocker").value){ $("lateMsg").innerHTML = `<div class="msg err">Choose a free locker.</div>`; return; }
+  $("lateGo").disabled = true;
+  try {
+    const d = await api("/api/staff/late_confirm", {ref: lateRef, locker_no: $("lateLocker").value,
+      staff_id: $("lateStaff").value.trim(), reason: $("lateReason").value.trim(), payment_verified: $("latePaid").checked});
+    $("lateMsg").innerHTML = `<div class="msg good">Done. ${esc(d.ref)} is paid on locker ${esc(d.locker_no)}. Check in by ${esc(fmtT(d.valid_until))} – press “Customer arrived – open locker” on the map.</div>`;
+    loadAll(); loadCabinet();
+  } catch(e){
+    $("lateMsg").innerHTML = `<div class="msg err">${esc(e.message)}</div>`;
+    if (e.data && e.data.locker_taken) openLate(lateRef);
+  }
+  $("lateGo").disabled = false;
+});
+
+/* ---------- printable receipt (Print / Save as PDF) ---------- */
+function printReceipt(b, phone){
+  if (!b) return;
+  const t = (cab && cab.tariff) || {bag:50, helmet:50, jumbo:100, extra_hour:10};
+  const hrs = b.base_hours || (cab && cab.base_hours) || 10;
+  const name = b.visitor_name || b.name || "";
+  const ph = String(phone || b.phone || ""); const masked = ph ? "xxxxxx" + ph.slice(-4) : "";
+  const lines = [["Medium bag", b.bags, t.bag], ["Helmet", b.helmets, t.helmet], ["Jumbo suitcase", b.jumbo, t.jumbo]]
+    .filter(x => x[1]).map(x => `<tr><td>${x[0]} × ${x[1]}</td><td>₹${x[1]*x[2]}</td></tr>`).join("");
+  let until = "";
+  if (b.checkin_at){ const s = new Date(String(b.checkin_at).replace(" ","T")); s.setHours(s.getHours() + hrs); until = fmtT(s); }
+  const extra = b.extra_amount || 0;
+  $("receiptWrap").innerHTML = `<div class="rc">
+    <h3>Arunachala Digital Luggage Lockers</h3>
+    <div class="muted">52 A Car Street, Tiruvannamalai – 606601 · +91 88380 75040</div>
+    <p style="margin:12px 0 2px"><b>Booking receipt</b> · ${esc(b.status)}</p>
+    <div class="ref">${esc(b.ref)}</div>
+    <table>
+      <tr><td>Locker</td><td><b>${esc(b.locker_no)}</b></td></tr>
+      <tr><td>Name</td><td>${esc(name)}</td></tr>
+      <tr><td>Mobile</td><td>${esc(masked)}</td></tr>
+      ${lines}
+      <tr><td><b>Paid (${hrs} hours)</b></td><td><b>₹${b.amount}</b></td></tr>
+      ${extra ? `<tr><td>Extra hours paid at checkout</td><td>₹${extra}</td></tr><tr><td><b>Total</b></td><td><b>₹${b.amount + extra}</b></td></tr>` : ""}
+      <tr><td>Payment confirmed</td><td>${esc(fmtT(b.paid_at))}</td></tr>
+      ${b.checkin_at ? `<tr><td>Checked in</td><td>${esc(fmtT(b.checkin_at))}</td></tr><tr><td>${hrs} hours end</td><td>${esc(until)}</td></tr>`
+                     : (b.valid_until ? `<tr><td>Check in by</td><td>${esc(fmtT(b.valid_until))}</td></tr>` : "")}
+      ${b.checkout_time ? `<tr><td>Collected</td><td>${esc(fmtT(b.checkout_time))}</td></tr>` : ""}
+    </table>
+    <p class="muted">Your ${hrs} hours start when the locker is opened for you at the shop. After ${hrs} hours: ₹${t.extra_hour} per extra hour (part of an hour counts as a full hour), paid at checkout. Show this booking ref to collect your luggage.</p>
+  </div>`;
+  window.print();
 }
 
 showTab("map");
