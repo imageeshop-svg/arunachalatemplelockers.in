@@ -129,7 +129,7 @@
         </div>
         <div id="rzpOpts" class="hidden">
           <button class="btn" id="rzpBtn" type="button">Pay <span id="rzpAmt"></span> now (UPI / Card / Net banking)</button>
-          <p class="small">Secure payment by Razorpay. Your locker is confirmed automatically when the payment succeeds.</p>
+          <p class="small">Secure payment by <span id="gwName">Razorpay</span>. Your locker is confirmed automatically when the payment succeeds.</p>
         </div>
       </div>
       <div id="paidBox" class="msg good hidden" style="font-size:16px">
@@ -181,7 +181,7 @@
     <select id="lateLocker"></select>
     <label for="lateStaff">Staff ID / name</label><input id="lateStaff" maxlength="40" autocomplete="off">
     <label for="lateReason">Reason</label><input id="lateReason" maxlength="300" placeholder="e.g. Paid 10:42 in Paytm, after hold expired">
-    <label class="check"><input type="checkbox" id="latePaid"> Payment verified (Paytm app / Razorpay dashboard)</label>
+    <label class="check"><input type="checkbox" id="latePaid"> Payment verified (Paytm app / Cashfree or Razorpay dashboard)</label>
     <div class="small">This does not open the locker or start the 10 hours. Use “Customer arrived – open locker” when the customer is here.</div>
     <div class="row2"><button class="btn ok" type="submit" id="lateGo">Confirm</button><button class="btn alt" type="button" onclick="closeLate()">Close</button></div>
     <div id="lateMsg"></div>
@@ -242,7 +242,7 @@ async function loadCabinet(){
     drawGrid(); renderPrices();
     $("freeCount").textContent = `Free: ${cab.free} of ${cab.total}`;
     if (!STAFF && !cab.open_now) msg("notice","info","Online booking is open 7 AM – 9 PM. You can still view the lockers.");
-    else if (STAFF && cab.payment_exceptions) msg("notice","err",`⚠ ${cab.payment_exceptions} online payment(s) need action – open 📋 All Bookings and use “Assign locker”, or refund in Razorpay.`);
+    else if (STAFF && cab.payment_exceptions) msg("notice","err",`⚠ ${cab.payment_exceptions} online payment(s) need action – open 📋 All Bookings and use “Assign locker”, or refund in the payment gateway (Cashfree / Razorpay).`);
     else if (STAFF && cab.simulate_locks) msg("notice","info","Lock control is in SIMULATION mode – locks will not physically open.");
     else msg("notice");
   } catch(e) {
@@ -283,8 +283,9 @@ function tapLocker(l){
   let html = `<div class="card"><h2>${esc(l.locker_no)} · ${esc(b.status)}</h2>
     <div>${esc(b.visitor_name)} · ${esc(b.phone)} · <span class="tag">${esc(b.source)}</span></div>
     <div class="small">Ref ${esc(b.ref)} · ${esc(items)} · Paid ${rupee(b.amount)} · Booked ${esc(b.created_at.slice(11,16))}</div>`;
-  if (b.status === "PENDING_PAYMENT" && b.pay_mode === "razorpay"){
-    html += `<div class="msg info">⏳ Waiting for online payment of ${rupee(b.amount)} (Razorpay) – pay by ${esc((b.expires_at||"").slice(11,16))}. It confirms automatically; no button needed.</div>
+  if (b.status === "PENDING_PAYMENT" && b.pay_mode && b.pay_mode !== "manual"){
+    const gwn = b.pay_mode === "cashfree" ? "Cashfree" : "Razorpay";
+    html += `<div class="msg info">⏳ Waiting for online payment of ${rupee(b.amount)} (${gwn}${b.pay_test ? " TEST" : ""}) – pay by ${esc((b.expires_at||"").slice(11,16))}. It confirms automatically; no button needed.</div>
       <button class="btn alt" onclick="staffCancel('${b.ref}')">Cancel booking</button>`;
   } else if (b.status === "PENDING_PAYMENT"){
     html += `<div class="small">Pay by ${esc((b.expires_at||"").slice(11,16))}. Check the Paytm app for ${rupee(b.amount)} with ref ${esc(b.ref)}.</div>
@@ -328,20 +329,22 @@ $("bookForm").addEventListener("submit", async ev => {
   } catch(e) { msg("bookMsg","err", e.message); loadCabinet(); }
   $("bookBtn").disabled = false;
 });
-function showPay(d, mobile){
+function showPay(d, mobile, noAutoOpen){
   cur = {ref:d.ref, mobile};
   $("bookForm").classList.add("hidden"); $("pay").classList.remove("hidden");
   $("pRef").textContent = d.ref; $("pLocker").textContent = d.locker_no; $("pAmt").textContent = rupee(d.amount);
   $("pBy").textContent = d.pay_before;
-  payable = true; rzp = d.razorpay || null;
+  payable = true; rzp = d.razorpay || null; cf = d.cashfree || null;
   $("payOpts").classList.remove("hidden"); $("paidBox").classList.add("hidden");
-  $("upiOpts").classList.toggle("hidden", !!rzp); $("rzpOpts").classList.toggle("hidden", !rzp);
-  if (rzp){
+  const online = !!(rzp || cf);
+  $("upiOpts").classList.toggle("hidden", online); $("rzpOpts").classList.toggle("hidden", !online);
+  $("gwName").textContent = cf ? "Cashfree" + (cf.mode === "sandbox" ? " (TEST mode – no real money)" : "") : "Razorpay";
+  if (online){
     $("rzpAmt").textContent = rupee(d.amount); $("upiBtn").removeAttribute("href"); $("qr").innerHTML = "";
     $("payStatus").className = "msg info"; $("payStatus").textContent = "Waiting for payment…";
-    $("staffPayBtns").classList.add("hidden");          // no manual button: Razorpay confirms it
+    $("staffPayBtns").classList.add("hidden");          // no manual button: the gateway confirms it
     if (STAFF){ const sb = $("staffPayBtns"); sb.classList.remove("hidden"); sb.querySelector(".btn.ok").classList.add("hidden"); }
-    openCheckout();
+    if (!noAutoOpen) openCheckout();
   } else {
     $("pUpi").textContent = d.upi_id; $("upiBtn").href = d.upi_link;
     try { const q = qrcode(0,"M"); q.addData(d.upi_link); q.make(); $("qr").innerHTML = q.createImgTag(6,8); }
@@ -363,7 +366,37 @@ function loadRzpScript(){
     document.head.appendChild(s);
   });
 }
+/* ---------- Cashfree Checkout (popup). Browser result is only a hint: the server asks Cashfree. ---------- */
+let cf = null;
+function loadCfScript(){
+  return new Promise((res, rej) => {
+    if (window.Cashfree) return res();
+    const s = document.createElement("script"); s.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+    s.onload = res; s.onerror = () => rej(new Error("Could not load the payment window. Check your internet and try again."));
+    document.head.appendChild(s);
+  });
+}
+async function openCashfree(){
+  if (!cf || !payable || !cur) return;
+  try { await loadCfScript(); }
+  catch(e){ $("payStatus").className = "msg err"; $("payStatus").textContent = e.message; return; }
+  const ref = cur.ref, mobile = cur.mobile;
+  try { sessionStorage.setItem("tvmPending", JSON.stringify({ref, mobile})); } catch(e) {}   // for a bank redirect
+  const verify = () => api("/api/payment/verify", {ref, mobile}).catch(() => {}).finally(() => poll());
+  let result;
+  try { result = await Cashfree({mode: cf.mode === "production" ? "production" : "sandbox"})
+          .checkout({paymentSessionId: cf.payment_session_id, redirectTarget: "_modal"}); }
+  catch(e){ result = {error: {message: e && e.message}}; }
+  if (result && result.paymentDetails){
+    $("payStatus").className = "msg info"; $("payStatus").textContent = "Payment done – confirming with the bank…";
+  } else if (result && result.error){
+    $("payStatus").className = "msg err";
+    $("payStatus").textContent = `Payment not completed${result.error.message ? ": " + result.error.message : ""}. You can try again until ${$("pBy").textContent}.`;
+  }
+  if (!(result && result.redirect)) verify();
+}
 async function openCheckout(){
+  if (cf) return openCashfree();
   if (!rzp || !payable || !cur) return;
   try { await loadRzpScript(); }
   catch(e){ $("payStatus").className = "msg err"; $("payStatus").textContent = e.message; return; }
@@ -393,8 +426,9 @@ function setPayView(d){
   payable = d.status === "PENDING_PAYMENT" && d.can_pay !== false;
   $("payOpts").classList.toggle("hidden", !payable);
   if (payable && d.razorpay) rzp = d.razorpay;
+  if (payable && d.cashfree) cf = d.cashfree;
   if (!payable){ $("upiBtn").removeAttribute("href"); $("qr").innerHTML = ""; }
-  else if (!rzp && d.upi_link && $("upiBtn").getAttribute("href") !== d.upi_link) $("upiBtn").href = d.upi_link;
+  else if (!rzp && !cf && d.upi_link && $("upiBtn").getAttribute("href") !== d.upi_link) $("upiBtn").href = d.upi_link;
   $("paidBox").classList.toggle("hidden", !paid);
   if (paid){ $("paidRef").textContent = d.ref; $("paidLocker").textContent = d.locker_no; $("paidAmt").textContent = rupee(d.amount); }
 }
@@ -406,7 +440,7 @@ async function poll(){
     const d = await api(`/api/booking?ref=${encodeURIComponent(cur.ref)}&mobile=${encodeURIComponent(cur.mobile)}`);
     lastStatus = d;
     setPayView(d);
-    if (d.status === "PENDING_PAYMENT" && rzp){ if ($("payStatus").className !== "msg err"){ $("payStatus").className = "msg info";
+    if (d.status === "PENDING_PAYMENT" && (rzp || cf)){ if ($("payStatus").className !== "msg err"){ $("payStatus").className = "msg info";
       $("payStatus").textContent = `Waiting for payment… Pay before ${d.pay_before || $("pBy").textContent}. If a payment fails, you can try again until then.`; } }
     else if (d.status === "PENDING_PAYMENT"){ $("payStatus").className = "msg info"; $("payStatus").textContent = STAFF
       ? "Show this QR to the customer. Press Payment received after checking the Paytm app."
@@ -433,7 +467,8 @@ async function poll(){
   pollTimer = setTimeout(poll, next);
 }
 function resetBooking(keepLocker){
-  clearTimeout(pollTimer); cur = null; lastStatus = null; $("receiptBtn").classList.add("hidden");
+  clearTimeout(pollTimer); cur = null; lastStatus = null; rzp = null; cf = null; $("receiptBtn").classList.add("hidden");
+  try { sessionStorage.removeItem("tvmPending"); } catch(e) {}
   payable = false; $("paidBox").classList.add("hidden"); $("payOpts").classList.remove("hidden");
   $("pay").classList.add("hidden"); $("bookForm").classList.remove("hidden"); msg("bookMsg");
   if (STAFF){ $("name").value = ""; $("mobile").value = ""; $("aadhaar").value = ""; }
@@ -495,8 +530,8 @@ async function loadAll(){
     $("allRows").innerHTML = d.bookings.map(b => {
       const AL = {LATE_CONFIRM:"Late confirm", REOPEN_NO_SHOW:"Re-opened", AUTO_LATE_CONFIRM:"Auto-confirmed (late online payment)",
                   PAYMENT_EXCEPTION:"⚠ Payment exception", ASSIGN_PAID:"Locker assigned (paid online)", REFUND:"Refund"};
-      const notes = (b.audit||[]).map(a => `<div class="small">${AL[a.action] || esc(a.action)}${a.staff_id && a.staff_id !== "RAZORPAY" ? " by " + esc(a.staff_id) : ""} ${esc(a.at.slice(11,16))}${a.new_locker && a.old_locker !== a.new_locker ? ` (${esc(a.old_locker)} → ${esc(a.new_locker)})` : ""}: ${esc(a.reason)}</div>`).join("")
-        + (b.payment ? `<div class="small">💳 Razorpay ${esc(b.payment.mode)}: ${esc(b.payment.status)}${b.payment.payment_id ? " · " + esc(b.payment.payment_id) : ""}${b.payment.refund_status ? " · refund " + esc(b.payment.refund_status) + " ₹" + (b.payment.refunded_paise/100) : ""}</div>` : "")
+      const notes = (b.audit||[]).map(a => `<div class="small">${AL[a.action] || esc(a.action)}${a.staff_id && !["RAZORPAY","CASHFREE"].includes(a.staff_id) ? " by " + esc(a.staff_id) : ""} ${esc(a.at.slice(11,16))}${a.new_locker && a.old_locker !== a.new_locker ? ` (${esc(a.old_locker)} → ${esc(a.new_locker)})` : ""}: ${esc(a.reason)}</div>`).join("")
+        + (b.payment ? `<div class="small">💳 ${b.payment.provider === "CASHFREE" ? "Cashfree" : "Razorpay"} ${esc(b.payment.mode)}: ${esc(b.payment.status)}${b.payment.payment_id ? " · " + esc(b.payment.payment_id) : ""}${b.payment.refund_status ? " · refund " + esc(b.payment.refund_status) + " ₹" + (b.payment.refunded_paise/100) : ""}</div>` : "")
         + (b.payment && b.payment.exception ? `<div class="small" style="color:var(--red);font-weight:700">⚠ ${esc(b.payment.exception)}</div>` : "");
       const needs = b.payment && b.payment.status === "NEEDS_ACTION";
       const act = (b.status === "EXPIRED" || b.status === "NO_SHOW" || (needs && b.status === "CANCELLED"))
@@ -575,6 +610,18 @@ function printReceipt(b, phone){
 }
 
 showTab("map");
+/* Back from a bank page after a Cashfree payment (?cf_order=...): show that booking's status again. */
+(async () => {
+  if (STAFF || !new URLSearchParams(location.search).get("cf_order")) return;
+  let saved = null; try { saved = JSON.parse(sessionStorage.getItem("tvmPending") || "null"); } catch(e) {}
+  history.replaceState(null, "", location.pathname);
+  if (!saved || !saved.ref) return;
+  try {
+    await api("/api/payment/verify", {ref: saved.ref, mobile: saved.mobile}).catch(() => {});
+    const d = await api(`/api/booking?ref=${encodeURIComponent(saved.ref)}&mobile=${encodeURIComponent(saved.mobile)}`);
+    showTab("book"); showPay(Object.assign({pay_before: d.pay_before || "–"}, d), saved.mobile, true);
+  } catch(e) {}
+})();
 setInterval(() => { if (!$("t-map").classList.contains("hidden")) loadCabinet(); }, STAFF ? 15000 : 30000);
 </script>
 </body>
