@@ -122,9 +122,15 @@
       <div class="small">Booking ref</div><div class="big" id="pRef"></div>
       <div id="payOpts">
         <p>Locker <b id="pLocker"></b> is held.<br>Pay <b id="pAmt"></b> before <b id="pBy"></b>.</p>
-        <a class="btn" id="upiBtn" href="#">Pay with UPI app (GPay / PhonePe / Paytm)</a>
-        <p class="small">Or scan this QR:</p><div id="qr"></div>
-        <p class="small">UPI ID: <span id="pUpi"></span> · keep the booking ref in the payment note</p>
+        <div id="upiOpts">
+          <a class="btn" id="upiBtn" href="#">Pay with UPI app (GPay / PhonePe / Paytm)</a>
+          <p class="small">Or scan this QR:</p><div id="qr"></div>
+          <p class="small">UPI ID: <span id="pUpi"></span> · keep the booking ref in the payment note</p>
+        </div>
+        <div id="rzpOpts" class="hidden">
+          <button class="btn" id="rzpBtn" type="button">Pay <span id="rzpAmt"></span> now (UPI / Card / Net banking)</button>
+          <p class="small">Secure payment by Razorpay. Your locker is confirmed automatically when the payment succeeds.</p>
+        </div>
       </div>
       <div id="paidBox" class="msg good hidden" style="font-size:16px">
         <div style="font-size:22px;font-weight:800">✅ Payment successful</div>
@@ -175,7 +181,7 @@
     <select id="lateLocker"></select>
     <label for="lateStaff">Staff ID / name</label><input id="lateStaff" maxlength="40" autocomplete="off">
     <label for="lateReason">Reason</label><input id="lateReason" maxlength="300" placeholder="e.g. Paid 10:42 in Paytm, after hold expired">
-    <label class="check"><input type="checkbox" id="latePaid"> Payment verified in the Paytm app</label>
+    <label class="check"><input type="checkbox" id="latePaid"> Payment verified (Paytm app / Razorpay dashboard)</label>
     <div class="small">This does not open the locker or start the 10 hours. Use “Customer arrived – open locker” when the customer is here.</div>
     <div class="row2"><button class="btn ok" type="submit" id="lateGo">Confirm</button><button class="btn alt" type="button" onclick="closeLate()">Close</button></div>
     <div id="lateMsg"></div>
@@ -236,6 +242,7 @@ async function loadCabinet(){
     drawGrid(); renderPrices();
     $("freeCount").textContent = `Free: ${cab.free} of ${cab.total}`;
     if (!STAFF && !cab.open_now) msg("notice","info","Online booking is open 7 AM – 9 PM. You can still view the lockers.");
+    else if (STAFF && cab.payment_exceptions) msg("notice","err",`⚠ ${cab.payment_exceptions} online payment(s) need action – open 📋 All Bookings and use “Assign locker”, or refund in Razorpay.`);
     else if (STAFF && cab.simulate_locks) msg("notice","info","Lock control is in SIMULATION mode – locks will not physically open.");
     else msg("notice");
   } catch(e) {
@@ -276,7 +283,10 @@ function tapLocker(l){
   let html = `<div class="card"><h2>${esc(l.locker_no)} · ${esc(b.status)}</h2>
     <div>${esc(b.visitor_name)} · ${esc(b.phone)} · <span class="tag">${esc(b.source)}</span></div>
     <div class="small">Ref ${esc(b.ref)} · ${esc(items)} · Paid ${rupee(b.amount)} · Booked ${esc(b.created_at.slice(11,16))}</div>`;
-  if (b.status === "PENDING_PAYMENT"){
+  if (b.status === "PENDING_PAYMENT" && b.pay_mode === "razorpay"){
+    html += `<div class="msg info">⏳ Waiting for online payment of ${rupee(b.amount)} (Razorpay) – pay by ${esc((b.expires_at||"").slice(11,16))}. It confirms automatically; no button needed.</div>
+      <button class="btn alt" onclick="staffCancel('${b.ref}')">Cancel booking</button>`;
+  } else if (b.status === "PENDING_PAYMENT"){
     html += `<div class="small">Pay by ${esc((b.expires_at||"").slice(11,16))}. Check the Paytm app for ${rupee(b.amount)} with ref ${esc(b.ref)}.</div>
       <div class="row2"><button class="btn ok" onclick="staffConfirm('${b.ref}')">✔ Payment received</button><button class="btn alt" onclick="staffCancel('${b.ref}')">Cancel</button></div>`;
   } else if (!b.checkin_at){
@@ -322,15 +332,59 @@ function showPay(d, mobile){
   cur = {ref:d.ref, mobile};
   $("bookForm").classList.add("hidden"); $("pay").classList.remove("hidden");
   $("pRef").textContent = d.ref; $("pLocker").textContent = d.locker_no; $("pAmt").textContent = rupee(d.amount);
-  $("pBy").textContent = d.pay_before; $("pUpi").textContent = d.upi_id;
-  payable = true; $("upiBtn").href = d.upi_link;
+  $("pBy").textContent = d.pay_before;
+  payable = true; rzp = d.razorpay || null;
   $("payOpts").classList.remove("hidden"); $("paidBox").classList.add("hidden");
-  try { const q = qrcode(0,"M"); q.addData(d.upi_link); q.make(); $("qr").innerHTML = q.createImgTag(6,8); }
-  catch(e){ $("qr").innerHTML = ""; }     // QR library unavailable: UPI button + UPI ID still shown
-  $("payStatus").className = "msg info"; $("payStatus").textContent = STAFF ? "Show this QR to the customer. Press Payment received after checking the Paytm app." : "Waiting for the shop to confirm your payment…";
-  $("staffPayBtns").classList.toggle("hidden", !STAFF);
+  $("upiOpts").classList.toggle("hidden", !!rzp); $("rzpOpts").classList.toggle("hidden", !rzp);
+  if (rzp){
+    $("rzpAmt").textContent = rupee(d.amount); $("upiBtn").removeAttribute("href"); $("qr").innerHTML = "";
+    $("payStatus").className = "msg info"; $("payStatus").textContent = "Waiting for payment…";
+    $("staffPayBtns").classList.add("hidden");          // no manual button: Razorpay confirms it
+    if (STAFF){ const sb = $("staffPayBtns"); sb.classList.remove("hidden"); sb.querySelector(".btn.ok").classList.add("hidden"); }
+    openCheckout();
+  } else {
+    $("pUpi").textContent = d.upi_id; $("upiBtn").href = d.upi_link;
+    try { const q = qrcode(0,"M"); q.addData(d.upi_link); q.make(); $("qr").innerHTML = q.createImgTag(6,8); }
+    catch(e){ $("qr").innerHTML = ""; }     // QR library unavailable: UPI button + UPI ID still shown
+    $("payStatus").className = "msg info"; $("payStatus").textContent = STAFF ? "Show this QR to the customer. Press Payment received after checking the Paytm app." : "Waiting for the shop to confirm your payment…";
+    $("staffPayBtns").classList.toggle("hidden", !STAFF);
+    if (STAFF) $("staffPayBtns").querySelector(".btn.ok").classList.remove("hidden");
+  }
   poll();
 }
+
+/* ---------- Razorpay Checkout (only when the server says online payment is on) ---------- */
+let rzp = null;
+function loadRzpScript(){
+  return new Promise((res, rej) => {
+    if (window.Razorpay) return res();
+    const s = document.createElement("script"); s.src = "https://checkout.razorpay.com/v1/checkout.js";
+    s.onload = res; s.onerror = () => rej(new Error("Could not load the payment window. Check your internet and try again."));
+    document.head.appendChild(s);
+  });
+}
+async function openCheckout(){
+  if (!rzp || !payable || !cur) return;
+  try { await loadRzpScript(); }
+  catch(e){ $("payStatus").className = "msg err"; $("payStatus").textContent = e.message; return; }
+  const ref = cur.ref, mobile = cur.mobile;
+  const co = new Razorpay({
+    key: rzp.key_id, order_id: rzp.order_id, amount: rzp.amount_paise, currency: rzp.currency || "INR",
+    name: "Arunachala Digital Luggage Lockers", description: `Locker ${$("pLocker").textContent} · ref ${ref}`,
+    prefill: {name: rzp.name || "", contact: "+91" + mobile}, notes: {booking_ref: ref},
+    theme: {color: "#e8445a"},
+    // Browser success is only a hint: the server checks with Razorpay before marking anything paid.
+    handler: r => { $("payStatus").className = "msg info"; $("payStatus").textContent = "Payment done – confirming with the bank…";
+                    api("/api/payment/verify", Object.assign({ref, mobile}, r)).catch(() => {}).finally(() => poll()); },
+    modal: {ondismiss: () => poll()}
+  });
+  co.on("payment.failed", r => {
+    $("payStatus").className = "msg err";
+    $("payStatus").textContent = `Payment failed${r && r.error && r.error.description ? ": " + r.error.description : ""}. You can try again until ${$("pBy").textContent}.`;
+  });
+  co.open();
+}
+$("rzpBtn").addEventListener("click", () => { if (payable) openCheckout(); });
 /* Payment options are shown ONLY while the server says the booking can still be paid.
    Paid -> options removed, "Payment successful". Expired/cancelled -> options removed (no retry). */
 let payable = false;
@@ -338,8 +392,9 @@ function setPayView(d){
   const paid = ["ACTIVE","CHECKED_OUT","NO_SHOW"].includes(d.status);
   payable = d.status === "PENDING_PAYMENT" && d.can_pay !== false;
   $("payOpts").classList.toggle("hidden", !payable);
+  if (payable && d.razorpay) rzp = d.razorpay;
   if (!payable){ $("upiBtn").removeAttribute("href"); $("qr").innerHTML = ""; }
-  else if (d.upi_link && $("upiBtn").getAttribute("href") !== d.upi_link) $("upiBtn").href = d.upi_link;
+  else if (!rzp && d.upi_link && $("upiBtn").getAttribute("href") !== d.upi_link) $("upiBtn").href = d.upi_link;
   $("paidBox").classList.toggle("hidden", !paid);
   if (paid){ $("paidRef").textContent = d.ref; $("paidLocker").textContent = d.locker_no; $("paidAmt").textContent = rupee(d.amount); }
 }
@@ -351,7 +406,9 @@ async function poll(){
     const d = await api(`/api/booking?ref=${encodeURIComponent(cur.ref)}&mobile=${encodeURIComponent(cur.mobile)}`);
     lastStatus = d;
     setPayView(d);
-    if (d.status === "PENDING_PAYMENT"){ $("payStatus").className = "msg info"; $("payStatus").textContent = STAFF
+    if (d.status === "PENDING_PAYMENT" && rzp){ if ($("payStatus").className !== "msg err"){ $("payStatus").className = "msg info";
+      $("payStatus").textContent = `Waiting for payment… Pay before ${d.pay_before || $("pBy").textContent}. If a payment fails, you can try again until then.`; } }
+    else if (d.status === "PENDING_PAYMENT"){ $("payStatus").className = "msg info"; $("payStatus").textContent = STAFF
       ? "Show this QR to the customer. Press Payment received after checking the Paytm app."
       : `Payment not confirmed yet. Pay before ${d.pay_before || $("pBy").textContent}. If your payment failed, you can try again until then.`; }
     const paid = d.status === "ACTIVE" || d.status === "CHECKED_OUT";
@@ -370,6 +427,7 @@ async function poll(){
     }
     if (d.status === "CHECKED_OUT"){ $("payStatus").className="msg good"; $("payStatus").textContent=`Collected at ${fmtT(d.checkout_time)}. Thank you!`; return; }
     if (d.status === "NO_SHOW"){ $("payStatus").className="msg err"; $("payStatus").textContent=`The check-in time for this booking has passed. Please call 8838075040 with ref ${cur.ref}.`; return; }
+    if (d.payment_received && (d.status === "EXPIRED" || d.status === "CANCELLED")){ $("payStatus").className="msg err"; $("payStatus").textContent=`We received your payment of ${rupee(d.amount)}, but locker ${d.locker_no} could not be kept for you. The shop will give you another locker or refund you – please call 8838075040 with ref ${cur.ref}.`; $("staffPayBtns").classList.add("hidden"); return; }
     if (d.status === "EXPIRED" || d.status === "CANCELLED"){ $("payStatus").className="msg err"; $("payStatus").textContent=`This booking is ${d.status.toLowerCase()}. If you already paid, come to the shop or call 8838075040 with ref ${cur.ref} – the shop can still confirm it.`; $("staffPayBtns").classList.add("hidden"); return; }
   } catch(e) {}
   pollTimer = setTimeout(poll, next);
@@ -435,9 +493,14 @@ async function loadAll(){
     $("allSummary").textContent = `${d.count} bookings · collected ₹${d.collected}`;
     d.bookings.forEach(b => lastRows[b.ref] = b);
     $("allRows").innerHTML = d.bookings.map(b => {
-      const notes = (b.audit||[]).map(a => `<div class="small">${a.action === "LATE_CONFIRM" ? "Late confirm" : "Re-opened"} by ${esc(a.staff_id)} ${esc(a.at.slice(11,16))}${a.old_locker !== a.new_locker ? ` (${esc(a.old_locker)} → ${esc(a.new_locker)})` : ""}: ${esc(a.reason)}</div>`).join("");
-      const act = (b.status === "EXPIRED" || b.status === "NO_SHOW")
-        ? `<button class="btn alt" style="margin:0;padding:6px 10px;width:auto;font-size:13px" onclick="openLate('${b.ref}')">${b.status === "EXPIRED" ? "Late confirm" : "Re-open"}</button>`
+      const AL = {LATE_CONFIRM:"Late confirm", REOPEN_NO_SHOW:"Re-opened", AUTO_LATE_CONFIRM:"Auto-confirmed (late online payment)",
+                  PAYMENT_EXCEPTION:"⚠ Payment exception", ASSIGN_PAID:"Locker assigned (paid online)", REFUND:"Refund"};
+      const notes = (b.audit||[]).map(a => `<div class="small">${AL[a.action] || esc(a.action)}${a.staff_id && a.staff_id !== "RAZORPAY" ? " by " + esc(a.staff_id) : ""} ${esc(a.at.slice(11,16))}${a.new_locker && a.old_locker !== a.new_locker ? ` (${esc(a.old_locker)} → ${esc(a.new_locker)})` : ""}: ${esc(a.reason)}</div>`).join("")
+        + (b.payment ? `<div class="small">💳 Razorpay ${esc(b.payment.mode)}: ${esc(b.payment.status)}${b.payment.payment_id ? " · " + esc(b.payment.payment_id) : ""}${b.payment.refund_status ? " · refund " + esc(b.payment.refund_status) + " ₹" + (b.payment.refunded_paise/100) : ""}</div>` : "")
+        + (b.payment && b.payment.exception ? `<div class="small" style="color:var(--red);font-weight:700">⚠ ${esc(b.payment.exception)}</div>` : "");
+      const needs = b.payment && b.payment.status === "NEEDS_ACTION";
+      const act = (b.status === "EXPIRED" || b.status === "NO_SHOW" || (needs && b.status === "CANCELLED"))
+        ? `<button class="btn alt" style="margin:0;padding:6px 10px;width:auto;font-size:13px" onclick="openLate('${b.ref}')">${needs ? "Assign locker" : b.status === "EXPIRED" ? "Late confirm" : "Re-open"}</button>`
         : (["ACTIVE","CHECKED_OUT"].includes(b.status) ? `<button class="btn alt" style="margin:0;padding:6px 10px;width:auto;font-size:13px" onclick="printReceipt(lastRows['${b.ref}'], lastRows['${b.ref}'].phone)">🧾</button>` : "");
       return `<tr><td>${esc(b.ref)}</td><td><span class="tag">${esc(b.source)}</span></td><td>${esc(b.locker_no)}</td><td>${esc(b.visitor_name)}</td><td>${esc(b.phone)}</td><td>${esc(itemText(b))}</td><td>${b.amount + b.extra_amount}</td><td>${esc(b.status)}${notes}</td><td>${esc(b.created_at.slice(11,16))}</td><td>${esc((b.paid_at||"").slice(11,16))}</td><td>${esc((b.checkin_at||"").slice(11,16))}</td><td>${esc((b.checkout_time||"").slice(11,16))}</td><td>${act}</td></tr>`;
     }).join("");
@@ -452,7 +515,8 @@ async function openLate(ref){
   const ok = l => l.state === "FREE" && (!b.jumbo || l.size !== "M");
   const free = cab.lockers.filter(ok).map(l => l.locker_no);
   const origFree = free.includes(b.locker_no);
-  $("lateTitle").textContent = b.status === "EXPIRED" ? "LATE CONFIRM – payment after hold expired" : "RE-OPEN – customer arrived after check-in time";
+  $("lateTitle").textContent = (b.payment && b.payment.status === "NEEDS_ACTION") ? "ASSIGN LOCKER – paid online, locker needed"
+    : b.status === "EXPIRED" ? "LATE CONFIRM – payment after hold expired" : "RE-OPEN – customer arrived after check-in time";
   $("lateInfo").textContent = `Ref ${b.ref} · ${b.visitor_name} · ${b.phone} · ${itemText(b)} · ₹${b.amount} · original locker ${b.locker_no}` + (origFree ? " (still free)" : " – NOW TAKEN, choose another");
   $("lateLocker").innerHTML = (origFree ? "" : `<option value="">– choose a free locker –</option>`)
     + free.map(n => `<option value="${esc(n)}"${n === b.locker_no ? " selected" : ""}>${esc(n)}${n === b.locker_no ? " (original)" : ""}</option>`).join("");
@@ -467,7 +531,7 @@ $("lateForm").addEventListener("submit", async ev => {
   try {
     const d = await api("/api/staff/late_confirm", {ref: lateRef, locker_no: $("lateLocker").value,
       staff_id: $("lateStaff").value.trim(), reason: $("lateReason").value.trim(), payment_verified: $("latePaid").checked});
-    $("lateMsg").innerHTML = `<div class="msg good">Done. ${esc(d.ref)} is paid on locker ${esc(d.locker_no)}. Check in by ${esc(fmtT(d.valid_until))} – press “Customer arrived – open locker” on the map.</div>`;
+    $("lateMsg").innerHTML = `<div class="msg good">${d.auto ? esc(d.message) + " " : "Done. "}${esc(d.ref)} is paid on locker ${esc(d.locker_no)}. Check in by ${esc(fmtT(d.valid_until))} – press “Customer arrived – open locker” on the map.</div>`;
     loadAll(); loadCabinet();
   } catch(e){
     $("lateMsg").innerHTML = `<div class="msg err">${esc(e.message)}</div>`;
