@@ -73,6 +73,17 @@
   .contact b{display:block;color:var(--muted);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
   body.ta .contact b, body.te .contact b{text-transform:none;letter-spacing:0}
   footer{border-top:1px solid var(--line);padding:22px 0 30px;color:var(--muted);font-size:14px;text-align:center}
+  #app{scroll-margin-top:64px}
+  .ways{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .ways div{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .ways h3{margin:0 0 6px;font-size:18px;color:var(--maroon)}
+  .ways p{margin:0}
+  .appbox{background:var(--maroon);color:#fff;border-radius:var(--radius);padding:22px 20px;margin-top:18px}
+  .appbox h3{margin:0 0 6px;font-size:20px;color:var(--saffron)}
+  .appbox p{margin:0 0 6px}
+  .appbox .btn{margin:10px 0 12px}
+  .appbox ol{margin:6px 0 10px;padding-left:22px}
+  .appbox .small{font-size:14px;opacity:.9}
   @media (max-width:520px){ .brand span{font-size:13px} .langs button{padding:6px 8px} }
 </style>
 </head>
@@ -101,6 +112,7 @@
     <span class="hours" data-i18n="hours">Open daily · 7 AM – 9 PM</span>
     <div class="cta">
       <a class="btn primary" href="book.html">🔒 <span data-i18n="book">Book Online</span></a>
+      <a class="btn primary" href="#app">📱 <span data-i18n="appBtn">Android App</span></a>
       <a class="btn ghost" href="tel:+918838075040">📞 <span data-i18n="call">Call</span> 88380 75040</a>
       <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&query=52+A+Car+Street+Tiruvannamalai+606601" target="_blank" rel="noopener">📍 <span data-i18n="directions">Get directions</span></a>
     </div>
@@ -116,6 +128,29 @@
       <li><span class="n">3</span><div data-i18n="step3">Your locker is assigned and you get a booking confirmation with a printable receipt.</div></li>
       <li><span class="n">4</span><div data-i18n="step4">Come back and collect your belongings. Any extra hours are paid at checkout.</div></li>
     </ol>
+  </section>
+
+  <section id="app">
+    <h2 data-i18n="waysTitle">Book your way — website, app or shop</h2>
+    <div class="ways">
+      <div><h3 data-i18n="way1T">🌐 Website</h3><p data-i18n="way1">Book and pay online on this website, from anywhere.</p></div>
+      <div><h3 data-i18n="way2T">📱 Android app</h3><p data-i18n="way2">Book and pay from your phone, and see your booking status and time left.</p></div>
+      <div><h3 data-i18n="way3T">🏪 At our shop</h3><p data-i18n="way3">Walk in to 52 A Car Street. We book your locker at the counter.</p></div>
+    </div>
+    <p class="note" data-i18n="waysNote">Check-in and check-out: for now, please come to our shop counter and show your booking reference — we will open your locker. Online check-in and check-out from the app and website are coming soon.</p>
+
+    <div class="appbox">
+      <h3 data-i18n="appTitle">Get our Android app</h3>
+      <p data-i18n="appText">Free. For Android 8.0 and above. This is a test version — the app is still being tested.</p>
+      <a class="btn primary" href="ArunachalaLockers.apk" download>⬇️ <span data-i18n="appDl">Download Android app (18 MB)</span></a>
+      <p data-i18n="appHowT"><b>How to install:</b></p>
+      <ol>
+        <li data-i18n="appHow1">Tap Download and open the downloaded file.</li>
+        <li data-i18n="appHow2">If your phone asks, allow “Install unknown apps” for your browser.</li>
+        <li data-i18n="appHow3">Tap Install, then open Arunachala Lockers.</li>
+      </ol>
+      <p class="small" data-i18n="appIos">iPhone app is not available yet — iPhone users can book on this website.</p>
+    </div>
   </section>
 
   <section id="charges">
@@ -208,7 +243,21 @@
       privacy:"உங்களுக்கு லாக்கர் ஒதுக்கவும், உங்கள் முன்பதிவு குறித்து உங்களைத் தொடர்பு கொள்ளவும், வணிகப் பதிவுகளுக்காகவும் மட்டுமே உங்கள் பெயர் மற்றும் மொபைல் (WhatsApp) எண்ணைச் சேகரிக்கிறோம். UPI கட்டணங்கள் உங்கள் UPI செயலி மற்றும் எங்கள் கட்டணச் சேவை வழங்குநர் மூலம் செயலாக்கப்படுகின்றன; உங்கள் UPI PIN அல்லது வங்கி விவரங்களை நாங்கள் பார்ப்பதோ சேமிப்பதோ இல்லை. சட்டப்படி தேவைப்படும் இடங்களைத் தவிர, உங்கள் விவரங்களை யாருக்கும் விற்பதோ பகிர்வதோ இல்லை.",
       contactTitle:"தொடர்புக்கு",
       addressLbl:"முகவரி", phoneLbl:"தொலைபேசி", emailLbl:"மின்னஞ்சல்", hoursLbl:"நேரம்",
-      hoursVal:"தினமும், காலை 7 – இரவு 9", ownerLbl:"உரிமையாளர்"
+      hoursVal:"தினமும், காலை 7 – இரவு 9", ownerLbl:"உரிமையாளர்",
+      appBtn:"ஆண்ட்ராய்டு செயலி",
+      waysTitle:"உங்கள் விருப்பப்படி முன்பதிவு — இணையதளம், செயலி அல்லது கடை",
+      way1T:"🌐 இணையதளம்", way1:"எங்கிருந்தும் இந்த இணையதளத்தில் ஆன்லைனில் முன்பதிவு செய்து பணம் செலுத்தலாம்.",
+      way2T:"📱 ஆண்ட்ராய்டு செயலி", way2:"உங்கள் மொபைலிலிருந்தே முன்பதிவு செய்து பணம் செலுத்தலாம்; முன்பதிவு நிலை மற்றும் மீதமுள்ள நேரத்தையும் பார்க்கலாம்.",
+      way3T:"🏪 எங்கள் கடையில்", way3:"52 A கார் தெருவில் உள்ள எங்கள் கடைக்கு நேரில் வாருங்கள். கவுண்டரிலேயே உங்கள் லாக்கரை முன்பதிவு செய்து தருவோம்.",
+      waysNote:"செக்-இன் மற்றும் செக்-அவுட்: தற்போது எங்கள் கடை கவுண்டருக்கு வந்து உங்கள் முன்பதிவு எண்ணைக் காட்டவும் — உங்கள் லாக்கரைத் திறந்து தருவோம். செயலி மற்றும் இணையதளம் மூலம் ஆன்லைன் செக்-இன், செக்-அவுட் விரைவில் வரும்.",
+      appTitle:"எங்கள் ஆண்ட்ராய்டு செயலியைப் பெறுங்கள்",
+      appText:"இலவசம். ஆண்ட்ராய்டு 8.0 மற்றும் அதற்கு மேல். இது சோதனைப் பதிப்பு — செயலி இன்னும் சோதனையில் உள்ளது.",
+      appDl:"ஆண்ட்ராய்டு செயலியைப் பதிவிறக்கவும் (18 MB)",
+      appHowT:"<b>நிறுவும் முறை:</b>",
+      appHow1:"பதிவிறக்கம் என்பதை அழுத்தி, பதிவிறக்கிய கோப்பைத் திறக்கவும்.",
+      appHow2:"உங்கள் மொபைல் கேட்டால், உங்கள் பிரவுசருக்கு “தெரியாத செயலிகளை நிறுவ” அனுமதி கொடுக்கவும்.",
+      appHow3:"Install என்பதை அழுத்தி, Arunachala Lockers செயலியைத் திறக்கவும்.",
+      appIos:"ஐபோன் செயலி இன்னும் கிடைக்கவில்லை — ஐபோன் பயனர்கள் இந்த இணையதளத்தில் முன்பதிவு செய்யலாம்."
     },
     te: {
       brand:"అరుణాచల డిజిటల్<br>లగేజ్ లాకర్లు",
@@ -240,7 +289,21 @@
       privacy:"మీకు లాకర్ కేటాయించడానికి, మీ బుకింగ్ గురించి మిమ్మల్ని సంప్రదించడానికి, వ్యాపార రికార్డుల కోసం మాత్రమే మీ పేరు మరియు మొబైల్ (WhatsApp) నంబర్‌ను సేకరిస్తాము. UPI చెల్లింపులు మీ UPI యాప్ మరియు మా చెల్లింపు సేవా ప్రదాత ద్వారా జరుగుతాయి; మీ UPI PIN లేదా బ్యాంక్ వివరాలను మేము చూడము, నిల్వ చేయము. చట్టప్రకారం అవసరమైన సందర్భాలు తప్ప, మీ వివరాలను ఎవరికీ అమ్మము లేదా పంచుకోము.",
       contactTitle:"సంప్రదించండి",
       addressLbl:"చిరునామా", phoneLbl:"ఫోన్", emailLbl:"ఇమెయిల్", hoursLbl:"సమయం",
-      hoursVal:"ప్రతిరోజూ, ఉదయం 7 – రాత్రి 9", ownerLbl:"యజమాని"
+      hoursVal:"ప్రతిరోజూ, ఉదయం 7 – రాత్రి 9", ownerLbl:"యజమాని",
+      appBtn:"ఆండ్రాయిడ్ యాప్",
+      waysTitle:"మీకు నచ్చిన విధంగా బుక్ చేయండి — వెబ్‌సైట్, యాప్ లేదా దుకాణం",
+      way1T:"🌐 వెబ్‌సైట్", way1:"ఎక్కడి నుంచైనా ఈ వెబ్‌సైట్‌లో ఆన్‌లైన్‌లో బుక్ చేసి చెల్లించవచ్చు.",
+      way2T:"📱 ఆండ్రాయిడ్ యాప్", way2:"మీ ఫోన్ నుంచే బుక్ చేసి చెల్లించవచ్చు; బుకింగ్ స్థితి మరియు మిగిలిన సమయాన్ని కూడా చూడవచ్చు.",
+      way3T:"🏪 మా దుకాణంలో", way3:"52 A కార్ స్ట్రీట్‌లోని మా దుకాణానికి నేరుగా రండి. కౌంటర్‌లోనే మీ లాకర్‌ను బుక్ చేస్తాము.",
+      waysNote:"చెక్-ఇన్ మరియు చెక్-అవుట్: ప్రస్తుతానికి మా దుకాణం కౌంటర్‌కు వచ్చి మీ బుకింగ్ నంబర్ చూపించండి — మీ లాకర్‌ను తెరుస్తాము. యాప్ మరియు వెబ్‌సైట్ ద్వారా ఆన్‌లైన్ చెక్-ఇన్, చెక్-అవుట్ త్వరలో వస్తుంది.",
+      appTitle:"మా ఆండ్రాయిడ్ యాప్ పొందండి",
+      appText:"ఉచితం. ఆండ్రాయిడ్ 8.0 మరియు ఆపై వెర్షన్లకు. ఇది టెస్ట్ వెర్షన్ — యాప్ ఇంకా పరీక్షలో ఉంది.",
+      appDl:"ఆండ్రాయిడ్ యాప్ డౌన్‌లోడ్ చేయండి (18 MB)",
+      appHowT:"<b>ఇన్‌స్టాల్ చేసే విధానం:</b>",
+      appHow1:"డౌన్‌లోడ్ నొక్కి, డౌన్‌లోడ్ అయిన ఫైల్‌ను తెరవండి.",
+      appHow2:"మీ ఫోన్ అడిగితే, మీ బ్రౌజర్‌కు “తెలియని యాప్‌లను ఇన్‌స్టాల్ చేయడానికి” అనుమతి ఇవ్వండి.",
+      appHow3:"Install నొక్కి, Arunachala Lockers యాప్‌ను తెరవండి.",
+      appIos:"ఐఫోన్ యాప్ ఇంకా అందుబాటులో లేదు — ఐఫోన్ వినియోగదారులు ఈ వెబ్‌సైట్‌లో బుక్ చేయవచ్చు."
     }
   };
   var nodes = document.querySelectorAll('[data-i18n]');
