@@ -6,150 +6,178 @@
 <title>Tiruvannamalai Temple Luggage Locker System</title>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 <style>
-  :root{--navy:#0f2d5a;--bg:#161f3a;--panel:#1b2647;--gold:#f4c430;--red:#e8445a;--grey:#8a8a8a;
-        --pend:#e09b2d;--text:#fff;--muted:#b9c0d4;--ok:#2e9e55}
+  :root{--bg:#fbf7f0;--panel:#ffffff;--ink:#2a1a14;--muted:#5f4f46;--line:#eadfd2;
+        --maroon:#7a1f2b;--maroon-dark:#5c1520;--saffron:#f4b942;--ok:#2e7d4f;
+        --free:#ffffff;--pend:#f4b942;--occ:#7a1f2b;--tab:#2a1a14}
   *{box-sizing:border-box}
-  body{margin:0;font-family:"Segoe UI",system-ui,"Noto Sans Tamil","Noto Sans Telugu",sans-serif;background:var(--bg);color:var(--text)}
-  header{background:var(--navy);text-align:center;padding:14px 10px 10px}
-  header h1{margin:0;color:var(--gold);font-size:clamp(17px,3.2vw,24px)}
-  header .sub{color:var(--muted);font-size:12px;margin-top:4px}
-  nav{display:flex;gap:4px;padding:8px 8px 0;border-bottom:2px solid #e9edf5;flex-wrap:wrap}
-  nav button{background:var(--navy);color:#fff;border:1px solid #3a4a72;border-bottom:0;padding:10px 16px;font-size:15px;font-weight:700;cursor:pointer}
-  nav button.on{background:var(--red)}
+  body{margin:0;font-family:Inter,"Noto Sans Tamil","Noto Sans Telugu","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5}
+  :focus-visible{outline:3px solid var(--saffron);outline-offset:2px}
+  .skip{position:absolute;left:-999px;top:8px;background:var(--maroon);color:#fff;padding:10px 14px;border-radius:8px;z-index:50}
+  .skip:focus{left:8px}
+  header{background:var(--maroon);color:#fff;padding:10px 14px}
+  .hbar{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .home{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
+  .home svg{flex:none}
+  header h1{margin:0;color:#fff;font-size:clamp(16px,3.2vw,22px);line-height:1.2}
+  header .sub{color:var(--saffron);font-size:13px;margin-top:2px;font-weight:600}
+  .langs{display:flex;gap:3px;background:rgba(255,255,255,.12);border-radius:999px;padding:3px}
+  .langs button{border:0;background:transparent;color:#fff;font:inherit;font-size:14px;min-height:36px;padding:5px 10px;border-radius:999px;cursor:pointer}
+  .langs button[aria-pressed="true"]{background:#fff;color:var(--maroon);font-weight:700}
+  nav{position:sticky;top:0;z-index:5;display:flex;gap:6px;padding:8px 8px;background:var(--bg);border-bottom:2px solid var(--line);flex-wrap:wrap;justify-content:center}
+  nav button{background:var(--panel);color:var(--maroon);border:2px solid var(--maroon);border-radius:10px;min-height:46px;padding:9px 18px;font:inherit;font-size:16px;font-weight:700;cursor:pointer;flex:1 1 0;max-width:260px}
+  nav button.on{background:var(--maroon);color:#fff}
   main{padding:14px;max-width:1000px;margin:0 auto}
-  h2{color:var(--red);font-size:17px;margin:4px 0 8px;letter-spacing:.3px}
-  .legend{display:flex;gap:16px;font-size:13px;color:var(--muted);margin-bottom:10px;flex-wrap:wrap;align-items:center}
-  .legend i{display:inline-block;width:12px;height:16px;margin-right:6px;vertical-align:middle}
-  .grid{display:grid;gap:2px;width:100%;max-width:780px;margin:0 auto;aspect-ratio:1.9;min-height:260px}
-  .cell{border:0;font-weight:700;font-size:clamp(11px,2.2vw,17px);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:2px}
-  .cell small{font-weight:400;font-size:clamp(9px,1.5vw,12px);opacity:.9}
-  .cell small.pre{font-weight:700;font-size:clamp(8px,1.3vw,11px);opacity:.75;letter-spacing:.5px;line-height:1}
-  .FREE{background:var(--grey)} .OCCUPIED{background:var(--red)} .PENDING{background:var(--pend)}
-  .cell.sel{outline:4px solid var(--gold);outline-offset:-4px}
-  .cell.FREE:hover{filter:brightness(1.15)}
-  .tablet{background:var(--navy);color:var(--gold);font-size:clamp(9px,1.6vw,13px);cursor:default;text-align:center}
-  .card{background:var(--panel);border:1px solid #2c3a63;border-radius:10px;padding:16px;margin:14px auto;max-width:520px}
-  label{display:block;font-weight:600;margin:10px 0 4px;color:var(--muted);font-size:14px}
-  input{width:100%;padding:11px;font-size:16px;border-radius:7px;border:1px solid #3a4a72;background:#0f1730;color:#fff}
-  .items{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-top:6px}
+  h2{color:var(--maroon);font-size:18px;margin:4px 0 8px;letter-spacing:.2px}
+  .guide{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;color:var(--muted);margin:0 0 10px;padding:0;list-style:none}
+  .guide b{color:var(--maroon)}
+  .legend{display:flex;gap:8px 16px;font-size:14px;color:var(--ink);margin-bottom:10px;flex-wrap:wrap;align-items:center}
+  .legend i{display:inline-block;width:18px;height:18px;margin-right:6px;vertical-align:-4px;border:1.5px solid #8a7a70;border-radius:3px}
+  #freeCount{font-weight:700;color:var(--maroon)}
+  .grid{display:grid;gap:3px;padding:3px;background:#cfc3b6;border-radius:8px;width:100%;max-width:780px;margin:0 auto;aspect-ratio:1.9;min-height:300px}
+  .cell{border:0;border-radius:4px;font:inherit;font-weight:700;font-size:clamp(11px,2.2vw,17px);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:2px;line-height:1.15;min-width:0;overflow:hidden}
+  .cell small{font-weight:400;font-size:clamp(9px,1.5vw,12px);opacity:.95}
+  .cell small.pre{font-weight:700;font-size:clamp(8px,1.3vw,11px);opacity:.7;letter-spacing:.5px;line-height:1}
+  .cell .st{display:block;font-weight:600;font-size:clamp(9px,1.45vw,12px);margin-top:2px;text-align:center;overflow-wrap:anywhere}
+  html:lang(ta) .cell .st, html:lang(te) .cell .st{font-size:clamp(8px,1.3vw,11px);letter-spacing:-.2px}
+  .foot a{color:var(--maroon)}
+  .FREE{background:var(--free);color:var(--ink);box-shadow:inset 0 0 0 1.5px #8a7a70}
+  .OCCUPIED{background:var(--occ);color:#fff;cursor:default}
+  .PENDING{color:var(--ink);cursor:default;background:repeating-linear-gradient(135deg,#f4b942 0 8px,#f8cf75 8px 16px)}
+  .cell.sel{outline:4px solid var(--ok);outline-offset:-4px}
+  .cell.FREE:hover{background:#eef8f1}
+  .tablet{background:var(--tab);color:var(--saffron);font-size:clamp(9px,1.6vw,13px);cursor:default;text-align:center;border-radius:4px;display:flex;align-items:center;justify-content:center}
+  .lg-free{background:var(--free)} .lg-pend{background:repeating-linear-gradient(135deg,#f4b942 0 4px,#f8cf75 4px 8px)} .lg-occ{background:var(--occ)} .lg-tab{background:var(--tab)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin:14px auto;max-width:520px}
+  label{display:block;font-weight:600;margin:12px 0 4px;color:var(--ink);font-size:15px}
+  .hint{font-size:13px;color:var(--muted);margin-top:3px}
+  input,select{width:100%;padding:11px;font-size:16px;border-radius:8px;border:1.5px solid #b9a99c;background:#fff;color:var(--ink)}
+  .items{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:6px}
   .step{display:flex;gap:8px;align-items:center}
-  .step button{width:38px;height:38px;font-size:20px;border-radius:7px;border:1px solid #3a4a72;background:#0f1730;color:#fff;cursor:pointer}
-  .step span{min-width:22px;text-align:center;font-weight:700}
-  .price{font-size:12px;color:var(--muted)}
-  .total{display:flex;justify-content:space-between;font-size:18px;font-weight:700;border-top:1px solid #2c3a63;margin-top:12px;padding-top:10px}
-  .btn{display:block;width:100%;padding:13px;font-size:16px;font-weight:700;border:0;border-radius:8px;background:var(--red);color:#fff;margin-top:12px;cursor:pointer;text-align:center;text-decoration:none}
-  .btn.ok{background:var(--ok)} .btn.alt{background:transparent;border:2px solid var(--muted)} .btn:disabled{opacity:.5}
+  .step button{width:44px;height:44px;font-size:22px;border-radius:8px;border:1.5px solid var(--maroon);background:#fff;color:var(--maroon);cursor:pointer}
+  .step span{min-width:24px;text-align:center;font-weight:700}
+  .price{font-size:13px;color:var(--muted)}
+  .total{display:flex;justify-content:space-between;font-size:18px;font-weight:700;border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
+  .btn{display:block;width:100%;min-height:48px;padding:13px;font:inherit;font-size:16px;font-weight:700;border:0;border-radius:10px;background:var(--maroon);color:#fff;margin-top:12px;cursor:pointer;text-align:center;text-decoration:none}
+  .btn.ok{background:var(--ok)} .btn.alt{background:transparent;border:2px solid var(--maroon);color:var(--maroon)} .btn:disabled{opacity:.5}
   .row2{display:flex;gap:8px} .row2 .btn{flex:1}
-  .msg{padding:10px;border-radius:7px;margin-top:10px;font-size:14px}
-  .err{background:#4a1820;color:#ffb3bd} .info{background:#4a3a12;color:#ffd98a} .good{background:#123d22;color:#9be8b4}
-  .center{text-align:center} .big{font-size:26px;font-weight:800;letter-spacing:1px;color:var(--gold)}
-  #qr img{background:#fff;padding:8px;border-radius:6px;width:210px;height:210px}
+  .msg{padding:10px 12px;border-radius:8px;margin-top:10px;font-size:15px}
+  .err{background:#fde8ea;color:#8a1c2b;border:1px solid #f3b7bf} .info{background:#fff4dc;color:#5c3d00;border:1px solid #f0d58f} .good{background:#e5f5ea;color:#1d5e33;border:1px solid #a9dcb8}
+  .center{text-align:center} .big{font-size:28px;font-weight:800;letter-spacing:1px;color:var(--maroon)}
+  #qr img{background:#fff;padding:8px;border-radius:6px;width:210px;height:210px;border:1px solid var(--line)}
   table{width:100%;border-collapse:collapse;font-size:13px}
-  th,td{border-bottom:1px solid #2c3a63;padding:7px 5px;text-align:left}
+  th,td{border-bottom:1px solid var(--line);padding:7px 5px;text-align:left}
   th{color:var(--muted)}
-  .tag{font-size:11px;padding:2px 6px;border-radius:4px;background:#2c3a63}
-  .hidden{display:none}
+  .tag{font-size:11px;padding:2px 6px;border-radius:4px;background:#f1e6da}
+  .hidden{display:none !important}
   .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-bottom:10px}
   .toolbar input{width:auto}
-  .small{font-size:12px;color:var(--muted)}
+  .small{font-size:13px;color:var(--muted)}
+  .wa{font-size:14px;color:var(--ink);background:#f3fbf5;border:1px solid #cde9d5;border-radius:8px;padding:8px 10px;margin-top:10px}
+  .foot{max-width:1000px;margin:10px auto 30px;padding:0 14px;font-size:14px;color:var(--muted);text-align:center}
   /* late-confirm dialog (staff) */
-  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;padding:30px 10px;overflow:auto;z-index:10}
-  .overlay.hidden{display:none}
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-start;justify-content:center;padding:30px 10px;overflow:auto;z-index:10}
   .overlay .card{width:100%;margin:0}
-  select{width:100%;padding:11px;font-size:16px;border-radius:7px;border:1px solid #3a4a72;background:#0f1730;color:#fff}
   .check{display:flex;gap:8px;align-items:center;margin-top:12px;font-weight:600}
   .check input{width:auto}
-  /* printable receipt */
-  #receiptWrap{display:none}
-  .rc{background:#fff;color:#111;max-width:420px;margin:0 auto;padding:18px;font-size:14px;line-height:1.45}
-  .rc h3{margin:0;font-size:18px} .rc .muted{color:#555;font-size:12px}
-  .rc table{font-size:14px;margin-top:10px} .rc th,.rc td{border-bottom:1px solid #ddd;color:#111;padding:5px 3px}
-  .rc td:last-child{text-align:right} .rc .ref{font-size:22px;font-weight:800;letter-spacing:1px}
-  @media print{
-    body > *:not(#receiptWrap){display:none !important}
-    body{background:#fff}
-    #receiptWrap{display:block !important}
-  }
+  @media (max-width:520px){ .grid{min-height:360px;aspect-ratio:auto;height:92vw} nav button{padding:9px 10px} }
 </style>
 </head>
 <body>
+<a class="skip" href="#main" data-t="skip">Skip to content</a>
 <header>
-  <h1>🛕 Tiruvannamalai Temple Luggage Locker System</h1>
-  <div class="sub" id="sub">23 Lockers · Arunachala Digital Luggage Lockers</div>
-</header>
-<nav id="tabs"></nav>
-<main>
-  <!-- LOCKER MAP (all modes) -->
-  <section id="t-map">
-    <div class="toolbar" style="justify-content:space-between">
-      <h2>LOCKER CABINET — TAP A COMPARTMENT</h2>
-      <button class="btn alt" style="width:auto;margin:0;padding:6px 14px" onclick="loadCabinet()">⟳ Refresh</button>
+  <div class="hbar">
+    <a class="home" href="index.html" aria-label="Arunachala Digital Luggage Lockers – home">
+      <svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#5c1520"/><rect x="18" y="26" width="28" height="24" rx="4" fill="none" stroke="#f4b942" stroke-width="5"/><path d="M24 26v-6a8 8 0 0 1 16 0v6" fill="none" stroke="#f4b942" stroke-width="5"/></svg>
+      <div>
+        <h1 data-t="brand">Arunachala Digital Luggage Lockers</h1>
+        <div class="sub" id="sub" data-t="sub">Locker map &amp; booking · 52 A Car Street, Tiruvannamalai</div>
+      </div>
+    </a>
+    <div class="langs" id="langs" role="group" aria-label="Language">
+      <button type="button" data-lang="en" aria-pressed="true" lang="en">EN</button>
+      <button type="button" data-lang="ta" aria-pressed="false" lang="ta">தமிழ்</button>
+      <button type="button" data-lang="te" aria-pressed="false" lang="te">తెలుగు</button>
     </div>
-    <div class="legend"><span><i style="background:var(--grey)"></i>Available</span>
-      <span><i style="background:var(--pend)"></i>Awaiting payment</span>
-      <span><i style="background:var(--red)"></i>Occupied</span>
-      <span id="freeCount"></span></div>
-    <div id="notice"></div>
+  </div>
+</header>
+<nav id="tabs" role="tablist" aria-label="Locker pages"></nav>
+<main id="main">
+  <!-- LOCKER MAP (all modes) -->
+  <section id="t-map" role="tabpanel">
+    <div class="toolbar" style="justify-content:space-between">
+      <h2 data-t="mapTitle">Locker cabinet — tap a white locker</h2>
+      <button class="btn alt" style="width:auto;margin:0;padding:8px 16px;min-height:44px" onclick="loadCabinet()" data-t="refresh">⟳ Refresh</button>
+    </div>
+    <ol class="guide" id="guide"><li data-t="g1"><b>1.</b> Tap a white (free) locker</li><li data-t="g2"><b>2.</b> Enter name, mobile &amp; items</li><li data-t="g3"><b>3.</b> Pay by UPI</li><li data-t="g4"><b>4.</b> Check in at the shop</li></ol>
+    <div class="legend"><span><i class="lg-free"></i><span data-t="stFreeL">✓ Free – available</span></span>
+      <span><i class="lg-pend"></i><span data-t="stPendL">⏳ Paying – awaiting payment</span></span>
+      <span><i class="lg-occ"></i><span data-t="stOccL">🔒 In use – occupied</span></span>
+      <span><i class="lg-tab"></i><span data-t="stTabL">Control tablet (not a locker)</span></span>
+      <span id="freeCount" aria-live="polite"></span></div>
+    <div class="small" data-t="sizeKey" style="margin:-4px 0 10px">XL = extra large · L = large · M = medium. Jumbo suitcase: choose L or XL.</div>
+    <div id="notice" aria-live="polite"></div>
     <div class="grid" id="grid"></div>
-    <div id="lockerPanel"></div>
+    <div id="lockerPanel" aria-live="polite"></div>
   </section>
 
   <!-- CHECK-IN / BOOK (all modes) -->
-  <section id="t-book" class="hidden">
+  <section id="t-book" class="hidden" role="tabpanel">
     <form id="bookForm" class="card" autocomplete="on">
-      <h2 id="bookTitle">BOOK LOCKER</h2>
-      <div class="small">Locker: <b id="bLocker">tap a locker on the map</b></div>
-      <label for="name">Name</label><input id="name" required maxlength="60" autocomplete="name">
-      <label for="mobile">Mobile number (WhatsApp)</label>
-      <input id="mobile" required inputmode="numeric" maxlength="10" placeholder="10-digit mobile" autocomplete="tel-national">
+      <h2 id="bookTitle" data-t="bookTitle">Book a locker</h2>
+      <div class="small"><span data-t="lockerLbl">Locker:</span> <b id="bLocker">tap a locker on the map</b></div>
+      <button type="button" class="btn alt" id="pickBtn" onclick="showTab('map')" data-t="pickBtn">🗺 Choose a locker on the map</button>
+      <label for="name" data-t="nameLbl">Name</label><input id="name" required maxlength="60" autocomplete="name">
+      <label for="mobile" data-t="mobLbl">Mobile number (WhatsApp)</label>
+      <input id="mobile" required inputmode="numeric" maxlength="10" placeholder="10-digit mobile" autocomplete="tel-national" aria-describedby="mobHint">
+      <div class="hint" id="mobHint" data-t="mobHint">Your WhatsApp receipts at check-in and check-out are sent to this number.</div>
       <div id="aadhaarBox" class="hidden"><label for="aadhaar">Aadhaar – last 4 digits</label>
         <input id="aadhaar" inputmode="numeric" maxlength="4"></div>
-      <label>Items</label>
+      <div style="font-weight:600;margin:12px 0 4px" data-t="itemsLbl">Items</div>
       <div class="items">
-        <div>Medium bag <div class="price" data-p="bag"></div></div>
-        <div class="step"><button type="button" data-k="bags" data-d="-1">−</button><span id="bags">1</span><button type="button" data-k="bags" data-d="1">+</button></div>
-        <div>Helmet <div class="price" data-p="helmet"></div></div>
-        <div class="step"><button type="button" data-k="helmets" data-d="-1">−</button><span id="helmets">0</span><button type="button" data-k="helmets" data-d="1">+</button></div>
-        <div>Jumbo suitcase <div class="price" data-p="jumbo"></div></div>
-        <div class="step"><button type="button" data-k="jumbo" data-d="-1">−</button><span id="jumbo">0</span><button type="button" data-k="jumbo" data-d="1">+</button></div>
+        <div><span data-t="itBag">Medium bag</span> <div class="price" data-p="bag"></div></div>
+        <div class="step"><button type="button" data-k="bags" data-d="-1" aria-label="−">−</button><span id="bags" aria-live="polite">1</span><button type="button" data-k="bags" data-d="1" aria-label="+">+</button></div>
+        <div><span data-t="itHelmet">Helmet</span> <div class="price" data-p="helmet"></div></div>
+        <div class="step"><button type="button" data-k="helmets" data-d="-1" aria-label="−">−</button><span id="helmets" aria-live="polite">0</span><button type="button" data-k="helmets" data-d="1" aria-label="+">+</button></div>
+        <div><span data-t="itJumbo">Jumbo suitcase</span> <div class="price" data-p="jumbo"></div></div>
+        <div class="step"><button type="button" data-k="jumbo" data-d="-1" aria-label="−">−</button><span id="jumbo" aria-live="polite">0</span><button type="button" data-k="jumbo" data-d="1" aria-label="+">+</button></div>
       </div>
-      <div class="total"><span>Pay now</span><span id="total">₹0</span></div>
+      <div class="total"><span data-t="payNow">Pay now</span><span id="total">₹0</span></div>
       <div class="small" id="hoursNote"></div>
-      <button class="btn" id="bookBtn" type="submit">Book &amp; Pay by UPI</button>
+      <button class="btn" id="bookBtn" type="submit" data-t="bookBtn">Book &amp; Pay by UPI</button>
       <div id="bookMsg"></div>
     </form>
-    <section id="pay" class="card center hidden">
-      <div class="small">Booking ref</div><div class="big" id="pRef"></div>
+    <section id="pay" class="card center hidden" aria-live="polite">
+      <div class="small" data-t="refLbl">Booking ref</div><div class="big" id="pRef"></div>
       <div id="payOpts">
-        <p>Locker <b id="pLocker"></b> is held.<br>Pay <b id="pAmt"></b> before <b id="pBy"></b>.</p>
+        <p id="heldP"></p><span class="hidden"><b id="pLocker"></b><b id="pAmt"></b><b id="pBy"></b></span>
         <div id="upiOpts">
-          <a class="btn" id="upiBtn" href="#">Pay with UPI app (GPay / PhonePe / Paytm)</a>
-          <p class="small">Or scan this QR:</p><div id="qr"></div>
-          <p class="small">UPI ID: <span id="pUpi"></span> · keep the booking ref in the payment note</p>
+          <a class="btn" id="upiBtn" href="#" data-t="upiBtn">Pay with UPI app (GPay / PhonePe / Paytm)</a>
+          <p class="small" data-t="orScan">Or scan this QR:</p><div id="qr"></div>
+          <p class="small"><span data-t="upiIdLbl">UPI ID:</span> <span id="pUpi"></span> · <span data-t="keepRef">keep the booking ref in the payment note</span></p>
         </div>
         <div id="rzpOpts" class="hidden">
-          <button class="btn" id="rzpBtn" type="button">Pay <span id="rzpAmt"></span> now (UPI / Card / Net banking)</button>
-          <p class="small">Secure payment by <span id="gwName">Razorpay</span>. Your locker is confirmed automatically when the payment succeeds.</p>
+          <button class="btn" id="rzpBtn" type="button"><span id="rzpLbl"></span><span id="rzpAmt" class="hidden"></span></button>
+          <p class="small" id="gwP"></p>
         </div>
       </div>
       <div id="paidBox" class="msg good hidden" style="font-size:16px">
-        <div style="font-size:22px;font-weight:800">✅ Payment successful</div>
-        <div>Booking ref <b id="paidRef"></b></div>
-        <div>Locker <b id="paidLocker"></b> · Amount paid <b id="paidAmt"></b></div>
-        <div class="small" style="color:inherit">Please do not pay again for this booking.</div>
+        <div style="font-size:22px;font-weight:800" data-t="paidOk">✅ Payment successful</div>
+        <div><span data-t="refLbl">Booking ref</span> <b id="paidRef"></b></div>
+        <div><span data-t="lockerW">Locker</span> <b id="paidLocker"></b> · <span data-t="amtPaid">Amount paid</span> <b id="paidAmt"></b></div>
+        <div class="small" style="color:inherit" data-t="noPayAgain">Please do not pay again for this booking.</div>
       </div>
       <div id="payStatus" class="msg info">Waiting for the shop to confirm your payment…</div>
-      <button class="btn alt hidden" id="receiptBtn" type="button" onclick="printReceipt(lastStatus, cur && cur.mobile)">🧾 Print / Save receipt</button>
+      <div class="wa" id="waNote" data-t="waNote">📲 Keep your booking ref (take a screenshot). At the shop, show it to check in. Your receipt is sent on WhatsApp at check-in and at check-out.</div>
       <div id="staffPayBtns" class="row2 hidden">
         <button class="btn ok" onclick="staffConfirm(cur.ref)">✔ Payment received</button>
         <button class="btn alt" onclick="staffCancel(cur.ref)">Cancel</button>
       </div>
-      <button class="btn alt" onclick="resetBooking()">New booking</button>
+      <button class="btn alt" onclick="resetBooking()" data-t="newBooking">New booking</button>
     </section>
   </section>
 
   <!-- CHECKOUT (staff) -->
-  <section id="t-out" class="hidden">
+  <section id="t-out" class="hidden" role="tabpanel">
     <div class="card">
       <h2>CHECKOUT</h2>
       <div class="small">Tap an occupied locker on the map, or search by mobile.</div>
@@ -160,7 +188,7 @@
   </section>
 
   <!-- ALL BOOKINGS (staff) -->
-  <section id="t-all" class="hidden">
+  <section id="t-all" class="hidden" role="tabpanel">
     <div class="toolbar">
       <div><label for="fDate">Date</label><input id="fDate" type="date"></div>
       <div><label for="fMobile">Mobile</label><input id="fMobile" inputmode="numeric" maxlength="10"></div>
@@ -188,8 +216,7 @@
   </form>
 </div>
 
-<!-- PRINTABLE RECEIPT (filled by printReceipt) -->
-<div id="receiptWrap"></div>
+<div class="foot" id="foot"><span data-t="footHelp">Need help? Call</span> <a href="tel:+918838075040">88380 75040</a> · <a href="index.html" data-t="footHome">Home</a> · <a href="index.html#faq" data-t="footFaq">FAQ</a></div>
 
 <script>
 /* ONE screen for every channel. MODE is "public" on the website/app; the shop PC server swaps it to "staff". */
@@ -199,6 +226,157 @@ const API = STAFF ? "" : "https://book.arunachalatemplelockers.in";
 const SOURCE = (new URLSearchParams(location.search).get("source") || "").toUpperCase() === "APP" ? "APP" : "WEB";
 
 let cab = null, selected = null, cur = null, pollTimer = null, lastStatus = null, lastRows = {}, lateRef = null;
+
+/* ---------- languages (public screen). Staff screen stays English. Same "lang" key as the home page. ---------- */
+const I18N = {
+ en:{skip:"Skip to content", brand:"Arunachala Digital Luggage Lockers", sub:"Locker map &amp; booking · 52 A Car Street, Tiruvannamalai",
+  tab_map:"🗺 Locker Map", tab_book:"✔ Book Locker", tab_out:"⬜ Checkout", tab_all:"📋 All Bookings",
+  mapTitle:"Locker cabinet — tap a white locker", refresh:"⟳ Refresh",
+  g1:"<b>1.</b> Tap a white (free) locker", g2:"<b>2.</b> Enter name, mobile &amp; items", g3:"<b>3.</b> Pay by UPI", g4:"<b>4.</b> Check in at the shop",
+  stFreeL:"✓ Free – available", stPendL:"⏳ Paying – awaiting payment", stOccL:"🔒 In use – occupied", stTabL:"Control tablet (not a locker)",
+  sizeKey:"XL = extra large · L = large · M = medium. Jumbo suitcase: choose L or XL.",
+  stFREE:"✓ Free", stPENDING:"⏳ Paying", stOCCUPIED:"🔒 In use", tablet:"CONTROL<br>TABLET", tabletAria:"Control tablet – not a locker",
+  stFREEa:"available", stPENDINGa:"awaiting payment", stOCCUPIEDa:"occupied",
+  sizeM:"Medium", sizeL:"Large", sizeXL:"Extra large",
+  freeCount:"Free: {free} of {total}",
+  closedNote:"Online booking is open 7 AM – 9 PM. You can still view the lockers.",
+  offline:"Online booking is unavailable right now. Please visit the shop at 52 A Car Street or call 8838075040.",
+  taken:"Locker {locker} is taken. Please choose a white (free) locker.",
+  bookTitle:"Book a locker", lockerLbl:"Locker:", tapMap:"tap a locker on the map", pickBtn:"🗺 Choose a locker on the map",
+  nameLbl:"Name", mobLbl:"Mobile number (WhatsApp)", mobHint:"Your WhatsApp receipts at check-in and check-out are sent to this number.",
+  itemsLbl:"Items", itBag:"Medium bag", itHelmet:"Helmet", itJumbo:"Jumbo suitcase", payNow:"Pay now", bookBtn:"Book &amp; Pay by UPI",
+  forHours:"{price} for {h} hours",
+  hoursNote:"Covers {h} hours from check-in (when the locker is opened for you at the shop). Extra ₹{x} per hour, paid at checkout.",
+  pickFirst:"Please tap a white (free) locker on the Locker Map first.",
+  refLbl:"Booking ref", lockerW:"Locker", amtPaid:"Amount paid", paidOk:"✅ Payment successful", noPayAgain:"Please do not pay again for this booking.",
+  held:"Locker <b>{locker}</b> is held.<br>Pay <b>{amt}</b> before <b>{by}</b>.",
+  upiBtn:"Pay with UPI app (GPay / PhonePe / Paytm)", orScan:"Or scan this QR:", upiIdLbl:"UPI ID:", keepRef:"keep the booking ref in the payment note",
+  waNote:"📲 Keep your booking ref (take a screenshot). At the shop, show it to check in. Your receipt is sent on WhatsApp at check-in and at check-out.",
+  newBooking:"New booking", payOnline:"Pay {amt} now (UPI / Card / Net banking)",
+  gwNote:"Secure payment by {gw}. Your locker is confirmed automatically when the payment succeeds.", testMode:" (TEST mode – no real money)",
+  wShop:"Waiting for the shop to confirm your payment…", wPay:"Waiting for payment…",
+  wPayBy:"Waiting for payment… Pay before {by}. If a payment fails, you can try again until then.",
+  notConf:"Payment not confirmed yet. Pay before {by}. If your payment failed, you can try again until then.",
+  payDone:"Payment done – confirming with the bank…",
+  payNotDone:"Payment not completed{why}. You can try again until {by}.", payFailed:"Payment failed{why}. You can try again until {by}.",
+  checkedIn:"Checked in at {t}. Locker {locker} is yours for {h} hours. Keep ref {ref} for collection.",
+  confirmed:"Payment confirmed. Locker {locker} is reserved for you. Come to the shop at 52 A Car Street{by} and show ref {ref}. Your {h} hours start when the locker is opened for you.",
+  byT:" by {t}",
+  collected:"Collected at {t}. Thank you!",
+  noShow:"The check-in time for this booking has passed. Please call 8838075040 with ref {ref}.",
+  paidLost:"We received your payment of {amt}, but locker {locker} could not be kept for you. The shop will give you another locker or refund you – please call 8838075040 with ref {ref}.",
+  expired:"This booking has expired. If you already paid, come to the shop or call 8838075040 with ref {ref} – the shop can still confirm it.",
+  cancelled:"This booking was cancelled. If you already paid, come to the shop or call 8838075040 with ref {ref} – the shop can still confirm it.",
+  scriptFail:"Could not load the payment window. Check your internet and try again.",
+  footHelp:"Need help? Call", footHome:"Home", footFaq:"FAQ"},
+ ta:{skip:"உள்ளடக்கத்திற்குச் செல்ல", brand:"அருணாசல டிஜிட்டல் லக்கேஜ் லாக்கர்கள்", sub:"லாக்கர் வரைபடம் &amp; முன்பதிவு · 52 A கார் தெரு, திருவண்ணாமலை",
+  tab_map:"🗺 லாக்கர் வரைபடம்", tab_book:"✔ லாக்கர் முன்பதிவு",
+  mapTitle:"லாக்கர் அலமாரி — வெள்ளை லாக்கரைத் தொடுங்கள்", refresh:"⟳ புதுப்பி",
+  g1:"<b>1.</b> வெள்ளை (காலி) லாக்கரைத் தொடுங்கள்", g2:"<b>2.</b> பெயர், மொபைல் &amp; பொருட்களை உள்ளிடுங்கள்", g3:"<b>3.</b> UPI மூலம் செலுத்துங்கள்", g4:"<b>4.</b> கடையில் செக்-இன் செய்யுங்கள்",
+  stFreeL:"✓ காலி – கிடைக்கும்", stPendL:"⏳ செலுத்துகிறார் – பணத்திற்காகக் காத்திருக்கிறது", stOccL:"🔒 பயன்பாட்டில் – நிரம்பியது", stTabL:"கட்டுப்பாட்டு டேப்லெட் (லாக்கர் அல்ல)",
+  sizeKey:"XL = மிகப் பெரியது · L = பெரியது · M = நடுத்தரம். ஜம்போ சூட்கேஸ்: L அல்லது XL-ஐத் தேர்ந்தெடுங்கள்.",
+  stFREE:"✓ காலி", stPENDING:"⏳ கட்டணம்", stOCCUPIED:"🔒 நிரம்பியது", tablet:"கட்டுப்பாட்டு<br>டேப்லெட்", tabletAria:"கட்டுப்பாட்டு டேப்லெட் – லாக்கர் அல்ல",
+  stFREEa:"கிடைக்கும்", stPENDINGa:"பணத்திற்காகக் காத்திருக்கிறது", stOCCUPIEDa:"நிரம்பியது",
+  sizeM:"நடுத்தரம்", sizeL:"பெரியது", sizeXL:"மிகப் பெரியது",
+  freeCount:"காலி: {total}-இல் {free}",
+  closedNote:"ஆன்லைன் முன்பதிவு காலை 7 – இரவு 9 வரை மட்டுமே. லாக்கர்களை இப்போதும் பார்க்கலாம்.",
+  offline:"ஆன்லைன் முன்பதிவு இப்போது கிடைக்கவில்லை. 52 A கார் தெருவில் உள்ள கடைக்கு வாருங்கள் அல்லது 8838075040-ஐ அழைக்கவும்.",
+  taken:"லாக்கர் {locker} ஏற்கனவே எடுக்கப்பட்டது. வெள்ளை (காலி) லாக்கரைத் தேர்ந்தெடுங்கள்.",
+  bookTitle:"லாக்கர் முன்பதிவு", lockerLbl:"லாக்கர்:", tapMap:"வரைபடத்தில் ஒரு லாக்கரைத் தொடுங்கள்", pickBtn:"🗺 வரைபடத்தில் லாக்கரைத் தேர்ந்தெடுங்கள்",
+  nameLbl:"பெயர்", mobLbl:"மொபைல் எண் (WhatsApp)", mobHint:"செக்-இன் மற்றும் செக்-அவுட் WhatsApp ரசீதுகள் இந்த எண்ணுக்கு அனுப்பப்படும்.",
+  itemsLbl:"பொருட்கள்", itBag:"நடுத்தர பை", itHelmet:"ஹெல்மெட்", itJumbo:"ஜம்போ சூட்கேஸ்", payNow:"இப்போது செலுத்த", bookBtn:"முன்பதிவு செய்து UPI மூலம் செலுத்துங்கள்",
+  forHours:"{h} மணி நேரத்திற்கு {price}",
+  hoursNote:"செக்-இன் முதல் (கடையில் லாக்கர் திறந்து தரப்படும்போது) {h} மணி நேரம். கூடுதல் ஒவ்வொரு மணி நேரத்திற்கும் ₹{x}, வெளியேறும்போது செலுத்த வேண்டும்.",
+  pickFirst:"முதலில் லாக்கர் வரைபடத்தில் ஒரு வெள்ளை (காலி) லாக்கரைத் தொடுங்கள்.",
+  refLbl:"முன்பதிவு எண்", lockerW:"லாக்கர்", amtPaid:"செலுத்திய தொகை", paidOk:"✅ பணம் செலுத்தப்பட்டது", noPayAgain:"இந்த முன்பதிவுக்கு மீண்டும் பணம் செலுத்த வேண்டாம்.",
+  held:"லாக்கர் <b>{locker}</b> உங்களுக்காக ஒதுக்கப்பட்டுள்ளது.<br><b>{by}</b>-க்கு முன் <b>{amt}</b> செலுத்துங்கள்.",
+  upiBtn:"UPI செயலி மூலம் செலுத்துங்கள் (GPay / PhonePe / Paytm)", orScan:"அல்லது இந்த QR-ஐ ஸ்கேன் செய்யுங்கள்:", upiIdLbl:"UPI ID:", keepRef:"பணம் செலுத்தும் குறிப்பில் முன்பதிவு எண்ணைச் சேர்க்கவும்",
+  waNote:"📲 உங்கள் முன்பதிவு எண்ணைச் சேமித்துக்கொள்ளுங்கள் (ஸ்கிரீன்ஷாட் எடுங்கள்). செக்-இன் செய்ய கடையில் அதைக் காட்டுங்கள். செக்-இன் மற்றும் செக்-அவுட் செய்யும்போது WhatsApp-இல் ரசீது அனுப்பப்படும்.",
+  newBooking:"புதிய முன்பதிவு", payOnline:"இப்போது {amt} செலுத்துங்கள் (UPI / கார்டு / நெட் பேங்கிங்)",
+  gwNote:"{gw} மூலம் பாதுகாப்பான கட்டணம். பணம் செலுத்தியதும் உங்கள் லாக்கர் தானாக உறுதிசெய்யப்படும்.", testMode:" (சோதனை முறை – உண்மையான பணம் இல்லை)",
+  wShop:"உங்கள் கட்டணத்தைக் கடை உறுதிசெய்யக் காத்திருக்கிறது…", wPay:"பணத்திற்காகக் காத்திருக்கிறது…",
+  wPayBy:"பணத்திற்காகக் காத்திருக்கிறது… {by}-க்கு முன் செலுத்துங்கள். கட்டணம் தோல்வியடைந்தால், அதுவரை மீண்டும் முயற்சிக்கலாம்.",
+  notConf:"கட்டணம் இன்னும் உறுதிசெய்யப்படவில்லை. {by}-க்கு முன் செலுத்துங்கள். கட்டணம் தோல்வியடைந்திருந்தால், அதுவரை மீண்டும் முயற்சிக்கலாம்.",
+  payDone:"பணம் செலுத்தப்பட்டது – வங்கியுடன் உறுதிசெய்கிறோம்…",
+  payNotDone:"கட்டணம் முடிவடையவில்லை{why}. {by} வரை மீண்டும் முயற்சிக்கலாம்.", payFailed:"கட்டணம் தோல்வியடைந்தது{why}. {by} வரை மீண்டும் முயற்சிக்கலாம்.",
+  checkedIn:"{t}-க்கு செக்-இன் செய்யப்பட்டது. லாக்கர் {locker} {h} மணி நேரத்திற்கு உங்களுடையது. உடைமைகளை எடுக்க முன்பதிவு எண் {ref}-ஐ வைத்திருங்கள்.",
+  confirmed:"கட்டணம் உறுதிசெய்யப்பட்டது. லாக்கர் {locker} உங்களுக்காக ஒதுக்கப்பட்டுள்ளது. 52 A கார் தெருவில் உள்ள கடைக்கு{by} வந்து முன்பதிவு எண் {ref}-ஐக் காட்டுங்கள். லாக்கர் திறந்து தரப்படும்போது உங்கள் {h} மணி நேரம் தொடங்கும்.",
+  byT:" {t}-க்குள்",
+  collected:"{t}-க்கு உடைமைகள் எடுக்கப்பட்டன. நன்றி!",
+  noShow:"இந்த முன்பதிவுக்கான செக்-இன் நேரம் கடந்துவிட்டது. முன்பதிவு எண் {ref}-உடன் 8838075040-ஐ அழைக்கவும்.",
+  paidLost:"உங்கள் {amt} கட்டணம் கிடைத்தது, ஆனால் லாக்கர் {locker}-ஐ உங்களுக்காக வைத்திருக்க முடியவில்லை. கடை உங்களுக்கு வேறு லாக்கர் தரும் அல்லது பணத்தைத் திருப்பித் தரும் – முன்பதிவு எண் {ref}-உடன் 8838075040-ஐ அழைக்கவும்.",
+  expired:"இந்த முன்பதிவு காலாவதியாகிவிட்டது. நீங்கள் ஏற்கனவே பணம் செலுத்தியிருந்தால், கடைக்கு வாருங்கள் அல்லது முன்பதிவு எண் {ref}-உடன் 8838075040-ஐ அழைக்கவும் – கடை இன்னும் உறுதிசெய்ய முடியும்.",
+  cancelled:"இந்த முன்பதிவு ரத்து செய்யப்பட்டது. நீங்கள் ஏற்கனவே பணம் செலுத்தியிருந்தால், கடைக்கு வாருங்கள் அல்லது முன்பதிவு எண் {ref}-உடன் 8838075040-ஐ அழைக்கவும் – கடை இன்னும் உறுதிசெய்ய முடியும்.",
+  scriptFail:"கட்டணச் சாளரத்தைத் திறக்க முடியவில்லை. இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.",
+  footHelp:"உதவி வேண்டுமா? அழைக்கவும்", footHome:"முகப்பு", footFaq:"கேள்வி-பதில்"},
+ te:{skip:"విషయానికి వెళ్ళండి", brand:"అరుణాచల డిజిటల్ లగేజ్ లాకర్లు", sub:"లాకర్ మ్యాప్ &amp; బుకింగ్ · 52 A కార్ స్ట్రీట్, తిరువణ్ణామలై",
+  tab_map:"🗺 లాకర్ మ్యాప్", tab_book:"✔ లాకర్ బుకింగ్",
+  mapTitle:"లాకర్ క్యాబినెట్ — తెల్ల లాకర్‌ను నొక్కండి", refresh:"⟳ రిఫ్రెష్",
+  g1:"<b>1.</b> తెల్ల (ఖాళీ) లాకర్‌ను నొక్కండి", g2:"<b>2.</b> పేరు, మొబైల్ &amp; వస్తువులు నమోదు చేయండి", g3:"<b>3.</b> UPI ద్వారా చెల్లించండి", g4:"<b>4.</b> దుకాణంలో చెక్-ఇన్ చేయండి",
+  stFreeL:"✓ ఖాళీ – అందుబాటులో ఉంది", stPendL:"⏳ చెల్లిస్తున్నారు – చెల్లింపు కోసం వేచి ఉంది", stOccL:"🔒 వాడుకలో – నిండింది", stTabL:"కంట్రోల్ టాబ్లెట్ (లాకర్ కాదు)",
+  sizeKey:"XL = చాలా పెద్దది · L = పెద్దది · M = మధ్యస్థం. జంబో సూట్‌కేస్: L లేదా XL ఎంచుకోండి.",
+  stFREE:"✓ ఖాళీ", stPENDING:"⏳ చెల్లింపు", stOCCUPIED:"🔒 నిండింది", tablet:"కంట్రోల్<br>టాబ్లెట్", tabletAria:"కంట్రోల్ టాబ్లెట్ – లాకర్ కాదు",
+  stFREEa:"అందుబాటులో ఉంది", stPENDINGa:"చెల్లింపు కోసం వేచి ఉంది", stOCCUPIEDa:"నిండింది",
+  sizeM:"మధ్యస్థం", sizeL:"పెద్దది", sizeXL:"చాలా పెద్దది",
+  freeCount:"ఖాళీ: {total}లో {free}",
+  closedNote:"ఆన్‌లైన్ బుకింగ్ ఉదయం 7 – రాత్రి 9 వరకు మాత్రమే. లాకర్లను ఇప్పుడు కూడా చూడవచ్చు.",
+  offline:"ఆన్‌లైన్ బుకింగ్ ఇప్పుడు అందుబాటులో లేదు. 52 A కార్ స్ట్రీట్‌లోని దుకాణానికి రండి లేదా 8838075040కు కాల్ చేయండి.",
+  taken:"లాకర్ {locker} ఇప్పటికే తీసుకోబడింది. దయచేసి తెల్ల (ఖాళీ) లాకర్‌ను ఎంచుకోండి.",
+  bookTitle:"లాకర్ బుకింగ్", lockerLbl:"లాకర్:", tapMap:"మ్యాప్‌లో ఒక లాకర్‌ను నొక్కండి", pickBtn:"🗺 మ్యాప్‌లో లాకర్ ఎంచుకోండి",
+  nameLbl:"పేరు", mobLbl:"మొబైల్ నంబర్ (WhatsApp)", mobHint:"చెక్-ఇన్ మరియు చెక్-అవుట్ WhatsApp రసీదులు ఈ నంబర్‌కు పంపబడతాయి.",
+  itemsLbl:"వస్తువులు", itBag:"మధ్యస్థ బ్యాగ్", itHelmet:"హెల్మెట్", itJumbo:"జంబో సూట్‌కేస్", payNow:"ఇప్పుడు చెల్లించాలి", bookBtn:"బుక్ చేసి UPI ద్వారా చెల్లించండి",
+  forHours:"{h} గంటలకు {price}",
+  hoursNote:"చెక్-ఇన్ నుంచి (దుకాణంలో లాకర్ తెరిచినప్పటి నుంచి) {h} గంటలు. ప్రతి అదనపు గంటకు ₹{x}, బయలుదేరేటప్పుడు చెల్లించాలి.",
+  pickFirst:"ముందుగా లాకర్ మ్యాప్‌లో ఒక తెల్ల (ఖాళీ) లాకర్‌ను నొక్కండి.",
+  refLbl:"బుకింగ్ నంబర్", lockerW:"లాకర్", amtPaid:"చెల్లించిన మొత్తం", paidOk:"✅ చెల్లింపు విజయవంతం", noPayAgain:"ఈ బుకింగ్‌కు మళ్లీ చెల్లించవద్దు.",
+  held:"లాకర్ <b>{locker}</b> మీ కోసం ఉంచబడింది.<br><b>{by}</b>లోపు <b>{amt}</b> చెల్లించండి.",
+  upiBtn:"UPI యాప్‌తో చెల్లించండి (GPay / PhonePe / Paytm)", orScan:"లేదా ఈ QR స్కాన్ చేయండి:", upiIdLbl:"UPI ID:", keepRef:"చెల్లింపు నోట్‌లో బుకింగ్ నంబర్ ఉంచండి",
+  waNote:"📲 మీ బుకింగ్ నంబర్‌ను దాచుకోండి (స్క్రీన్‌షాట్ తీసుకోండి). చెక్-ఇన్ కోసం దుకాణంలో చూపించండి. చెక్-ఇన్ మరియు చెక్-అవుట్ సమయంలో WhatsAppలో రసీదు పంపబడుతుంది.",
+  newBooking:"కొత్త బుకింగ్", payOnline:"ఇప్పుడు {amt} చెల్లించండి (UPI / కార్డ్ / నెట్ బ్యాంకింగ్)",
+  gwNote:"{gw} ద్వారా సురక్షిత చెల్లింపు. చెల్లింపు విజయవంతమైనప్పుడు మీ లాకర్ ఆటోమేటిక్‌గా నిర్ధారించబడుతుంది.", testMode:" (టెస్ట్ మోడ్ – నిజమైన డబ్బు కాదు)",
+  wShop:"మీ చెల్లింపును దుకాణం నిర్ధారించే వరకు వేచి ఉంది…", wPay:"చెల్లింపు కోసం వేచి ఉంది…",
+  wPayBy:"చెల్లింపు కోసం వేచి ఉంది… {by}లోపు చెల్లించండి. చెల్లింపు విఫలమైతే, అప్పటివరకు మళ్లీ ప్రయత్నించవచ్చు.",
+  notConf:"చెల్లింపు ఇంకా నిర్ధారించబడలేదు. {by}లోపు చెల్లించండి. చెల్లింపు విఫలమైతే, అప్పటివరకు మళ్లీ ప్రయత్నించవచ్చు.",
+  payDone:"చెల్లింపు పూర్తయింది – బ్యాంక్‌తో నిర్ధారిస్తున్నాము…",
+  payNotDone:"చెల్లింపు పూర్తి కాలేదు{why}. {by} వరకు మళ్లీ ప్రయత్నించవచ్చు.", payFailed:"చెల్లింపు విఫలమైంది{why}. {by} వరకు మళ్లీ ప్రయత్నించవచ్చు.",
+  checkedIn:"{t}కి చెక్-ఇన్ అయింది. లాకర్ {locker} {h} గంటలు మీది. వస్తువులు తీసుకోవడానికి బుకింగ్ నంబర్ {ref} ఉంచుకోండి.",
+  confirmed:"చెల్లింపు నిర్ధారించబడింది. లాకర్ {locker} మీ కోసం ఉంచబడింది. 52 A కార్ స్ట్రీట్‌లోని దుకాణానికి{by} వచ్చి బుకింగ్ నంబర్ {ref} చూపించండి. లాకర్ తెరిచినప్పుడు మీ {h} గంటలు మొదలవుతాయి.",
+  byT:" {t}లోపు",
+  collected:"{t}కి వస్తువులు తీసుకున్నారు. ధన్యవాదాలు!",
+  noShow:"ఈ బుకింగ్ చెక్-ఇన్ సమయం దాటిపోయింది. బుకింగ్ నంబర్ {ref}తో 8838075040కు కాల్ చేయండి.",
+  paidLost:"మీ {amt} చెల్లింపు అందింది, కానీ లాకర్ {locker}ను మీ కోసం ఉంచలేకపోయాము. దుకాణం మీకు వేరే లాకర్ ఇస్తుంది లేదా డబ్బు తిరిగి ఇస్తుంది – బుకింగ్ నంబర్ {ref}తో 8838075040కు కాల్ చేయండి.",
+  expired:"ఈ బుకింగ్ గడువు ముగిసింది. మీరు ఇప్పటికే చెల్లించి ఉంటే, దుకాణానికి రండి లేదా బుకింగ్ నంబర్ {ref}తో 8838075040కు కాల్ చేయండి – దుకాణం ఇంకా నిర్ధారించగలదు.",
+  cancelled:"ఈ బుకింగ్ రద్దు చేయబడింది. మీరు ఇప్పటికే చెల్లించి ఉంటే, దుకాణానికి రండి లేదా బుకింగ్ నంబర్ {ref}తో 8838075040కు కాల్ చేయండి – దుకాణం ఇంకా నిర్ధారించగలదు.",
+  scriptFail:"చెల్లింపు విండో తెరవలేకపోయాము. మీ ఇంటర్నెట్ చూసి మళ్లీ ప్రయత్నించండి.",
+  footHelp:"సహాయం కావాలా? కాల్ చేయండి", footHome:"హోమ్", footFaq:"ప్రశ్నలు-జవాబులు"}
+};
+let LANG = "en";
+if (!STAFF){
+  const q = new URLSearchParams(location.search).get("lang");
+  try { LANG = q || localStorage.getItem("lang") || "en"; } catch(e) { LANG = q || "en"; }
+  if (!I18N[LANG]) LANG = "en";
+}
+/* t("key", {var:value}) – text in the chosen language, falls back to English. */
+function t(k, v){
+  let s = (I18N[LANG] && I18N[LANG][k] != null) ? I18N[LANG][k] : (I18N.en[k] != null ? I18N.en[k] : k);
+  if (v) s = s.replace(/\{(\w+)\}/g, (m, x) => v[x] != null ? v[x] : m);
+  return s;
+}
+function applyLang(){
+  document.documentElement.lang = LANG;
+  document.querySelectorAll("[data-t]").forEach(el => { el.innerHTML = t(el.dataset.t); });
+  document.querySelectorAll("#langs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === LANG ? "true" : "false"));
+  document.querySelectorAll("#tabs button").forEach(b => { b.textContent = tabLabel(b.dataset.tab); });
+  if (!selected) $("bLocker").textContent = t("tapMap"); else if (cab) { const l = cab.lockers.find(x => x.locker_no === selected); if (l) $("bLocker").textContent = lockerName(l); }
+  if (cab){ drawGrid(); renderPrices(); showCabinetNotes(); }
+  if (cur){ renderHeld(); if ($("rzpAmt")) payOnlineText(); poll(); }
+}
+document.querySelectorAll("#langs button").forEach(b => b.addEventListener("click", () => {
+  LANG = b.dataset.lang; try { localStorage.setItem("lang", LANG); } catch(e) {} applyLang();
+}));
+const sizeName = s => t(s === "M" ? "sizeM" : s === "L" ? "sizeL" : "sizeXL");
+const lockerName = l => `${l.locker_no} (${sizeName(l.size)})`;
+
 /* "2026-11-12 21:00:00" -> "09:00 PM" (adds "13 Nov" when not today) */
 function fmtT(s){
   if (!s) return "";
@@ -213,17 +391,24 @@ const rupee = n => "₹" + n;
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 /* ---------- tabs ---------- */
-const TABS = STAFF ? [["map","🗺 Locker Map"],["book","✔ Check-In"],["out","⬜ Checkout"],["all","📋 All Bookings"]]
-                   : [["map","🗺 Locker Map"],["book","✔ Book Locker"]];
-$("tabs").innerHTML = TABS.map(([k,t]) => `<button data-t="${k}">${t}</button>`).join("");
-$("tabs").addEventListener("click", e => { const t = e.target.closest("button"); if (t) showTab(t.dataset.t); });
+const TABS = STAFF ? [["map"],["book"],["out"],["all"]] : [["map"],["book"]];
+function tabLabel(k){ return STAFF && k === "book" ? "✔ Check-In" : t("tab_" + k); }
+/* tab buttons use data-tab (not data-t, which is the translation key attribute) */
+$("tabs").innerHTML = TABS.map(([k]) => `<button type="button" role="tab" id="tab-${k}" aria-controls="t-${k}" data-tab="${k}">${tabLabel(k)}</button>`).join("");
+$("tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) showTab(b.dataset.tab); });
 function showTab(k){
   TABS.forEach(([x]) => $("t-"+x).classList.toggle("hidden", x !== k));
-  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.t === k));
+  document.querySelectorAll("#tabs button").forEach(b => { const on = b.dataset.tab === k; b.classList.toggle("on", on); b.setAttribute("aria-selected", on ? "true" : "false"); });
+  $("pickBtn").classList.toggle("hidden", !!selected || STAFF);
   if (k === "all") loadAll();
   if (k === "map") loadCabinet();
 }
-if (STAFF){ $("aadhaarBox").classList.remove("hidden"); $("bookTitle").textContent = "CHECK-IN (SHOP)"; $("sub").textContent = "Staff screen · 23 Lockers · Shop / App / Web bookings in one list"; }
+if (STAFF){
+  ["bookTitle","sub"].forEach(id => $(id).removeAttribute("data-t"));
+  $("aadhaarBox").classList.remove("hidden"); $("bookTitle").textContent = "CHECK-IN (SHOP)"; $("sub").textContent = "Staff screen · 23 Lockers · Shop / App / Web bookings in one list";
+  ["langs","guide","foot","mobHint"].forEach(id => $(id).classList.add("hidden"));
+  document.querySelector("header .home").removeAttribute("href");
+}
 
 /* ---------- api ---------- */
 async function api(path, body){
@@ -240,14 +425,19 @@ async function loadCabinet(){
   try {
     cab = await api("/api/cabinet");
     drawGrid(); renderPrices();
-    $("freeCount").textContent = `Free: ${cab.free} of ${cab.total}`;
-    if (!STAFF && !cab.open_now) msg("notice","info","Online booking is open 7 AM – 9 PM. You can still view the lockers.");
+    $("freeCount").textContent = t("freeCount", {free: cab.free, total: cab.total});
+    if (!STAFF && !cab.open_now) msg("notice","info",t("closedNote"));
     else if (STAFF && cab.payment_exceptions) msg("notice","err",`⚠ ${cab.payment_exceptions} online payment(s) need action – open 📋 All Bookings and use “Assign locker”, or refund in the payment gateway (Cashfree / Razorpay).`);
     else if (STAFF && cab.simulate_locks) msg("notice","info","Lock control is in SIMULATION mode – locks will not physically open.");
     else msg("notice");
   } catch(e) {
-    msg("notice","err", STAFF ? "Cannot reach the locker server." : "Online booking is unavailable right now. Please visit the shop at 52 A Car Street or call 8838075040.");
+    msg("notice","err", STAFF ? "Cannot reach the locker server." : t("offline"));
   }
+}
+/* re-translate the map notes after a language change (no new server request) */
+function showCabinetNotes(){
+  $("freeCount").textContent = t("freeCount", {free: cab.free, total: cab.total});
+  if (!STAFF && !cab.open_now) msg("notice","info",t("closedNote"));
 }
 /* "TVM-M108" -> small "TVM" line above "M108" so it fits in narrow boxes on phones */
 function cellLabel(id){
@@ -258,25 +448,28 @@ function drawGrid(){
   const g = $("grid"); g.innerHTML = "";
   g.style.gridTemplateColumns = `repeat(${cab.grid.cols},1fr)`;
   g.style.gridTemplateRows = `repeat(${cab.grid.rows},1fr)`;
-  const t = cab.grid.tablet, tb = document.createElement("div");
-  tb.className = "cell tablet"; tb.innerHTML = "CONTROL<br>TABLET";
-  tb.style.gridColumn = `${t.col+1}`; tb.style.gridRow = `${t.row+1} / span ${t.span}`; g.appendChild(tb);
+  const tp = cab.grid.tablet, tb = document.createElement("div");
+  tb.className = "tablet"; tb.innerHTML = t("tablet"); tb.setAttribute("role","img"); tb.setAttribute("aria-label", t("tabletAria"));
+  tb.style.gridColumn = `${tp.col+1}`; tb.style.gridRow = `${tp.row+1} / span ${tp.span}`; g.appendChild(tb);
   cab.lockers.forEach(l => {
     const b = document.createElement("button");
     b.className = `cell ${l.state}` + (selected === l.locker_no ? " sel" : "");
     b.style.gridColumn = `${l.col+1}`; b.style.gridRow = `${l.row+1} / span ${l.span}`;
-    b.innerHTML = cellLabel(l.locker_no) + (STAFF && l.booking ? `<small>${esc(l.booking.visitor_name).slice(0,12)}</small>` : "");
-    b.setAttribute("aria-label", `${l.locker_no} ${l.size} ${l.state}`);
+    b.type = "button";
+    b.innerHTML = cellLabel(l.locker_no) + `<span class="st" aria-hidden="true">${t("st" + l.state)}</span>`
+      + (STAFF && l.booking ? `<small>${esc(l.booking.visitor_name).slice(0,12)}</small>` : "");
+    b.setAttribute("aria-label", `${l.locker_no}, ${sizeName(l.size)}, ${t("st" + l.state + "a")}`);
+    if (selected === l.locker_no) b.setAttribute("aria-pressed", "true");
     b.onclick = () => tapLocker(l);
     g.appendChild(b);
   });
 }
 function tapLocker(l){
   if (l.state === "FREE"){
-    selected = l.locker_no; $("bLocker").textContent = `${l.locker_no} (${l.size === "M" ? "Medium" : l.size === "L" ? "Large" : "Extra large"})`;
+    selected = l.locker_no; $("bLocker").textContent = lockerName(l);
     $("lockerPanel").innerHTML = ""; drawGrid(); resetBooking(true); showTab("book"); return;
   }
-  if (!STAFF){ $("lockerPanel").innerHTML = `<div class="card msg info">Locker ${esc(l.locker_no)} is taken. Please choose a grey locker.</div>`; return; }
+  if (!STAFF){ $("lockerPanel").innerHTML = `<div class="card msg info">${esc(t("taken", {locker: l.locker_no}))}</div>`; return; }
   const b = l.booking; if (!b) return;
   lastRows[b.ref] = b;
   const items = itemText(b);
@@ -292,13 +485,11 @@ function tapLocker(l){
       <div class="row2"><button class="btn ok" onclick="staffConfirm('${b.ref}')">✔ Payment received</button><button class="btn alt" onclick="staffCancel('${b.ref}')">Cancel</button></div>`;
   } else if (!b.checkin_at){
     html += `<div class="msg info">Paid ${esc(fmtT(b.paid_at))} – waiting for the customer. Check in by <b>${esc(fmtT(b.valid_until))}</b>. The 10 hours start when the locker is opened.</div>
-      <div class="row2"><button class="btn ok" onclick="staffCheckin('${b.ref}')">✔ Customer arrived – open locker</button>
-      <button class="btn alt" onclick="printReceipt(lastRows['${b.ref}'], lastRows['${b.ref}'].phone)">🧾 Receipt</button></div>`;
+      <button class="btn ok" onclick="staffCheckin('${b.ref}')">✔ Customer arrived – open locker</button>`;
   } else {
     html += `<div class="small">Checked in ${esc(fmtT(b.checkin_at))} · In use ${b.hours} h · Extra due: <b>${rupee(b.extra_due)}</b></div>
       <div class="row2"><button class="btn" onclick="staffCheckout('${b.ref}', ${b.extra_due})">⬜ Checkout &amp; open locker</button>
-      <button class="btn alt" onclick="staffOpen('${l.locker_no}')">Open only</button></div>
-      <button class="btn alt" onclick="printReceipt(lastRows['${b.ref}'], lastRows['${b.ref}'].phone)">🧾 Receipt</button>`;
+      <button class="btn alt" onclick="staffOpen('${l.locker_no}')">Open only</button></div>`;
   }
   $("lockerPanel").innerHTML = html + `<div id="panelMsg"></div></div>`;
 }
@@ -310,8 +501,8 @@ function renderPrices(){
   const t = cab.tariff;
   for (const k in counts) $(k).textContent = counts[k];
   $("total").textContent = rupee(counts.bags*t.bag + counts.helmets*t.helmet + counts.jumbo*t.jumbo);
-  document.querySelectorAll("[data-p]").forEach(el => el.textContent = rupee(t[el.dataset.p]) + " for " + cab.base_hours + " hours");
-  $("hoursNote").textContent = `Covers ${cab.base_hours} hours from check-in (when the locker is opened for you at the shop). Extra ₹${t.extra_hour} per hour, paid at checkout.`;
+  document.querySelectorAll("[data-p]").forEach(el => el.textContent = window.t("forHours", {price: rupee(t[el.dataset.p]), h: cab.base_hours}));
+  $("hoursNote").textContent = window.t("hoursNote", {h: cab.base_hours, x: t.extra_hour});
 }
 document.querySelectorAll(".step button").forEach(b => b.addEventListener("click", () => {
   const sum = counts.bags + counts.helmets + counts.jumbo, d = +b.dataset.d;
@@ -320,7 +511,7 @@ document.querySelectorAll(".step button").forEach(b => b.addEventListener("click
 }));
 $("bookForm").addEventListener("submit", async ev => {
   ev.preventDefault();
-  if (!selected){ msg("bookMsg","err","Please tap a grey locker on the Locker Map first."); return; }
+  if (!selected){ msg("bookMsg","err",t("pickFirst")); return; }
   $("bookBtn").disabled = true; msg("bookMsg");
   try {
     const d = await api("/api/book", {locker_no:selected, name:$("name").value.trim(), mobile:$("mobile").value.trim(),
@@ -329,19 +520,26 @@ $("bookForm").addEventListener("submit", async ev => {
   } catch(e) { msg("bookMsg","err", e.message); loadCabinet(); }
   $("bookBtn").disabled = false;
 });
+function renderHeld(){
+  $("heldP").innerHTML = t("held", {locker: esc($("pLocker").textContent), amt: esc($("pAmt").textContent), by: esc($("pBy").textContent)});
+}
+function payOnlineText(){
+  $("rzpLbl").textContent = t("payOnline", {amt: $("rzpAmt").textContent});
+  const gw = cf ? "Cashfree" + (cf.mode === "sandbox" ? t("testMode") : "") : "Razorpay";
+  $("gwP").textContent = t("gwNote", {gw});
+}
 function showPay(d, mobile, noAutoOpen){
   cur = {ref:d.ref, mobile};
   $("bookForm").classList.add("hidden"); $("pay").classList.remove("hidden");
   $("pRef").textContent = d.ref; $("pLocker").textContent = d.locker_no; $("pAmt").textContent = rupee(d.amount);
-  $("pBy").textContent = d.pay_before;
+  $("pBy").textContent = d.pay_before; renderHeld();
   payable = true; rzp = d.razorpay || null; cf = d.cashfree || null;
   $("payOpts").classList.remove("hidden"); $("paidBox").classList.add("hidden");
   const online = !!(rzp || cf);
   $("upiOpts").classList.toggle("hidden", online); $("rzpOpts").classList.toggle("hidden", !online);
-  $("gwName").textContent = cf ? "Cashfree" + (cf.mode === "sandbox" ? " (TEST mode – no real money)" : "") : "Razorpay";
   if (online){
-    $("rzpAmt").textContent = rupee(d.amount); $("upiBtn").removeAttribute("href"); $("qr").innerHTML = "";
-    $("payStatus").className = "msg info"; $("payStatus").textContent = "Waiting for payment…";
+    $("rzpAmt").textContent = rupee(d.amount); payOnlineText(); $("upiBtn").removeAttribute("href"); $("qr").innerHTML = "";
+    $("payStatus").className = "msg info"; $("payStatus").textContent = t("wPay");
     $("staffPayBtns").classList.add("hidden");          // no manual button: the gateway confirms it
     if (STAFF){ const sb = $("staffPayBtns"); sb.classList.remove("hidden"); sb.querySelector(".btn.ok").classList.add("hidden"); }
     if (!noAutoOpen) openCheckout();
@@ -349,7 +547,7 @@ function showPay(d, mobile, noAutoOpen){
     $("pUpi").textContent = d.upi_id; $("upiBtn").href = d.upi_link;
     try { const q = qrcode(0,"M"); q.addData(d.upi_link); q.make(); $("qr").innerHTML = q.createImgTag(6,8); }
     catch(e){ $("qr").innerHTML = ""; }     // QR library unavailable: UPI button + UPI ID still shown
-    $("payStatus").className = "msg info"; $("payStatus").textContent = STAFF ? "Show this QR to the customer. Press Payment received after checking the Paytm app." : "Waiting for the shop to confirm your payment…";
+    $("payStatus").className = "msg info"; $("payStatus").textContent = STAFF ? "Show this QR to the customer. Press Payment received after checking the Paytm app." : t("wShop");
     $("staffPayBtns").classList.toggle("hidden", !STAFF);
     if (STAFF) $("staffPayBtns").querySelector(".btn.ok").classList.remove("hidden");
   }
@@ -362,7 +560,7 @@ function loadRzpScript(){
   return new Promise((res, rej) => {
     if (window.Razorpay) return res();
     const s = document.createElement("script"); s.src = "https://checkout.razorpay.com/v1/checkout.js";
-    s.onload = res; s.onerror = () => rej(new Error("Could not load the payment window. Check your internet and try again."));
+    s.onload = res; s.onerror = () => rej(new Error(t("scriptFail")));
     document.head.appendChild(s);
   });
 }
@@ -372,7 +570,7 @@ function loadCfScript(){
   return new Promise((res, rej) => {
     if (window.Cashfree) return res();
     const s = document.createElement("script"); s.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
-    s.onload = res; s.onerror = () => rej(new Error("Could not load the payment window. Check your internet and try again."));
+    s.onload = res; s.onerror = () => rej(new Error(t("scriptFail")));
     document.head.appendChild(s);
   });
 }
@@ -388,10 +586,10 @@ async function openCashfree(){
           .checkout({paymentSessionId: cf.payment_session_id, redirectTarget: "_modal"}); }
   catch(e){ result = {error: {message: e && e.message}}; }
   if (result && result.paymentDetails){
-    $("payStatus").className = "msg info"; $("payStatus").textContent = "Payment done – confirming with the bank…";
+    $("payStatus").className = "msg info"; $("payStatus").textContent = t("payDone");
   } else if (result && result.error){
     $("payStatus").className = "msg err";
-    $("payStatus").textContent = `Payment not completed${result.error.message ? ": " + result.error.message : ""}. You can try again until ${$("pBy").textContent}.`;
+    $("payStatus").textContent = t("payNotDone", {why: result.error.message ? ": " + result.error.message : "", by: $("pBy").textContent});
   }
   if (!(result && result.redirect)) verify();
 }
@@ -405,15 +603,15 @@ async function openCheckout(){
     key: rzp.key_id, order_id: rzp.order_id, amount: rzp.amount_paise, currency: rzp.currency || "INR",
     name: "Arunachala Digital Luggage Lockers", description: `Locker ${$("pLocker").textContent} · ref ${ref}`,
     prefill: {name: rzp.name || "", contact: "+91" + mobile}, notes: {booking_ref: ref},
-    theme: {color: "#e8445a"},
+    theme: {color: "#7a1f2b"},
     // Browser success is only a hint: the server checks with Razorpay before marking anything paid.
-    handler: r => { $("payStatus").className = "msg info"; $("payStatus").textContent = "Payment done – confirming with the bank…";
+    handler: r => { $("payStatus").className = "msg info"; $("payStatus").textContent = t("payDone");
                     api("/api/payment/verify", Object.assign({ref, mobile}, r)).catch(() => {}).finally(() => poll()); },
     modal: {ondismiss: () => poll()}
   });
   co.on("payment.failed", r => {
     $("payStatus").className = "msg err";
-    $("payStatus").textContent = `Payment failed${r && r.error && r.error.description ? ": " + r.error.description : ""}. You can try again until ${$("pBy").textContent}.`;
+    $("payStatus").textContent = t("payFailed", {why: r && r.error && r.error.description ? ": " + r.error.description : "", by: $("pBy").textContent});
   });
   co.open();
 }
@@ -441,39 +639,37 @@ async function poll(){
     lastStatus = d;
     setPayView(d);
     if (d.status === "PENDING_PAYMENT" && (rzp || cf)){ if ($("payStatus").className !== "msg err"){ $("payStatus").className = "msg info";
-      $("payStatus").textContent = `Waiting for payment… Pay before ${d.pay_before || $("pBy").textContent}. If a payment fails, you can try again until then.`; } }
+      $("payStatus").textContent = t("wPayBy", {by: d.pay_before || $("pBy").textContent}); } }
     else if (d.status === "PENDING_PAYMENT"){ $("payStatus").className = "msg info"; $("payStatus").textContent = STAFF
       ? "Show this QR to the customer. Press Payment received after checking the Paytm app."
-      : `Payment not confirmed yet. Pay before ${d.pay_before || $("pBy").textContent}. If your payment failed, you can try again until then.`; }
+      : t("notConf", {by: d.pay_before || $("pBy").textContent}); }
     const paid = d.status === "ACTIVE" || d.status === "CHECKED_OUT";
-    $("receiptBtn").classList.toggle("hidden", !paid);
     if (paid) $("staffPayBtns").classList.add("hidden");
     if (d.status === "ACTIVE" && d.checkin_at){
       $("payStatus").className="msg good";
-      $("payStatus").textContent=`Checked in at ${fmtT(d.checkin_at)}. Locker ${d.locker_no} is yours for ${d.base_hours || 10} hours. Keep ref ${cur.ref} for collection.`;
+      $("payStatus").textContent=t("checkedIn", {t: fmtT(d.checkin_at), locker: d.locker_no, h: d.base_hours || 10, ref: cur.ref});
       return;
     }
     if (d.status === "ACTIVE"){
       $("payStatus").className="msg good";
-      $("payStatus").textContent=`Payment confirmed. Locker ${d.locker_no} is reserved for you. Come to the shop at 52 A Car Street`
-        + (d.valid_until ? ` by ${fmtT(d.valid_until)}` : "") + ` and show ref ${cur.ref}. Your ${d.base_hours || 10} hours start when the locker is opened for you.`;
+      $("payStatus").textContent=t("confirmed", {locker: d.locker_no, by: d.valid_until ? t("byT", {t: fmtT(d.valid_until)}) : "", ref: cur.ref, h: d.base_hours || 10});
       next = 30000;      // keep checking until the customer is checked in
     }
-    if (d.status === "CHECKED_OUT"){ $("payStatus").className="msg good"; $("payStatus").textContent=`Collected at ${fmtT(d.checkout_time)}. Thank you!`; return; }
-    if (d.status === "NO_SHOW"){ $("payStatus").className="msg err"; $("payStatus").textContent=`The check-in time for this booking has passed. Please call 8838075040 with ref ${cur.ref}.`; return; }
-    if (d.payment_received && (d.status === "EXPIRED" || d.status === "CANCELLED")){ $("payStatus").className="msg err"; $("payStatus").textContent=`We received your payment of ${rupee(d.amount)}, but locker ${d.locker_no} could not be kept for you. The shop will give you another locker or refund you – please call 8838075040 with ref ${cur.ref}.`; $("staffPayBtns").classList.add("hidden"); return; }
-    if (d.status === "EXPIRED" || d.status === "CANCELLED"){ $("payStatus").className="msg err"; $("payStatus").textContent=`This booking is ${d.status.toLowerCase()}. If you already paid, come to the shop or call 8838075040 with ref ${cur.ref} – the shop can still confirm it.`; $("staffPayBtns").classList.add("hidden"); return; }
+    if (d.status === "CHECKED_OUT"){ $("payStatus").className="msg good"; $("payStatus").textContent=t("collected", {t: fmtT(d.checkout_time)}); return; }
+    if (d.status === "NO_SHOW"){ $("payStatus").className="msg err"; $("payStatus").textContent=t("noShow", {ref: cur.ref}); return; }
+    if (d.payment_received && (d.status === "EXPIRED" || d.status === "CANCELLED")){ $("payStatus").className="msg err"; $("payStatus").textContent=t("paidLost", {amt: rupee(d.amount), locker: d.locker_no, ref: cur.ref}); $("staffPayBtns").classList.add("hidden"); return; }
+    if (d.status === "EXPIRED" || d.status === "CANCELLED"){ $("payStatus").className="msg err"; $("payStatus").textContent=t(d.status === "EXPIRED" ? "expired" : "cancelled", {ref: cur.ref}); $("staffPayBtns").classList.add("hidden"); return; }
   } catch(e) {}
   pollTimer = setTimeout(poll, next);
 }
 function resetBooking(keepLocker){
-  clearTimeout(pollTimer); cur = null; lastStatus = null; rzp = null; cf = null; $("receiptBtn").classList.add("hidden");
+  clearTimeout(pollTimer); cur = null; lastStatus = null; rzp = null; cf = null;
   try { sessionStorage.removeItem("tvmPending"); } catch(e) {}
   payable = false; $("paidBox").classList.add("hidden"); $("payOpts").classList.remove("hidden");
   $("pay").classList.add("hidden"); $("bookForm").classList.remove("hidden"); msg("bookMsg");
   if (STAFF){ $("name").value = ""; $("mobile").value = ""; $("aadhaar").value = ""; }
   counts.bags = 1; counts.helmets = 0; counts.jumbo = 0; renderPrices();
-  if (!keepLocker){ selected = null; $("bLocker").textContent = "tap a locker on the map"; showTab("map"); }
+  if (!keepLocker){ selected = null; $("bLocker").textContent = t("tapMap"); showTab("map"); }
 }
 
 /* ---------- staff actions ---------- */
@@ -532,11 +728,11 @@ async function loadAll(){
                   PAYMENT_EXCEPTION:"⚠ Payment exception", ASSIGN_PAID:"Locker assigned (paid online)", REFUND:"Refund"};
       const notes = (b.audit||[]).map(a => `<div class="small">${AL[a.action] || esc(a.action)}${a.staff_id && !["RAZORPAY","CASHFREE"].includes(a.staff_id) ? " by " + esc(a.staff_id) : ""} ${esc(a.at.slice(11,16))}${a.new_locker && a.old_locker !== a.new_locker ? ` (${esc(a.old_locker)} → ${esc(a.new_locker)})` : ""}: ${esc(a.reason)}</div>`).join("")
         + (b.payment ? `<div class="small">💳 ${b.payment.provider === "CASHFREE" ? "Cashfree" : "Razorpay"} ${esc(b.payment.mode)}: ${esc(b.payment.status)}${b.payment.payment_id ? " · " + esc(b.payment.payment_id) : ""}${b.payment.refund_status ? " · refund " + esc(b.payment.refund_status) + " ₹" + (b.payment.refunded_paise/100) : ""}</div>` : "")
-        + (b.payment && b.payment.exception ? `<div class="small" style="color:var(--red);font-weight:700">⚠ ${esc(b.payment.exception)}</div>` : "");
+        + (b.payment && b.payment.exception ? `<div class="small" style="color:var(--maroon);font-weight:700">⚠ ${esc(b.payment.exception)}</div>` : "");
       const needs = b.payment && b.payment.status === "NEEDS_ACTION";
       const act = (b.status === "EXPIRED" || b.status === "NO_SHOW" || (needs && b.status === "CANCELLED"))
         ? `<button class="btn alt" style="margin:0;padding:6px 10px;width:auto;font-size:13px" onclick="openLate('${b.ref}')">${needs ? "Assign locker" : b.status === "EXPIRED" ? "Late confirm" : "Re-open"}</button>`
-        : (["ACTIVE","CHECKED_OUT"].includes(b.status) ? `<button class="btn alt" style="margin:0;padding:6px 10px;width:auto;font-size:13px" onclick="printReceipt(lastRows['${b.ref}'], lastRows['${b.ref}'].phone)">🧾</button>` : "");
+        : "";
       return `<tr><td>${esc(b.ref)}</td><td><span class="tag">${esc(b.source)}</span></td><td>${esc(b.locker_no)}</td><td>${esc(b.visitor_name)}</td><td>${esc(b.phone)}</td><td>${esc(itemText(b))}</td><td>${b.amount + b.extra_amount}</td><td>${esc(b.status)}${notes}</td><td>${esc(b.created_at.slice(11,16))}</td><td>${esc((b.paid_at||"").slice(11,16))}</td><td>${esc((b.checkin_at||"").slice(11,16))}</td><td>${esc((b.checkout_time||"").slice(11,16))}</td><td>${act}</td></tr>`;
     }).join("");
   } catch(e){ $("allSummary").textContent = e.message; }
@@ -575,40 +771,7 @@ $("lateForm").addEventListener("submit", async ev => {
   $("lateGo").disabled = false;
 });
 
-/* ---------- printable receipt (Print / Save as PDF) ---------- */
-function printReceipt(b, phone){
-  if (!b) return;
-  const t = (cab && cab.tariff) || {bag:50, helmet:50, jumbo:100, extra_hour:10};
-  const hrs = b.base_hours || (cab && cab.base_hours) || 10;
-  const name = b.visitor_name || b.name || "";
-  const ph = String(phone || b.phone || ""); const masked = ph ? "xxxxxx" + ph.slice(-4) : "";
-  const lines = [["Medium bag", b.bags, t.bag], ["Helmet", b.helmets, t.helmet], ["Jumbo suitcase", b.jumbo, t.jumbo]]
-    .filter(x => x[1]).map(x => `<tr><td>${x[0]} × ${x[1]}</td><td>₹${x[1]*x[2]}</td></tr>`).join("");
-  let until = "";
-  if (b.checkin_at){ const s = new Date(String(b.checkin_at).replace(" ","T")); s.setHours(s.getHours() + hrs); until = fmtT(s); }
-  const extra = b.extra_amount || 0;
-  $("receiptWrap").innerHTML = `<div class="rc">
-    <h3>Arunachala Digital Luggage Lockers</h3>
-    <div class="muted">52 A Car Street, Tiruvannamalai – 606601 · +91 88380 75040</div>
-    <p style="margin:12px 0 2px"><b>Booking receipt</b> · ${esc(b.status)}</p>
-    <div class="ref">${esc(b.ref)}</div>
-    <table>
-      <tr><td>Locker</td><td><b>${esc(b.locker_no)}</b></td></tr>
-      <tr><td>Name</td><td>${esc(name)}</td></tr>
-      <tr><td>Mobile</td><td>${esc(masked)}</td></tr>
-      ${lines}
-      <tr><td><b>Paid (${hrs} hours)</b></td><td><b>₹${b.amount}</b></td></tr>
-      ${extra ? `<tr><td>Extra hours paid at checkout</td><td>₹${extra}</td></tr><tr><td><b>Total</b></td><td><b>₹${b.amount + extra}</b></td></tr>` : ""}
-      <tr><td>Payment confirmed</td><td>${esc(fmtT(b.paid_at))}</td></tr>
-      ${b.checkin_at ? `<tr><td>Checked in</td><td>${esc(fmtT(b.checkin_at))}</td></tr><tr><td>${hrs} hours end</td><td>${esc(until)}</td></tr>`
-                     : (b.valid_until ? `<tr><td>Check in by</td><td>${esc(fmtT(b.valid_until))}</td></tr>` : "")}
-      ${b.checkout_time ? `<tr><td>Collected</td><td>${esc(fmtT(b.checkout_time))}</td></tr>` : ""}
-    </table>
-    <p class="muted">Your ${hrs} hours start when the locker is opened for you at the shop. After ${hrs} hours: ₹${t.extra_hour} per extra hour (part of an hour counts as a full hour), paid at checkout. Show this booking ref to collect your luggage.</p>
-  </div>`;
-  window.print();
-}
-
+applyLang();
 showTab("map");
 /* Back from a bank page after a Cashfree payment (?cf_order=...): show that booking's status again. */
 (async () => {
