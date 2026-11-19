@@ -50,7 +50,7 @@
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin:14px auto;max-width:520px}
   label{display:block;font-weight:600;margin:12px 0 4px;color:var(--ink);font-size:15px}
   .hint{font-size:13px;color:var(--muted);margin-top:3px}
-  input,select{width:100%;padding:11px;font-size:16px;border-radius:8px;border:1.5px solid #b9a99c;background:#fff;color:var(--ink)}
+  input,select,textarea{width:100%;padding:11px;font-size:16px;border-radius:8px;border:1.5px solid #b9a99c;background:#fff;color:var(--ink)}
   .items{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:6px}
   .step{display:flex;gap:8px;align-items:center}
   .step button{width:44px;height:44px;font-size:22px;border-radius:8px;border:1.5px solid var(--maroon);background:#fff;color:var(--maroon);cursor:pointer}
@@ -72,6 +72,24 @@
   .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-bottom:10px}
   .toolbar input{width:auto}
   .small{font-size:13px;color:var(--muted)}
+  textarea{font-family:inherit;resize:vertical}
+  /* staff screen */
+  .sbar{display:flex;gap:10px;align-items:center;color:#fff;font-size:14px}
+  .sbar button{background:transparent;border:1.5px solid rgba(255,255,255,.7);color:#fff;border-radius:8px;padding:5px 10px;font:inherit;cursor:pointer}
+  .cphoto{width:150px;height:188px;object-fit:cover;border-radius:8px;border:2px solid var(--line);background:#f1e6da;display:block}
+  .cphoto.big{width:220px;height:275px}
+  .crow{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+  .clist button{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px;margin:6px 0;font:inherit;cursor:pointer}
+  .clist button:hover{background:#f6ece0}
+  .pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px}
+  .pill.PENDING{background:#fff4dc;color:#5c3d00} .pill.APPROVED{background:#e5f5ea;color:#1d5e33} .pill.REJECTED{background:#fde8ea;color:#8a1c2b} .pill.REVIEW{background:#8a1c2b;color:#fff}
+  video.cam{width:240px;height:300px;object-fit:cover;border-radius:8px;background:#000}
+  .hist{font-size:12px;color:var(--muted);max-height:220px;overflow:auto}
+  .rsteps{margin:6px 0 0;padding-left:20px} .rsteps li{margin:4px 0}
+  .stat{font-size:18px;font-weight:700;padding:10px 12px;border-radius:8px;margin:10px 0}
+  .stat.PENDING{background:#fff4dc;color:#5c3d00;border:1px solid #f0d58f}
+  .stat.APPROVED{background:#e5f5ea;color:#1d5e33;border:1px solid #a9dcb8}
+  .stat.REJECTED{background:#fde8ea;color:#8a1c2b;border:1px solid #f3b7bf}
   .wa{font-size:14px;color:var(--ink);background:#f3fbf5;border:1px solid #cde9d5;border-radius:8px;padding:8px 10px;margin-top:10px}
   .foot{max-width:1000px;margin:10px auto 30px;padding:0 14px;font-size:14px;color:var(--muted);text-align:center}
   /* late-confirm dialog (staff) */
@@ -93,6 +111,7 @@
         <div class="sub" id="sub" data-t="sub">Locker map &amp; booking · 52 A Car Street, Tiruvannamalai</div>
       </div>
     </a>
+    <div class="sbar hidden" id="staffBar"><span id="staffWho"></span><button type="button" onclick="staffLogout()">Log out</button></div>
     <div class="langs" id="langs" role="group" aria-label="Language">
       <button type="button" data-lang="en" aria-pressed="true" lang="en">EN</button>
       <button type="button" data-lang="ta" aria-pressed="false" lang="ta">தமிழ்</button>
@@ -126,10 +145,15 @@
       <h2 id="bookTitle" data-t="bookTitle">Book a locker</h2>
       <div class="small"><span data-t="lockerLbl">Locker:</span> <b id="bLocker">tap a locker on the map</b></div>
       <button type="button" class="btn alt" id="pickBtn" onclick="showTab('map')" data-t="pickBtn">🗺 Choose a locker on the map</button>
-      <label for="name" data-t="nameLbl">Name</label><input id="name" required maxlength="60" autocomplete="name">
-      <label for="mobile" data-t="mobLbl">Mobile number (WhatsApp)</label>
+      <div id="custPick" class="hidden">
+        <label for="cpQuery">Customer – mobile number or customer ID</label>
+        <div class="row2"><input id="cpQuery" maxlength="12" autocomplete="off"><button class="btn" type="button" style="width:auto;margin:0" onclick="cpFind()">Find</button></div>
+        <div id="cpInfo"></div>
+      </div>
+      <div id="nameBox"><label for="name" data-t="nameLbl">Name</label><input id="name" required maxlength="60" autocomplete="name"></div>
+      <div id="mobileBox"><label for="mobile" data-t="mobLbl">Mobile number (WhatsApp)</label>
       <input id="mobile" required inputmode="numeric" maxlength="10" placeholder="10-digit mobile" autocomplete="tel-national" aria-describedby="mobHint">
-      <div class="hint" id="mobHint" data-t="mobHint">Your WhatsApp receipts at check-in and check-out are sent to this number.</div>
+      <div class="hint" id="mobHint" data-t="mobHint">Your WhatsApp receipts at check-in and check-out are sent to this number.</div></div>
       <div id="aadhaarBox" class="hidden"><label for="aadhaar">Aadhaar – last 4 digits</label>
         <input id="aadhaar" inputmode="numeric" maxlength="4"></div>
       <div style="font-weight:600;margin:12px 0 4px" data-t="itemsLbl">Items</div>
@@ -177,12 +201,66 @@
   </section>
 
   <!-- CHECKOUT (staff) -->
+  <!-- REGISTER IN ADVANCE (public website only; staff register customers in their own tab) -->
+  <section id="t-reg" class="hidden" role="tabpanel">
+    <div class="card">
+      <h2 data-t="regTitle">Register in advance</h2>
+      <ol class="rsteps"><li data-t="rs1">Send your details here (one time).</li>
+        <li data-t="rs2">Visit the shop with your Aadhaar card. Staff look at it, compare its photo with you and take a recent photo.</li>
+        <li data-t="rs3">When staff approve your registration, you can be given a free locker at the shop.</li></ol>
+      <p class="small" data-t="rsNote">Registration does not reserve a locker.</p>
+    </div>
+    <form class="card" id="regForm" novalidate>
+      <label for="rName" data-t="rName">Full name</label>
+      <input id="rName" required maxlength="60" autocomplete="name">
+      <label for="rMobile" data-t="mobLbl">Mobile number (WhatsApp)</label>
+      <input id="rMobile" required inputmode="numeric" maxlength="10" placeholder="10-digit mobile" autocomplete="tel-national">
+      <label for="rAddr" data-t="rAddr">Address (house / street / area)</label>
+      <textarea id="rAddr" rows="2" maxlength="200" autocomplete="street-address"></textarea>
+      <label for="rTown" data-t="rTown">Town / city</label>
+      <input id="rTown" maxlength="60" autocomplete="address-level2">
+      <label for="rPin" data-t="rPin">PIN code</label>
+      <input id="rPin" inputmode="numeric" maxlength="6" autocomplete="postal-code">
+      <label class="check"><input type="checkbox" id="rConsent"> <span data-t="rConsent">I agree that the shop may keep these details and my photo for the locker service.</span></label>
+      <div class="hint" data-t="rNoAadhaar">Do not type or upload your Aadhaar here. Just bring the card to the shop – staff check it there.</div>
+      <button class="btn" type="submit" id="rBtn" data-t="rSubmit">Send my details</button>
+      <div id="rMsg" aria-live="polite"></div>
+    </form>
+    <div class="card center hidden" id="regResult" aria-live="polite">
+      <div class="small" data-t="custId">Customer ID</div>
+      <div class="big" id="rCid"></div>
+      <div class="stat" id="rStatus"></div>
+      <div class="small" id="rMob"></div>
+      <div id="otpBox" class="hidden" style="text-align:left">
+        <h2 data-t="otpTitle">Verify your mobile number</h2>
+        <div class="small" data-t="otpNote">We send a code by SMS to confirm that this phone number is yours. This does not replace the Aadhaar check at the shop.</div>
+        <button class="btn" type="button" id="otpSendBtn" onclick="otpSend()" data-t="otpSend">Send SMS code</button>
+        <div id="otpEnter" class="hidden"><label for="otpCode" data-t="otpCode">6-digit SMS code</label>
+          <input id="otpCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+          <button class="btn ok" type="button" onclick="otpVerify()" data-t="otpVerify">Verify code</button></div>
+        <div id="otpMsg" aria-live="polite"></div>
+      </div>
+      <p class="small" data-t="rKeepId">Tell this customer ID or your mobile number at the counter.</p>
+      <div class="row2"><button class="btn alt" type="button" onclick="regRefresh()" data-t="rRefresh">⟳ Check status</button>
+        <button class="btn alt" type="button" onclick="regForget()" data-t="rForget">Remove from this browser</button></div>
+    </div>
+    <form class="card" id="regLook" novalidate>
+      <h2 data-t="rLookTitle">Already registered? Check your status</h2>
+      <label for="lMobile" data-t="mobLbl">Mobile number (WhatsApp)</label>
+      <input id="lMobile" inputmode="numeric" maxlength="10" autocomplete="tel-national">
+      <label for="lCid" data-t="custId">Customer ID</label>
+      <input id="lCid" maxlength="10" placeholder="C1042" autocapitalize="characters">
+      <button class="btn alt" type="submit" data-t="rLookBtn">Check status</button>
+      <div id="lMsg" aria-live="polite"></div>
+    </form>
+  </section>
+
   <section id="t-out" class="hidden" role="tabpanel">
     <div class="card">
       <h2>CHECKOUT</h2>
-      <div class="small">Tap an occupied locker on the map, or search by mobile.</div>
-      <label for="outMobile">Mobile number</label>
-      <div class="row2"><input id="outMobile" inputmode="numeric" maxlength="10"><button class="btn" style="width:auto;margin:0" onclick="findForCheckout()">Find</button></div>
+      <div class="small">Tap an occupied locker on the map, or search by mobile number or booking ref.</div>
+      <label for="outMobile">Mobile number or booking ref</label>
+      <div class="row2"><input id="outMobile" maxlength="12" autocomplete="off"><button class="btn" style="width:auto;margin:0" onclick="findForCheckout()">Find</button></div>
       <div id="outResult"></div>
     </div>
   </section>
@@ -192,11 +270,43 @@
     <div class="toolbar">
       <div><label for="fDate">Date</label><input id="fDate" type="date"></div>
       <div><label for="fMobile">Mobile</label><input id="fMobile" inputmode="numeric" maxlength="10"></div>
+      <div><label for="fRef">Booking ref</label><input id="fRef" maxlength="12"></div>
       <button class="btn" style="width:auto;margin:0" onclick="loadAll()">Show</button>
     </div>
     <div id="allSummary" class="small"></div>
-    <table><thead><tr><th>Ref</th><th>Source</th><th>Locker</th><th>Name</th><th>Mobile</th><th>Items</th><th>₹</th><th>Status</th><th>Booked</th><th>Paid</th><th>In</th><th>Out</th><th></th></tr></thead>
+    <table><thead><tr><th>Ref</th><th>Source</th><th>Locker</th><th>Customer</th><th>Name</th><th>Mobile</th><th>Items</th><th>₹</th><th>Status</th><th>Booked</th><th>Paid</th><th>In</th><th>Out</th><th></th></tr></thead>
       <tbody id="allRows"></tbody></table>
+  </section>
+
+  <!-- CUSTOMERS (staff) -->
+  <section id="t-cust" class="hidden" role="tabpanel">
+    <div class="card" style="max-width:none">
+      <h2>CUSTOMERS</h2>
+      <div class="toolbar"><div style="flex:1"><label for="cQuery">Mobile, customer ID or name (empty = pending registrations first)</label>
+        <input id="cQuery" maxlength="40" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();custSearch()}"></div>
+        <button class="btn" type="button" style="width:auto;margin:0" onclick="custSearch()">Find</button>
+        <button class="btn alt" type="button" style="width:auto;margin:0" onclick="custNew()">+ New customer (walk-in)</button></div>
+      <div id="cList" class="clist"></div>
+    </div>
+    <div id="cProfile"></div>
+  </section>
+
+  <!-- STAFF ACCOUNTS (admin) -->
+  <section id="t-staff" class="hidden" role="tabpanel">
+    <div class="card" style="max-width:none">
+      <h2>STAFF ACCOUNTS</h2>
+      <div id="staffRows"></div>
+      <h2 style="margin-top:16px">ADD STAFF</h2>
+      <div class="toolbar">
+        <div><label for="sId">Staff ID</label><input id="sId" maxlength="20" autocomplete="off"></div>
+        <div><label for="sName">Name</label><input id="sName" maxlength="60" autocomplete="off"></div>
+        <div><label for="sRole">Role</label><select id="sRole" style="width:auto"><option>STAFF</option><option>ADMIN</option></select></div>
+        <div><label for="sPin">PIN (4–8 digits)</label><input id="sPin" type="password" inputmode="numeric" maxlength="8" autocomplete="new-password"></div>
+        <button class="btn" type="button" style="width:auto;margin:0" onclick="staffAddNew()">Add</button>
+      </div>
+      <div id="staffMsg"></div>
+      <p class="small">STAFF: registrations, bookings, check-in and checkout. ADMIN: also staff accounts, clearing manual reviews and approving a hand-over after a photo mismatch.</p>
+    </div>
   </section>
 </main>
 
@@ -207,13 +317,41 @@
     <div class="small" id="lateInfo"></div>
     <label for="lateLocker">Locker (re-checked when you press Confirm)</label>
     <select id="lateLocker"></select>
-    <label for="lateStaff">Staff ID / name</label><input id="lateStaff" maxlength="40" autocomplete="off">
     <label for="lateReason">Reason</label><input id="lateReason" maxlength="300" placeholder="e.g. Paid 10:42 in Paytm, after hold expired">
     <label class="check"><input type="checkbox" id="latePaid"> Payment verified (Paytm app / Cashfree or Razorpay dashboard)</label>
     <div class="small">This does not open the locker or start the 10 hours. Use “Customer arrived – open locker” when the customer is here.</div>
     <div class="row2"><button class="btn ok" type="submit" id="lateGo">Confirm</button><button class="btn alt" type="button" onclick="closeLate()">Close</button></div>
     <div id="lateMsg"></div>
   </form>
+</div>
+
+<!-- STAFF LOGIN (staff screen only) -->
+<div id="loginBox" class="overlay hidden">
+  <form class="card" id="loginForm">
+    <h2 id="loginTitle">STAFF LOGIN</h2>
+    <div class="small" id="loginInfo">Every action is recorded with your staff ID.</div>
+    <label for="lgId">Staff ID</label><input id="lgId" maxlength="20" autocomplete="username">
+    <div id="lgNameBox" class="hidden"><label for="lgName">Your name</label><input id="lgName" maxlength="60"></div>
+    <label for="lgPin">PIN</label><input id="lgPin" type="password" inputmode="numeric" maxlength="8" autocomplete="current-password">
+    <button class="btn" type="submit" id="lgBtn">Log in</button>
+    <div id="lgMsg"></div>
+  </form>
+</div>
+
+<!-- PHOTO CHECK before opening a locker / handing back luggage (staff) -->
+<div id="pcBox" class="overlay hidden">
+  <div class="card">
+    <h2 id="pcTitle">PHOTO CHECK</h2>
+    <div class="crow"><img id="pcPhoto" class="cphoto big" alt="Saved customer photo"><div id="pcInfo" class="small" style="flex:1;min-width:180px"></div></div>
+    <p><b>Look at the customer. Is this the same person as the saved photo?</b></p>
+    <button class="btn ok" type="button" onclick="pcAnswer('MATCHED')">✔ Same person – continue</button>
+    <label for="pcNote">Note (needed if not matching)</label><input id="pcNote" maxlength="300" placeholder="e.g. face does not match / photo is old">
+    <div class="row2"><button class="btn alt" type="button" onclick="pcAnswer('MISMATCH')">✖ Does not match</button>
+      <button class="btn alt" type="button" onclick="pcAnswer('NO_PHOTO')">Photo missing / outdated</button></div>
+    <button class="btn hidden" type="button" id="pcOverride" onclick="pcAnswer('MANAGER_OVERRIDE')">Admin: approve hand-over after manual review</button>
+    <button class="btn alt" type="button" onclick="pcClose(false)">Cancel</button>
+    <div id="pcMsg"></div>
+  </div>
 </div>
 
 <div class="foot" id="foot"><span data-t="footHelp">Need help? Call</span> <a href="tel:+918838075040">88380 75040</a> · <a href="index.html" data-t="footHome">Home</a> · <a href="index.html#faq" data-t="footFaq">FAQ</a></div>
@@ -268,6 +406,27 @@ const I18N = {
   expired:"This booking has expired. If you already paid, come to the shop or call 8838075040 with ref {ref} – the shop can still confirm it.",
   cancelled:"This booking was cancelled. If you already paid, come to the shop or call 8838075040 with ref {ref} – the shop can still confirm it.",
   scriptFail:"Could not load the payment window. Check your internet and try again.",
+  tab_reg:"📝 Register / status", regTitle:"Register in advance",
+  rs1:"Send your details here (one time).", rs2:"Visit the shop with your Aadhaar card. Staff look at it, compare its photo with you and take a recent photo.",
+  rs3:"When staff approve your registration, you can be given a free locker at the shop.", rsNote:"Registration does not reserve a locker.",
+  rName:"Full name", rAddr:"Address (house / street / area)", rTown:"Town / city", rPin:"PIN code",
+  rConsent:"I agree that the shop may keep these details and my photo for the locker service.",
+  rNoAadhaar:"Do not type or upload your Aadhaar here. Just bring the card to the shop – staff check it there.",
+  rSubmit:"Send my details", custId:"Customer ID",
+  otpTitle:"Verify your mobile number", otpNote:"We send a code by SMS to confirm that this phone number is yours. This does not replace the Aadhaar check at the shop.",
+  otpSend:"Send SMS code", otpCode:"6-digit SMS code", otpVerify:"Verify code", otpSent:"We sent a 6-digit code by SMS to your mobile.",
+  rKeepId:"Tell this customer ID or your mobile number at the counter.", rRefresh:"⟳ Check status", rForget:"Remove from this browser",
+  rLookTitle:"Already registered? Check your status", rLookBtn:"Check status",
+  st_PENDING:"Pending – please visit the shop with your Aadhaar card to complete registration.",
+  st_APPROVED:"Approved – you can be given a locker at the shop.", st_REJECTED:"Not approved – please contact the shop.",
+  mobOtp:"✓ Mobile number verified", mobStaff:"Mobile number confirmed at the shop (not OTP-verified)", mobNone:"Mobile number not verified yet – staff will confirm it at the shop.",
+  regNotFound:"No registration found for this mobile number and customer ID.", regAlready:"This mobile number is already registered. Details can only be changed at the shop.",
+  rErrName:"Please enter your full name.", rErrMobile:"Please enter a valid 10-digit mobile number.", rErrAddr:"Please enter your address (house / street / area).",
+  rErrTown:"Please enter your town or city.", rErrPin:"Please enter a valid 6-digit PIN code.", rErrConsent:"Please tick the box to agree that the shop may keep these details.",
+  rErrCid:"Please enter your customer ID (for example C1042).",
+  freeSeeOnly:"{locker} is free right now. Lockers are given at the shop: come to 52 A Car Street – staff check your registration and photo, give you a free locker and take payment by UPI.",
+  regBtn:"📝 Register in advance", mapTitleS:"Free lockers right now",
+  gs1:"<b>1.</b> See which lockers are free", gs2:"<b>2.</b> Register in advance (one time)", gs3:"<b>3.</b> Visit the shop with your Aadhaar card", gs4:"<b>4.</b> Staff give you a locker &amp; take UPI payment",
   footHelp:"Need help? Call", footHome:"Home", footFaq:"FAQ"},
  ta:{skip:"உள்ளடக்கத்திற்குச் செல்ல", brand:"அருணாசல டிஜிட்டல் லக்கேஜ் லாக்கர்கள்", sub:"லாக்கர் வரைபடம் &amp; முன்பதிவு · 52 A கார் தெரு, திருவண்ணாமலை",
   tab_map:"🗺 லாக்கர் வரைபடம்", tab_book:"✔ லாக்கர் முன்பதிவு",
@@ -308,6 +467,27 @@ const I18N = {
   expired:"இந்த முன்பதிவு காலாவதியாகிவிட்டது. நீங்கள் ஏற்கனவே பணம் செலுத்தியிருந்தால், கடைக்கு வாருங்கள் அல்லது முன்பதிவு எண் {ref}-உடன் 8838075040-ஐ அழைக்கவும் – கடை இன்னும் உறுதிசெய்ய முடியும்.",
   cancelled:"இந்த முன்பதிவு ரத்து செய்யப்பட்டது. நீங்கள் ஏற்கனவே பணம் செலுத்தியிருந்தால், கடைக்கு வாருங்கள் அல்லது முன்பதிவு எண் {ref}-உடன் 8838075040-ஐ அழைக்கவும் – கடை இன்னும் உறுதிசெய்ய முடியும்.",
   scriptFail:"கட்டணச் சாளரத்தைத் திறக்க முடியவில்லை. இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.",
+  tab_reg:"📝 பதிவு / நிலை", regTitle:"முன்கூட்டியே பதிவு செய்யுங்கள்",
+  rs1:"உங்கள் விவரங்களை இங்கே அனுப்புங்கள் (ஒரே ஒரு முறை).", rs2:"உங்கள் ஆதார் அட்டையுடன் கடைக்கு வாருங்கள். ஊழியர்கள் அதைப் பார்த்து, அதிலுள்ள புகைப்படத்தை உங்களுடன் ஒப்பிட்டு, சமீபத்திய புகைப்படம் எடுப்பார்கள்.",
+  rs3:"ஊழியர்கள் உங்கள் பதிவை அங்கீகரித்த பிறகு, கடையில் உங்களுக்குக் காலி லாக்கர் வழங்கப்படும்.", rsNote:"பதிவு செய்வதால் லாக்கர் ஒதுக்கப்படாது.",
+  rName:"முழுப் பெயர்", rAddr:"முகவரி (வீடு / தெரு / பகுதி)", rTown:"ஊர் / நகரம்", rPin:"அஞ்சல் குறியீடு (PIN)",
+  rConsent:"லாக்கர் சேவைக்காக இந்த விவரங்களையும் என் புகைப்படத்தையும் கடை வைத்திருக்க ஒப்புக்கொள்கிறேன்.",
+  rNoAadhaar:"உங்கள் ஆதாரை இங்கே தட்டச்சு செய்யவோ பதிவேற்றவோ வேண்டாம். அட்டையைக் கடைக்குக் கொண்டு வாருங்கள் – ஊழியர்கள் அங்கே சரிபார்ப்பார்கள்.",
+  rSubmit:"என் விவரங்களை அனுப்பு", custId:"வாடிக்கையாளர் எண்",
+  otpTitle:"உங்கள் மொபைல் எண்ணைச் சரிபார்க்கவும்", otpNote:"இந்த மொபைல் எண் உங்களுடையது என்பதை உறுதிசெய்ய SMS மூலம் குறியீடு அனுப்புவோம். இது கடையில் நடக்கும் ஆதார் சரிபார்ப்புக்கு மாற்று அல்ல.",
+  otpSend:"SMS குறியீட்டை அனுப்பு", otpCode:"6 இலக்க SMS குறியீடு", otpVerify:"குறியீட்டைச் சரிபார்", otpSent:"உங்கள் மொபைலுக்கு 6 இலக்க குறியீடு SMS மூலம் அனுப்பப்பட்டது.",
+  rKeepId:"இந்த வாடிக்கையாளர் எண்ணை அல்லது உங்கள் மொபைல் எண்ணைக் கவுண்டரில் சொல்லுங்கள்.", rRefresh:"⟳ நிலையைப் பார்", rForget:"இந்த உலாவியிலிருந்து நீக்கு",
+  rLookTitle:"ஏற்கனவே பதிவு செய்துள்ளீர்களா? நிலையைப் பாருங்கள்", rLookBtn:"நிலையைப் பார்",
+  st_PENDING:"நிலுவையில் – பதிவை முடிக்க உங்கள் ஆதார் அட்டையுடன் கடைக்கு வாருங்கள்.",
+  st_APPROVED:"அங்கீகரிக்கப்பட்டது – கடையில் உங்களுக்கு லாக்கர் வழங்கப்படும்.", st_REJECTED:"அங்கீகரிக்கப்படவில்லை – கடையைத் தொடர்பு கொள்ளுங்கள்.",
+  mobOtp:"✓ மொபைல் எண் சரிபார்க்கப்பட்டது", mobStaff:"மொபைல் எண் கடையில் உறுதிசெய்யப்பட்டது (OTP மூலம் அல்ல)", mobNone:"மொபைல் எண் இன்னும் சரிபார்க்கப்படவில்லை – ஊழியர்கள் கடையில் உறுதிசெய்வார்கள்.",
+  regNotFound:"இந்த மொபைல் எண் மற்றும் வாடிக்கையாளர் எண்ணுக்குப் பதிவு எதுவும் இல்லை.", regAlready:"இந்த மொபைல் எண் ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது. விவரங்களைக் கடையில் மட்டுமே மாற்ற முடியும்.",
+  rErrName:"உங்கள் முழுப் பெயரை உள்ளிடுங்கள்.", rErrMobile:"சரியான 10 இலக்க மொபைல் எண்ணை உள்ளிடுங்கள்.", rErrAddr:"உங்கள் முகவரியை உள்ளிடுங்கள் (வீடு / தெரு / பகுதி).",
+  rErrTown:"உங்கள் ஊர் அல்லது நகரத்தை உள்ளிடுங்கள்.", rErrPin:"சரியான 6 இலக்க அஞ்சல் குறியீட்டை உள்ளிடுங்கள்.", rErrConsent:"விவரங்களைக் கடை வைத்திருக்க ஒப்புக்கொள்ள பெட்டியில் டிக் செய்யுங்கள்.",
+  rErrCid:"உங்கள் வாடிக்கையாளர் எண்ணை உள்ளிடுங்கள் (எ.கா. C1042).",
+  freeSeeOnly:"{locker} இப்போது காலியாக உள்ளது. லாக்கர்கள் கடையில் வழங்கப்படும்: 52 A கார் தெருவுக்கு வாருங்கள் – ஊழியர்கள் உங்கள் பதிவையும் புகைப்படத்தையும் சரிபார்த்து, காலி லாக்கர் வழங்கி, UPI மூலம் கட்டணம் பெறுவார்கள்.",
+  regBtn:"📝 முன்கூட்டியே பதிவு", mapTitleS:"இப்போது காலியாக உள்ள லாக்கர்கள்",
+  gs1:"<b>1.</b> காலி லாக்கர்களைப் பாருங்கள்", gs2:"<b>2.</b> முன்கூட்டியே பதிவு செய்யுங்கள் (ஒரு முறை)", gs3:"<b>3.</b> ஆதார் அட்டையுடன் கடைக்கு வாருங்கள்", gs4:"<b>4.</b> ஊழியர்கள் லாக்கர் வழங்கி UPI கட்டணம் பெறுவார்கள்",
   footHelp:"உதவி வேண்டுமா? அழைக்கவும்", footHome:"முகப்பு", footFaq:"கேள்வி-பதில்"},
  te:{skip:"విషయానికి వెళ్ళండి", brand:"అరుణాచల డిజిటల్ లగేజ్ లాకర్లు", sub:"లాకర్ మ్యాప్ &amp; బుకింగ్ · 52 A కార్ స్ట్రీట్, తిరువణ్ణామలై",
   tab_map:"🗺 లాకర్ మ్యాప్", tab_book:"✔ లాకర్ బుకింగ్",
@@ -348,6 +528,27 @@ const I18N = {
   expired:"ఈ బుకింగ్ గడువు ముగిసింది. మీరు ఇప్పటికే చెల్లించి ఉంటే, దుకాణానికి రండి లేదా బుకింగ్ నంబర్ {ref}తో 8838075040కు కాల్ చేయండి – దుకాణం ఇంకా నిర్ధారించగలదు.",
   cancelled:"ఈ బుకింగ్ రద్దు చేయబడింది. మీరు ఇప్పటికే చెల్లించి ఉంటే, దుకాణానికి రండి లేదా బుకింగ్ నంబర్ {ref}తో 8838075040కు కాల్ చేయండి – దుకాణం ఇంకా నిర్ధారించగలదు.",
   scriptFail:"చెల్లింపు విండో తెరవలేకపోయాము. మీ ఇంటర్నెట్ చూసి మళ్లీ ప్రయత్నించండి.",
+  tab_reg:"📝 నమోదు / స్థితి", regTitle:"ముందుగానే నమోదు చేసుకోండి",
+  rs1:"మీ వివరాలను ఇక్కడ పంపండి (ఒక్కసారి మాత్రమే).", rs2:"మీ ఆధార్ కార్డుతో దుకాణానికి రండి. సిబ్బంది దాన్ని చూసి, అందులోని ఫోటోను మీతో పోల్చి, ఇటీవలి ఫోటో తీస్తారు.",
+  rs3:"సిబ్బంది మీ నమోదును ఆమోదించిన తర్వాత, దుకాణంలో మీకు ఖాళీ లాకర్ ఇవ్వబడుతుంది.", rsNote:"నమోదు చేయడం వల్ల లాకర్ రిజర్వ్ కాదు.",
+  rName:"పూర్తి పేరు", rAddr:"చిరునామా (ఇల్లు / వీధి / ప్రాంతం)", rTown:"ఊరు / నగరం", rPin:"పిన్ కోడ్",
+  rConsent:"లాకర్ సేవ కోసం ఈ వివరాలను మరియు నా ఫోటోను దుకాణం ఉంచుకోవడానికి నేను అంగీకరిస్తున్నాను.",
+  rNoAadhaar:"మీ ఆధార్‌ను ఇక్కడ టైప్ చేయవద్దు లేదా అప్‌లోడ్ చేయవద్దు. కార్డును దుకాణానికి తీసుకురండి – సిబ్బంది అక్కడ చూస్తారు.",
+  rSubmit:"నా వివరాలు పంపండి", custId:"కస్టమర్ ID",
+  otpTitle:"మీ మొబైల్ నంబర్‌ను ధృవీకరించండి", otpNote:"ఈ ఫోన్ నంబర్ మీదే అని నిర్ధారించడానికి SMS ద్వారా కోడ్ పంపుతాము. ఇది దుకాణంలో జరిగే ఆధార్ తనిఖీకి ప్రత్యామ్నాయం కాదు.",
+  otpSend:"SMS కోడ్ పంపండి", otpCode:"6 అంకెల SMS కోడ్", otpVerify:"కోడ్ ధృవీకరించండి", otpSent:"మీ మొబైల్‌కు 6 అంకెల కోడ్ SMS ద్వారా పంపాము.",
+  rKeepId:"ఈ కస్టమర్ ID లేదా మీ మొబైల్ నంబర్‌ను కౌంటర్‌లో చెప్పండి.", rRefresh:"⟳ స్థితి చూడండి", rForget:"ఈ బ్రౌజర్ నుంచి తొలగించండి",
+  rLookTitle:"ఇప్పటికే నమోదు చేసుకున్నారా? మీ స్థితి చూడండి", rLookBtn:"స్థితి చూడండి",
+  st_PENDING:"పెండింగ్ – నమోదు పూర్తి చేయడానికి మీ ఆధార్ కార్డుతో దుకాణానికి రండి.",
+  st_APPROVED:"ఆమోదించబడింది – దుకాణంలో మీకు లాకర్ ఇవ్వబడుతుంది.", st_REJECTED:"ఆమోదించబడలేదు – దయచేసి దుకాణాన్ని సంప్రదించండి.",
+  mobOtp:"✓ మొబైల్ నంబర్ ధృవీకరించబడింది", mobStaff:"మొబైల్ నంబర్ దుకాణంలో నిర్ధారించబడింది (OTP ద్వారా కాదు)", mobNone:"మొబైల్ నంబర్ ఇంకా ధృవీకరించబడలేదు – సిబ్బంది దుకాణంలో నిర్ధారిస్తారు.",
+  regNotFound:"ఈ మొబైల్ నంబర్ మరియు కస్టమర్ IDకి నమోదు ఏదీ కనుగొనబడలేదు.", regAlready:"ఈ మొబైల్ నంబర్ ఇప్పటికే నమోదైంది. వివరాలను దుకాణంలో మాత్రమే మార్చవచ్చు.",
+  rErrName:"దయచేసి మీ పూర్తి పేరు నమోదు చేయండి.", rErrMobile:"దయచేసి సరైన 10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి.", rErrAddr:"దయచేసి మీ చిరునామా నమోదు చేయండి (ఇల్లు / వీధి / ప్రాంతం).",
+  rErrTown:"దయచేసి మీ ఊరు లేదా నగరం నమోదు చేయండి.", rErrPin:"దయచేసి సరైన 6 అంకెల పిన్ కోడ్ నమోదు చేయండి.", rErrConsent:"వివరాలను దుకాణం ఉంచుకోవడానికి అంగీకరించడానికి బాక్స్‌లో టిక్ చేయండి.",
+  rErrCid:"దయచేసి మీ కస్టమర్ ID నమోదు చేయండి (ఉదా. C1042).",
+  freeSeeOnly:"{locker} ఇప్పుడు ఖాళీగా ఉంది. లాకర్లు దుకాణంలో ఇవ్వబడతాయి: 52 A కార్ స్ట్రీట్‌కు రండి – సిబ్బంది మీ నమోదు మరియు ఫోటోను తనిఖీ చేసి, ఖాళీ లాకర్ ఇచ్చి, UPI ద్వారా చెల్లింపు తీసుకుంటారు.",
+  regBtn:"📝 ముందుగానే నమోదు", mapTitleS:"ఇప్పుడు ఖాళీగా ఉన్న లాకర్లు",
+  gs1:"<b>1.</b> ఖాళీ లాకర్లు చూడండి", gs2:"<b>2.</b> ముందుగానే నమోదు చేసుకోండి (ఒక్కసారి)", gs3:"<b>3.</b> ఆధార్ కార్డుతో దుకాణానికి రండి", gs4:"<b>4.</b> సిబ్బంది లాకర్ ఇచ్చి UPI చెల్లింపు తీసుకుంటారు",
   footHelp:"సహాయం కావాలా? కాల్ చేయండి", footHome:"హోమ్", footFaq:"ప్రశ్నలు-జవాబులు"}
 };
 let LANG = "en";
@@ -368,7 +569,8 @@ function applyLang(){
   document.querySelectorAll("#langs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === LANG ? "true" : "false"));
   document.querySelectorAll("#tabs button").forEach(b => { b.textContent = tabLabel(b.dataset.tab); });
   if (!selected) $("bLocker").textContent = t("tapMap"); else if (cab) { const l = cab.lockers.find(x => x.locker_no === selected); if (l) $("bLocker").textContent = lockerName(l); }
-  if (cab){ drawGrid(); renderPrices(); showCabinetNotes(); }
+  if (cab){ drawGrid(); renderPrices(); showCabinetNotes(); applyMode(); }
+  if (typeof regRender === "function" && reg) regRender();
   if (cur){ renderHeld(); if ($("rzpAmt")) payOnlineText(); poll(); }
 }
 document.querySelectorAll("#langs button").forEach(b => b.addEventListener("click", () => {
@@ -391,8 +593,9 @@ const rupee = n => "₹" + n;
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 /* ---------- tabs ---------- */
-const TABS = STAFF ? [["map"],["book"],["out"],["all"]] : [["map"],["book"]];
-function tabLabel(k){ return STAFF && k === "book" ? "✔ Check-In" : t("tab_" + k); }
+const TABS = STAFF ? [["map"],["book"],["out"],["all"],["cust"],["staff"]] : [["map"],["book"],["reg"]];
+const STAFF_TABS = {map:"🗺 Locker Map", book:"✔ Check-In", out:"⬜ Checkout", all:"📋 All Bookings", cust:"👤 Customers", staff:"🔑 Staff"};
+function tabLabel(k){ return STAFF ? STAFF_TABS[k] : t("tab_" + k); }
 /* tab buttons use data-tab (not data-t, which is the translation key attribute) */
 $("tabs").innerHTML = TABS.map(([k]) => `<button type="button" role="tab" id="tab-${k}" aria-controls="t-${k}" data-tab="${k}">${tabLabel(k)}</button>`).join("");
 $("tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) showTab(b.dataset.tab); });
@@ -402,19 +605,41 @@ function showTab(k){
   $("pickBtn").classList.toggle("hidden", !!selected || STAFF);
   if (k === "all") loadAll();
   if (k === "map") loadCabinet();
+  if (k === "reg") regOpen();
+  if (k === "cust" && !$("cList").innerHTML) custSearch();
+  if (k === "staff") staffLoad();
+}
+/* See-only mode (server setting online_booking = false): the website shows free lockers and takes
+   registrations in advance; lockers are given and paid for only at the shop. */
+const seeOnly = () => !STAFF && !!cab && cab.online_booking === false;
+function applyMode(){
+  if (STAFF || !cab) return;
+  const so = seeOnly();
+  $("tab-book").classList.toggle("hidden", so);
+  document.querySelectorAll("#guide li").forEach((li, i) => { li.dataset.t = (so ? "gs" : "g") + (i + 1); li.innerHTML = t(li.dataset.t); });
+  const h = document.querySelector("#t-map h2"); h.dataset.t = so ? "mapTitleS" : "mapTitle"; h.innerHTML = t(h.dataset.t);
+  if (so && !$("t-book").classList.contains("hidden")) showTab("map");
 }
 if (STAFF){
   ["bookTitle","sub"].forEach(id => $(id).removeAttribute("data-t"));
   $("aadhaarBox").classList.remove("hidden"); $("bookTitle").textContent = "CHECK-IN (SHOP)"; $("sub").textContent = "Staff screen · 23 Lockers · Shop / App / Web bookings in one list";
-  ["langs","guide","foot","mobHint"].forEach(id => $(id).classList.add("hidden"));
+  ["langs","guide","foot","mobHint","nameBox","mobileBox"].forEach(id => $(id).classList.add("hidden"));
+  $("name").required = false; $("mobile").required = false;
+  $("custPick").classList.remove("hidden"); $("staffBar").classList.remove("hidden");
+  $("tab-staff").classList.add("hidden");
   document.querySelector("header .home").removeAttribute("href");
 }
 
 /* ---------- api ---------- */
+let TOKEN = null; try { TOKEN = sessionStorage.getItem("staffToken"); } catch(e) {}
+let ME = null;           // logged-in staff member {staff_id, name, role}
 async function api(path, body){
-  const opt = body ? {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)} : {cache:"no-store"};
+  const headers = body ? {"Content-Type":"application/json"} : {};
+  if (STAFF && TOKEN) headers["X-Staff-Token"] = TOKEN;
+  const opt = body ? {method:"POST", headers, body:JSON.stringify(body)} : {cache:"no-store", headers};
   const r = await fetch(API + path, opt);
   let d = {}; try { d = await r.json(); } catch(e) {}
+  if (STAFF && r.status === 401 && d.login) showLogin();
   if (!r.ok) throw Object.assign(new Error(d.error || ("Error " + r.status)), {data:d, status:r.status});
   return d;
 }
@@ -424,7 +649,7 @@ function msg(el, cls, text){ $(el).innerHTML = text ? `<div class="msg ${cls}">$
 async function loadCabinet(){
   try {
     cab = await api("/api/cabinet");
-    drawGrid(); renderPrices();
+    drawGrid(); renderPrices(); applyMode();
     $("freeCount").textContent = t("freeCount", {free: cab.free, total: cab.total});
     if (!STAFF && !cab.open_now) msg("notice","info",t("closedNote"));
     else if (STAFF && cab.payment_exceptions) msg("notice","err",`⚠ ${cab.payment_exceptions} online payment(s) need action – open 📋 All Bookings and use “Assign locker”, or refund in the payment gateway (Cashfree / Razorpay).`);
@@ -465,6 +690,11 @@ function drawGrid(){
   });
 }
 function tapLocker(l){
+  if (l.state === "FREE" && seeOnly()){
+    $("lockerPanel").innerHTML = `<div class="card"><div class="msg good">${esc(t("freeSeeOnly", {locker: lockerName(l)}))}</div>
+      <button class="btn" type="button" onclick="showTab('reg')">${esc(t("regBtn"))}</button></div>`;
+    return;
+  }
   if (l.state === "FREE"){
     selected = l.locker_no; $("bLocker").textContent = lockerName(l);
     $("lockerPanel").innerHTML = ""; drawGrid(); resetBooking(true); showTab("book"); return;
@@ -474,7 +704,7 @@ function tapLocker(l){
   lastRows[b.ref] = b;
   const items = itemText(b);
   let html = `<div class="card"><h2>${esc(l.locker_no)} · ${esc(b.status)}</h2>
-    <div>${esc(b.visitor_name)} · ${esc(b.phone)} · <span class="tag">${esc(b.source)}</span></div>
+    <div>${esc(b.visitor_name)} · ${esc(b.phone)} · <span class="tag">${esc(b.source)}</span>${b.customer_id ? ` · <a href="#" onclick="event.preventDefault();custOpen('${esc(b.customer_id)}');showTab('cust')">${esc(b.customer_id)}</a>` : ""}</div>
     <div class="small">Ref ${esc(b.ref)} · ${esc(items)} · Paid ${rupee(b.amount)} · Booked ${esc(b.created_at.slice(11,16))}</div>`;
   if (b.status === "PENDING_PAYMENT" && b.pay_mode && b.pay_mode !== "manual"){
     const gwn = b.pay_mode === "cashfree" ? "Cashfree" : "Razorpay";
@@ -488,7 +718,7 @@ function tapLocker(l){
       <button class="btn ok" onclick="staffCheckin('${b.ref}')">✔ Customer arrived – open locker</button>`;
   } else {
     html += `<div class="small">Checked in ${esc(fmtT(b.checkin_at))} · In use ${b.hours} h · Extra due: <b>${rupee(b.extra_due)}</b></div>
-      <div class="row2"><button class="btn" onclick="staffCheckout('${b.ref}', ${b.extra_due})">⬜ Checkout &amp; open locker</button>
+      <div class="row2"><button class="btn" onclick="staffCheckout('${b.ref}', ${b.extra_due}, '${esc(b.customer_id||"")}')">⬜ Checkout &amp; open locker</button>
       <button class="btn alt" onclick="staffOpen('${l.locker_no}')">Open only</button></div>`;
   }
   $("lockerPanel").innerHTML = html + `<div id="panelMsg"></div></div>`;
@@ -512,11 +742,18 @@ document.querySelectorAll(".step button").forEach(b => b.addEventListener("click
 $("bookForm").addEventListener("submit", async ev => {
   ev.preventDefault();
   if (!selected){ msg("bookMsg","err",t("pickFirst")); return; }
+  if (STAFF){
+    if (!cpSel){ msg("bookMsg","err","Find the customer first (mobile number or customer ID)."); return; }
+    if (cpSel.status !== "APPROVED" || cpSel.needs_review){ msg("bookMsg","err",`Customer ${cpSel.customer_id} is not approved for a locker. Open 👤 Customers to complete the registration check.`); return; }
+    if (!$("cpOk") || !$("cpOk").checked){ msg("bookMsg","err","Compare the customer with the saved photo and tick “Photo checked”."); return; }
+  }
   $("bookBtn").disabled = true; msg("bookMsg");
   try {
-    const d = await api("/api/book", {locker_no:selected, name:$("name").value.trim(), mobile:$("mobile").value.trim(),
-      aadhaar_last4: STAFF ? $("aadhaar").value.trim() : "", source: SOURCE, ...counts});
-    showPay(d, $("mobile").value.trim());
+    const body = STAFF ? {locker_no:selected, customer_id:cpSel.customer_id, photo_checked:true,
+                          aadhaar_last4:$("aadhaar").value.trim(), ...counts}
+                       : {locker_no:selected, name:$("name").value.trim(), mobile:$("mobile").value.trim(), source: SOURCE, ...counts};
+    const d = await api("/api/book", body);
+    showPay(d, STAFF ? cpSel.phone : $("mobile").value.trim());
   } catch(e) { msg("bookMsg","err", e.message); loadCabinet(); }
   $("bookBtn").disabled = false;
 });
@@ -667,7 +904,8 @@ function resetBooking(keepLocker){
   try { sessionStorage.removeItem("tvmPending"); } catch(e) {}
   payable = false; $("paidBox").classList.add("hidden"); $("payOpts").classList.remove("hidden");
   $("pay").classList.add("hidden"); $("bookForm").classList.remove("hidden"); msg("bookMsg");
-  if (STAFF){ $("name").value = ""; $("mobile").value = ""; $("aadhaar").value = ""; }
+  if (STAFF){ $("name").value = ""; $("mobile").value = ""; $("aadhaar").value = "";
+    if (!keepLocker) cpClear(); else if ($("cpOk")) $("cpOk").checked = false; }   // keep the chosen customer while choosing a locker
   counts.bags = 1; counts.helmets = 0; counts.jumbo = 0; renderPrices();
   if (!keepLocker){ selected = null; $("bLocker").textContent = t("tapMap"); showTab("map"); }
 }
@@ -683,10 +921,16 @@ async function staffConfirm(ref){
   catch(e){ alertMsg(e.message, false); }
   loadCabinet();
 }
-async function staffCheckin(ref){
-  if (!confirm(`Customer is at the counter with ref ${ref}? The locker will open and the 10 hours start now.`)) return;
+async function staffCheckin(ref, retried){
+  if (!retried && !confirm(`Customer is at the counter with ref ${ref}? The locker will open and the 10 hours start now.`)) return;
   try { const d = await api("/api/staff/checkin", {ref}); alertMsg(`Checked in at ${fmtT(d.checkin_at)}. Locker ${d.locker_no} ${d.lock_opened ? "opened" : "– open command FAILED, open manually"}.`, d.lock_opened); }
-  catch(e){ alertMsg(e.message, false); }
+  catch(e){
+    if (e.data && e.data.need_photo_check && !retried){
+      if (await photoCheck(ref, "CHECKIN", e.data.customer_id)) return staffCheckin(ref, true);
+    } else if (e.data && e.data.need_registration){
+      alertMsg(e.message, false); $("cQuery").value = e.data.phone || ""; showTab("cust"); custSearch();
+    } else alertMsg(e.message, false);
+  }
   await loadCabinet(); if ($("outMobile").value) findForCheckout();
 }
 async function staffCancel(ref){
@@ -694,7 +938,9 @@ async function staffCancel(ref){
   try { await api("/api/staff/cancel", {ref}); alertMsg(`Booking ${ref} cancelled.`, true); poll(); } catch(e){ alertMsg(e.message, false); }
   loadCabinet();
 }
-async function staffCheckout(ref, extra){
+async function staffCheckout(ref, extra, cid){
+  // Compare the customer with the saved photo BEFORE handing back the luggage (recorded on the server).
+  if (!(await photoCheck(ref, "CHECKOUT", cid))) return;
   if (extra > 0 && !confirm(`Collect extra ₹${extra} from the customer, then press OK.`)) return;
   try { const d = await api("/api/staff/checkout", {ref, collect_extra: extra > 0}); alertMsg(`Checked out. Locker ${d.locker_no} ${d.lock_opened ? "opened" : "– open command FAILED, open manually"}.`, d.lock_opened); }
   catch(e){ alertMsg(e.message, false); }
@@ -706,21 +952,23 @@ async function staffOpen(locker_no){
 }
 function alertMsg(t, ok){ const el = $("panelMsg") || $("outResult"); if (el) el.innerHTML = `<div class="msg ${ok?"good":"err"}">${esc(t)}</div>`; else alert(t); }
 async function findForCheckout(){
-  const m = $("outMobile").value.replace(/\D/g,"");
-  if (m.length !== 10){ $("outResult").innerHTML = `<div class="msg err">Enter a 10-digit mobile.</div>`; return; }
+  const q = $("outMobile").value.trim().toUpperCase(), m = q.replace(/\D/g,"");
+  const byRef = /^AL[A-Z0-9]{6}$/.test(q);
+  if (!byRef && m.length !== 10){ $("outResult").innerHTML = `<div class="msg err">Enter a 10-digit mobile or a booking ref (AL……).</div>`; return; }
   await loadCabinet();
-  const hits = cab.lockers.filter(l => l.booking && l.booking.phone === m && l.booking.status === "ACTIVE");
+  const hits = cab.lockers.filter(l => l.booking && l.booking.status === "ACTIVE" && (byRef ? l.booking.ref === q : l.booking.phone === m));
   $("outResult").innerHTML = hits.length ? hits.map(l => !l.booking.checkin_at
     ? `<div class="card"><b>${esc(l.locker_no)}</b> · ${esc(l.booking.visitor_name)} · ${esc(itemText(l.booking))}<div class="small">Paid – not checked in yet (check in by ${esc(fmtT(l.booking.valid_until))})</div>
       <button class="btn ok" onclick="staffCheckin('${l.booking.ref}')">✔ Customer arrived – open ${esc(l.locker_no)}</button></div>`
     : `<div class="card"><b>${esc(l.locker_no)}</b> · ${esc(l.booking.visitor_name)} · ${esc(itemText(l.booking))}<div class="small">Checked in ${esc(fmtT(l.booking.checkin_at))} · In use ${l.booking.hours} h · Extra due ${rupee(l.booking.extra_due)}</div>
-      <button class="btn" onclick="staffCheckout('${l.booking.ref}', ${l.booking.extra_due})">⬜ Checkout &amp; open ${esc(l.locker_no)}</button></div>`).join("")
+      <button class="btn" onclick="staffCheckout('${l.booking.ref}', ${l.booking.extra_due}, '${esc(l.booking.customer_id||"")}')">⬜ Checkout &amp; open ${esc(l.locker_no)}</button></div>`).join("")
     : `<div class="msg info">No active locker for this mobile.</div>`;
 }
 async function loadAll(){
   if (!$("fDate").value) $("fDate").value = new Date().toLocaleDateString("en-CA");
   try {
-    const d = await api(`/api/staff/bookings?date=${$("fDate").value}&mobile=${encodeURIComponent($("fMobile").value)}`);
+    const ref = $("fRef").value.trim().toUpperCase();
+    const d = await api(`/api/staff/bookings?date=${ref ? "" : $("fDate").value}&mobile=${encodeURIComponent($("fMobile").value)}&ref=${encodeURIComponent(ref)}`);
     $("allSummary").textContent = `${d.count} bookings · collected ₹${d.collected}`;
     d.bookings.forEach(b => lastRows[b.ref] = b);
     $("allRows").innerHTML = d.bookings.map(b => {
@@ -728,12 +976,14 @@ async function loadAll(){
                   PAYMENT_EXCEPTION:"⚠ Payment exception", ASSIGN_PAID:"Locker assigned (paid online)", REFUND:"Refund"};
       const notes = (b.audit||[]).map(a => `<div class="small">${AL[a.action] || esc(a.action)}${a.staff_id && !["RAZORPAY","CASHFREE"].includes(a.staff_id) ? " by " + esc(a.staff_id) : ""} ${esc(a.at.slice(11,16))}${a.new_locker && a.old_locker !== a.new_locker ? ` (${esc(a.old_locker)} → ${esc(a.new_locker)})` : ""}: ${esc(a.reason)}</div>`).join("")
         + (b.payment ? `<div class="small">💳 ${b.payment.provider === "CASHFREE" ? "Cashfree" : "Razorpay"} ${esc(b.payment.mode)}: ${esc(b.payment.status)}${b.payment.payment_id ? " · " + esc(b.payment.payment_id) : ""}${b.payment.refund_status ? " · refund " + esc(b.payment.refund_status) + " ₹" + (b.payment.refunded_paise/100) : ""}</div>` : "")
-        + (b.payment && b.payment.exception ? `<div class="small" style="color:var(--maroon);font-weight:700">⚠ ${esc(b.payment.exception)}</div>` : "");
+        + (b.payment && b.payment.exception ? `<div class="small" style="color:var(--maroon);font-weight:700">⚠ ${esc(b.payment.exception)}</div>` : "")
+        + (b.photo_checks || []).map(pc => `<div class="small">📷 ${esc(pc.stage)} ${esc(pc.result)} by ${esc(pc.staff_id)} ${esc(pc.at.slice(11,16))}${pc.note ? ": " + esc(pc.note) : ""}</div>`).join("")
+        + (b.booked_by ? `<div class="small">Booked by ${esc(b.booked_by)}${b.checkin_by ? " · in " + esc(b.checkin_by) : ""}${b.checkout_by ? " · out " + esc(b.checkout_by) : ""}</div>` : "");
       const needs = b.payment && b.payment.status === "NEEDS_ACTION";
       const act = (b.status === "EXPIRED" || b.status === "NO_SHOW" || (needs && b.status === "CANCELLED"))
         ? `<button class="btn alt" style="margin:0;padding:6px 10px;width:auto;font-size:13px" onclick="openLate('${b.ref}')">${needs ? "Assign locker" : b.status === "EXPIRED" ? "Late confirm" : "Re-open"}</button>`
         : "";
-      return `<tr><td>${esc(b.ref)}</td><td><span class="tag">${esc(b.source)}</span></td><td>${esc(b.locker_no)}</td><td>${esc(b.visitor_name)}</td><td>${esc(b.phone)}</td><td>${esc(itemText(b))}</td><td>${b.amount + b.extra_amount}</td><td>${esc(b.status)}${notes}</td><td>${esc(b.created_at.slice(11,16))}</td><td>${esc((b.paid_at||"").slice(11,16))}</td><td>${esc((b.checkin_at||"").slice(11,16))}</td><td>${esc((b.checkout_time||"").slice(11,16))}</td><td>${act}</td></tr>`;
+      return `<tr><td>${esc(b.ref)}</td><td><span class="tag">${esc(b.source)}</span></td><td>${esc(b.locker_no)}</td><td>${b.customer_id ? `<a href="#" onclick="event.preventDefault();custOpen('${esc(b.customer_id)}');showTab('cust')">${esc(b.customer_id)}</a>` : "–"}</td><td>${esc(b.visitor_name)}</td><td>${esc(b.phone)}</td><td>${esc(itemText(b))}</td><td>${b.amount + b.extra_amount}</td><td>${esc(b.status)}${notes}</td><td>${esc(b.created_at.slice(11,16))}</td><td>${esc((b.paid_at||"").slice(11,16))}</td><td>${esc((b.checkin_at||"").slice(11,16))}</td><td>${esc((b.checkout_time||"").slice(11,16))}</td><td>${act}</td></tr>`;
     }).join("");
   } catch(e){ $("allSummary").textContent = e.message; }
 }
@@ -761,7 +1011,7 @@ $("lateForm").addEventListener("submit", async ev => {
   $("lateGo").disabled = true;
   try {
     const d = await api("/api/staff/late_confirm", {ref: lateRef, locker_no: $("lateLocker").value,
-      staff_id: $("lateStaff").value.trim(), reason: $("lateReason").value.trim(), payment_verified: $("latePaid").checked});
+      reason: $("lateReason").value.trim(), payment_verified: $("latePaid").checked});
     $("lateMsg").innerHTML = `<div class="msg good">${d.auto ? esc(d.message) + " " : "Done. "}${esc(d.ref)} is paid on locker ${esc(d.locker_no)}. Check in by ${esc(fmtT(d.valid_until))} – press “Customer arrived – open locker” on the map.</div>`;
     loadAll(); loadCabinet();
   } catch(e){
@@ -771,8 +1021,363 @@ $("lateForm").addEventListener("submit", async ev => {
   $("lateGo").disabled = false;
 });
 
+/* ====================== STAFF SCREEN: login, customers, photo checks, staff accounts ======================
+   Registration rule: a customer gets a locker only after staff approval. For approval staff take a recent
+   photo, look at the Aadhaar card, compare its photo with the customer and the recent photo, and record only
+   the OUTCOME (no Aadhaar number, image or QR is stored for registration). Before opening a locker or
+   handing back luggage, staff compare the customer with the saved photo; every check is recorded. */
+
+/* ---------- login ---------- */
+let setupMode = false;
+async function showLogin(){
+  if (!STAFF) return;
+  try { const s = await api("/api/staff/setup"); setupMode = !!s.needs_setup; } catch(e) { setupMode = false; }
+  $("loginTitle").textContent = setupMode ? "CREATE THE FIRST ADMIN" : "STAFF LOGIN";
+  $("loginInfo").textContent = setupMode ? "No staff accounts yet. Create the owner's ADMIN account (staff ID, name and a 4–8 digit PIN)."
+                                         : "Every action is recorded with your staff ID.";
+  $("lgNameBox").classList.toggle("hidden", !setupMode);
+  $("lgBtn").textContent = setupMode ? "Create admin and log in" : "Log in";
+  $("lgMsg").innerHTML = ""; $("lgPin").value = "";
+  $("loginBox").classList.remove("hidden"); $("lgId").focus();
+}
+$("loginForm").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const id = $("lgId").value.trim(), pin = $("lgPin").value;
+  try {
+    if (setupMode) await api("/api/staff/setup", {staff_id:id, name:$("lgName").value.trim(), pin});
+    const d = await api("/api/staff/login", {staff_id:id, pin});
+    TOKEN = d.token; try { sessionStorage.setItem("staffToken", TOKEN); } catch(e) {}
+    setMe(d); $("loginBox").classList.add("hidden"); loadCabinet();
+  } catch(e) { $("lgMsg").innerHTML = `<div class="msg err">${esc(e.message)}</div>`; }
+});
+function setMe(d){
+  ME = {staff_id:d.staff_id, name:d.name, role:d.role};
+  $("staffWho").textContent = `${d.name} (${d.staff_id} · ${d.role})`;
+  $("tab-staff").classList.toggle("hidden", d.role !== "ADMIN");
+  $("pcOverride").classList.toggle("hidden", d.role !== "ADMIN");
+}
+async function staffLogout(){
+  try { await api("/api/staff/logout", {}); } catch(e) {}
+  TOKEN = null; ME = null; try { sessionStorage.removeItem("staffToken"); } catch(e) {}
+  showLogin();
+}
+async function staffStart(){
+  if (!TOKEN) return showLogin();
+  try { setMe(await api("/api/staff/me")); } catch(e) { /* 401 shows the login */ }
+}
+
+/* ---------- saved photo (fetched with the staff token; never public) ---------- */
+async function loadPhoto(cid, img){
+  img.removeAttribute("src"); img.alt = "No photo saved";
+  if (!cid) return false;
+  try {
+    const r = await fetch(`/api/staff/photo?customer_id=${encodeURIComponent(cid)}`, {headers:{"X-Staff-Token":TOKEN||""}, cache:"no-store"});
+    if (!r.ok) return false;
+    img.src = URL.createObjectURL(await r.blob()); img.alt = "Saved photo of " + cid; return true;
+  } catch(e) { return false; }
+}
+
+/* ---------- customer for the booking at the counter ---------- */
+let cpSel = null;
+function cpClear(){ cpSel = null; $("cpQuery").value = ""; $("cpInfo").innerHTML = ""; }
+async function cpFind(q){
+  q = (q || $("cpQuery").value).trim();
+  if (!q){ $("cpInfo").innerHTML = `<div class="msg err">Type the customer's mobile number or customer ID.</div>`; return; }
+  try {
+    const d = await api(`/api/staff/customers?q=${encodeURIComponent(q)}`);
+    const exact = d.customers.find(c => c.customer_id === q.toUpperCase() || c.phone === q.replace(/\D/g,"").slice(-10)) || (d.customers.length === 1 ? d.customers[0] : null);
+    if (!exact){ $("cpInfo").innerHTML = `<div class="msg info">No single match. ${d.customers.length ? "Type the full mobile number." : "Not registered yet –"} <a href="#" onclick="event.preventDefault();custNew('${esc(q.replace(/\D/g,""))}')">register a new customer</a>.</div>`; cpSel = null; return; }
+    const full = (await api(`/api/staff/customer?customer_id=${exact.customer_id}`)).customer;
+    cpSel = full; $("cpQuery").value = full.customer_id;
+    const ok = full.status === "APPROVED" && !full.needs_review;
+    $("cpInfo").innerHTML = `<div class="crow" style="margin-top:8px"><img id="cpPhoto" class="cphoto" alt="">
+      <div style="flex:1;min-width:160px"><b>${esc(full.full_name)}</b> <span class="pill ${full.needs_review ? "REVIEW" : esc(full.status)}">${full.needs_review ? "REVIEW" : esc(full.status)}</span>
+        <div class="small">${esc(full.customer_id)} · ${esc(full.phone)} · ${esc(full.town)}</div>
+        ${ok ? `<label class="check"><input type="checkbox" id="cpOk"> Photo checked – this is the same person</label>`
+             : `<div class="msg err">Not approved for a locker${full.needs_review ? " (manual review: " + esc(full.review_note || "") + ")" : ""}. <a href="#" onclick="event.preventDefault();custOpen('${esc(full.customer_id)}');showTab('cust')">Open profile</a></div>`}
+      </div></div>`;
+    loadPhoto(full.customer_id, $("cpPhoto"));
+  } catch(e) { $("cpInfo").innerHTML = `<div class="msg err">${esc(e.message)}</div>`; }
+}
+
+/* ---------- photo check dialog (check-in / checkout) ---------- */
+let pcResolve = null, pcRef = null, pcStage = null;
+async function photoCheck(ref, stage, cid){
+  pcRef = ref; pcStage = stage;
+  $("pcTitle").textContent = stage === "CHECKOUT" ? "PHOTO CHECK – before handing back luggage" : "PHOTO CHECK – before opening the locker";
+  $("pcNote").value = ""; $("pcMsg").innerHTML = "";
+  let info = `Booking ${esc(ref)}`;
+  if (cid){
+    try { const c = (await api(`/api/staff/customer?customer_id=${encodeURIComponent(cid)}`)).customer;
+      info = `<b>${esc(c.full_name)}</b><br>${esc(c.customer_id)} · ${esc(c.phone)}<br>${esc(c.town)}<br>Booking ${esc(ref)}`
+        + (c.needs_review ? `<div class="msg err">Manual review: ${esc(c.review_note || "")}</div>` : ""); } catch(e) {}
+  }
+  $("pcInfo").innerHTML = info;
+  const has = await loadPhoto(cid, $("pcPhoto"));
+  if (!has) $("pcMsg").innerHTML = `<div class="msg info">No saved photo for this booking. Use “Photo missing” – an admin can then approve the hand-over after checking the customer.</div>`;
+  $("pcBox").classList.remove("hidden");
+  return new Promise(res => { pcResolve = res; });
+}
+function pcClose(ok){ $("pcBox").classList.add("hidden"); if (pcResolve) pcResolve(ok); pcResolve = null; }
+async function pcAnswer(result){
+  try {
+    await api("/api/staff/photo_check", {ref:pcRef, stage:pcStage, result, note:$("pcNote").value.trim()});
+    if (result === "MATCHED" || result === "MANAGER_OVERRIDE") return pcClose(true);
+    $("pcMsg").innerHTML = `<div class="msg err">Recorded. The customer's profile is now waiting for manual review – do not hand over the locker or luggage until an admin approves it here.</div>`;
+  } catch(e) { $("pcMsg").innerHTML = `<div class="msg err">${esc(e.message)}</div>`; }
+}
+
+/* ---------- customers tab ---------- */
+let custCur = null, camStream = null;
+async function custSearch(){
+  try {
+    const d = await api(`/api/staff/customers?q=${encodeURIComponent($("cQuery").value.trim())}`);
+    $("cList").innerHTML = d.customers.length ? d.customers.map(c =>
+      `<button type="button" onclick="custOpen('${esc(c.customer_id)}')"><b>${esc(c.customer_id)}</b> · ${esc(c.full_name)} · ${esc(c.phone)} · ${esc(c.town)}
+        <span class="pill ${esc(c.status)}">${esc(c.status)}</span>${c.needs_review ? `<span class="pill REVIEW">REVIEW</span>` : ""}
+        <span class="small">${c.has_photo ? "📷" : "no photo"} · ${c.mobile_verified === "OTP" ? "mobile OTP-verified" : c.mobile_verified ? "mobile confirmed at shop" : "mobile not verified"} · via ${esc(c.created_via)}</span></button>`).join("")
+      : `<div class="msg info">No customer found.</div>`;
+  } catch(e) { $("cList").innerHTML = `<div class="msg err">${esc(e.message)}</div>`; }
+}
+function custNew(mobile){
+  showTab("cust");
+  custCur = null; camStop();
+  $("cProfile").innerHTML = custFormHtml({phone: mobile || ""}) + `<div id="cpMsg2"></div>`;
+}
+function custFormHtml(c){
+  return `<div class="card" style="max-width:none"><h2>${c.customer_id ? "CUSTOMER " + esc(c.customer_id) : "NEW CUSTOMER (walk-in)"}</h2>
+    <div class="toolbar">
+      <div style="flex:2;min-width:200px"><label for="cfName">Full name</label><input id="cfName" maxlength="60" value="${esc(c.full_name||"")}"></div>
+      <div style="flex:1;min-width:140px"><label for="cfMobile">Mobile</label><input id="cfMobile" inputmode="numeric" maxlength="10" value="${esc(c.phone||"")}"></div></div>
+    <label for="cfAddr">Address (house / street / area)</label><textarea id="cfAddr" rows="2" maxlength="200">${esc(c.address_line||"")}</textarea>
+    <div class="toolbar">
+      <div style="flex:2;min-width:160px"><label for="cfTown">Town / city</label><input id="cfTown" maxlength="60" value="${esc(c.town||"")}"></div>
+      <div style="flex:1;min-width:110px"><label for="cfPin">PIN code</label><input id="cfPin" inputmode="numeric" maxlength="6" value="${esc(c.pincode||"")}"></div></div>
+    ${c.status === "APPROVED" ? `<div class="small">Changing name, mobile or address sends an approved profile back to PENDING for a fresh check.</div>` : ""}
+    <button class="btn" type="button" onclick="custSave('${esc(c.customer_id||"")}')">${c.customer_id ? "Save changes" : "Save customer"}</button></div>`;
+}
+async function custSave(cid){
+  try {
+    const d = await api("/api/staff/customer_save", {customer_id:cid || "", name:$("cfName").value.trim(), mobile:$("cfMobile").value.trim(),
+      address_line:$("cfAddr").value.trim(), town:$("cfTown").value.trim(), pincode:$("cfPin").value.trim()});
+    await custOpen(d.customer_id); custSearch();
+  } catch(e) {
+    const el = $("cpMsg2") || $("cMsg");
+    if (el) el.innerHTML = `<div class="msg err">${esc(e.message)}${e.data && e.data.customer_id ? ` <a href="#" onclick="event.preventDefault();custOpen('${esc(e.data.customer_id)}')">Open ${esc(e.data.customer_id)}</a>` : ""}</div>`;
+  }
+}
+async function custOpen(cid){
+  camStop();
+  try {
+    const d = await api(`/api/staff/customer?customer_id=${encodeURIComponent(cid)}`);
+    const c = d.customer; custCur = c;
+    const mob = c.mobile_verified === "OTP" ? "✓ Mobile number verified (SMS OTP)"
+              : c.mobile_verified === "STAFF_NO_OTP" ? "Mobile number confirmed at the shop – NOT OTP-verified" : "Mobile number not verified yet";
+    const approved = c.status === "APPROVED";
+    $("cProfile").innerHTML = `
+    <div class="card" style="max-width:none">
+      <h2>${esc(c.customer_id)} · ${esc(c.full_name)} <span class="pill ${esc(c.status)}">${esc(c.status)}</span>${c.needs_review ? `<span class="pill REVIEW">MANUAL REVIEW</span>` : ""}</h2>
+      ${c.needs_review ? `<div class="msg err">Manual review: ${esc(c.review_note || "")}. No locker or luggage hand-over until an admin clears it.
+          ${ME && ME.role === "ADMIN" ? `<button class="btn alt" type="button" onclick="custReview(true)">Admin: clear review (after checking the customer)</button>` : ""}</div>` : ""}
+      <div class="crow">
+        <div><img id="cfPhoto" class="cphoto big" alt="">
+          <div class="small">${c.photo_taken_at ? "Photo " + esc(fmtT(c.photo_taken_at)) + " by " + esc(c.photo_taken_by) : "No photo yet"}</div>
+          <div class="row2"><button class="btn alt" type="button" onclick="camStart()">📷 Camera</button>
+            <label class="btn alt" style="margin-top:12px">🖼 File<input type="file" accept="image/*" capture="user" id="cfFile" class="hidden" onchange="photoFromFile(this)"></label></div>
+          <div id="camBox" class="hidden"><video id="cam" class="cam" autoplay playsinline muted></video>
+            <div class="row2"><button class="btn ok" type="button" onclick="camSnap()">Take photo</button><button class="btn alt" type="button" onclick="camStop()">Close</button></div></div>
+        </div>
+        <div style="flex:1;min-width:260px">
+          <div><b>${esc(c.phone)}</b> · ${esc(mob)}</div>
+          <div class="small">${esc(c.address_line)}, ${esc(c.town)} – ${esc(c.pincode)}</div>
+          <div class="small">Registered ${esc(fmtT(c.created_at))} via ${esc(c.created_via)}${c.decided_by ? ` · ${esc(c.status)} by ${esc(c.decided_by)} ${esc(fmtT(c.decided_at))}` : ""}${c.decision_reason ? ` – ${esc(c.decision_reason)}` : ""}</div>
+          ${c.id_check ? `<div class="small">Aadhaar visual check: ${esc(c.id_check)} by ${esc(c.id_check_by)} ${esc(fmtT(c.id_check_at))}</div>` : ""}
+
+          <h2 style="margin-top:14px">1. Mobile number</h2>
+          ${c.mobile_verified === "OTP" ? `<div class="msg good">✓ Mobile number verified</div>` : `
+            <div class="row2"><button class="btn alt" type="button" onclick="custMobile('send')">Send SMS code</button>
+              <input id="cfOtp" inputmode="numeric" maxlength="6" placeholder="code" style="margin-top:12px">
+              <button class="btn alt" type="button" onclick="custMobile('check')">Check code</button></div>
+            <div class="small">If SMS is not available: call the number (or see the customer's phone) and record it below. This is stored as “not OTP-verified”.</div>
+            <div class="row2"><input id="cfMobNote" maxlength="200" placeholder="How was it confirmed? e.g. called – customer's phone rang" style="margin-top:12px">
+              <button class="btn alt" type="button" onclick="custMobile('staff')">Confirmed at shop</button></div>`}
+
+          <h2 style="margin-top:14px">2. Aadhaar visual check &amp; decision</h2>
+          <div class="small">Look at the customer's Aadhaar card. Do NOT copy, photograph or type the Aadhaar number here.</div>
+          <label class="check"><input type="checkbox" id="ckShown"> Customer showed the Aadhaar card</label>
+          <label class="check"><input type="checkbox" id="ckAadhaar"> Aadhaar photo matches the customer</label>
+          <label class="check"><input type="checkbox" id="ckRecent"> Recent photo (left) matches the customer</label>
+          <div class="row2"><button class="btn ok" type="button" onclick="custDecide('APPROVE')">✔ Approve</button>
+            <button class="btn alt" type="button" onclick="custDecide('REJECT')">✖ Reject</button></div>
+          <input id="cfReason" maxlength="300" placeholder="Reason (needed to reject)" style="margin-top:10px">
+          ${approved && !c.needs_review ? `<button class="btn" type="button" onclick="custGiveLocker()">🔒 Give a locker to this customer</button>` : ""}
+          ${!c.needs_review ? `<div class="row2"><input id="cfRevNote" maxlength="300" placeholder="Photo missing / outdated / not matching – note" style="margin-top:12px"><button class="btn alt" type="button" onclick="custReview(false)">Send to manual review</button></div>` : ""}
+          <div id="cMsg"></div>
+        </div>
+      </div>
+    </div>
+    ${custFormHtml(c)}
+    <div class="card hist" style="max-width:none"><b>Bookings</b>${d.bookings.map(b => `<div>${esc(b.ref)} · ${esc(b.locker_no)} · ${esc(b.status)} · ${esc(fmtT(b.created_at))}</div>`).join("") || "<div>none</div>"}
+      <b>Photo checks</b>${d.photo_checks.map(p => `<div>${esc(p.stage)} ${esc(p.ref)}: ${esc(p.result)} by ${esc(p.staff_id)} ${esc(fmtT(p.at))}${p.note ? " – " + esc(p.note) : ""}</div>`).join("") || "<div>none</div>"}
+      <b>History</b>${d.audit.map(a => `<div>${esc(fmtT(a.at))} · ${esc(a.action)} · ${esc(a.staff_id)}${a.detail ? " · " + esc(a.detail) : ""}</div>`).join("")}</div>`;
+    loadPhoto(c.photo_taken_at ? c.customer_id : null, $("cfPhoto"));
+  } catch(e) { $("cProfile").innerHTML = `<div class="msg err">${esc(e.message)}</div>`; }
+}
+function cMsg(text, ok){ $("cMsg").innerHTML = `<div class="msg ${ok ? "good" : "err"}">${esc(text)}</div>`; }
+async function custMobile(action){
+  try {
+    const d = await api("/api/staff/mobile", {customer_id:custCur.customer_id, action,
+      code: $("cfOtp") ? $("cfOtp").value.trim() : "", note: $("cfMobNote") ? $("cfMobNote").value.trim() : ""});
+    if (action === "send") return cMsg("SMS code sent. Ask the customer for the code and press Check code.", true);
+    await custOpen(custCur.customer_id); cMsg(d.mobile_status || "Saved.", true);
+  } catch(e) { cMsg(e.message, false); }
+}
+async function custDecide(decision){
+  if (decision === "APPROVE" && !confirm(`Approve ${custCur.full_name} (${custCur.customer_id}) for lockers?`)) return;
+  try {
+    await api("/api/staff/decide", {customer_id:custCur.customer_id, decision, reason:$("cfReason").value.trim(),
+      aadhaar_shown:$("ckShown").checked, aadhaar_photo_matches:$("ckAadhaar").checked, recent_photo_matches:$("ckRecent").checked});
+    await custOpen(custCur.customer_id); custSearch();
+    cMsg(decision === "APPROVE" ? "Approved. The customer can now be given a locker." : "Rejected.", true);
+  } catch(e) { cMsg(e.message, false); }
+}
+async function custReview(clear){
+  try {
+    await api("/api/staff/review", {customer_id:custCur.customer_id, clear, note: clear ? "" : ($("cfRevNote") ? $("cfRevNote").value.trim() : "")});
+    await custOpen(custCur.customer_id); custSearch();
+  } catch(e) { cMsg(e.message, false); }
+}
+function custGiveLocker(){
+  const cid = custCur.customer_id;
+  showTab("map");
+  msg("notice", "good", `Customer ${cid} (${custCur.full_name}) selected – tap a free locker.`);
+  cpFind(cid);
+}
+/* photo: webcam or file -> 480x600 JPEG */
+async function camStart(){
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({video:{width:640, height:800}, audio:false});
+    $("cam").srcObject = camStream; $("camBox").classList.remove("hidden");
+  } catch(e) { cMsg("Camera not available: " + e.message + ". Use 🖼 File instead.", false); }
+}
+function camStop(){ if (camStream){ camStream.getTracks().forEach(t => t.stop()); camStream = null; } const b = $("camBox"); if (b) b.classList.add("hidden"); }
+function toJpeg(src, w, h){
+  const c = document.createElement("canvas"); c.width = 480; c.height = 600;
+  const want = 480/600, have = w/h;
+  let sw = w, sh = h, sx = 0, sy = 0;
+  if (have > want){ sw = h*want; sx = (w-sw)/2; } else { sh = w/want; sy = (h-sh)/2; }
+  c.getContext("2d").drawImage(src, sx, sy, sw, sh, 0, 0, 480, 600);
+  return c.toDataURL("image/jpeg", 0.85);
+}
+async function savePhoto(dataUrl){
+  try {
+    const d = await api("/api/staff/customer_photo", {customer_id:custCur.customer_id, image:dataUrl});
+    camStop(); await custOpen(custCur.customer_id);
+    cMsg("Photo saved." + (d.back_to_pending ? " The profile is back to PENDING – check and approve again." : ""), true);
+  } catch(e) { cMsg(e.message, false); }
+}
+function camSnap(){ const v = $("cam"); if (!v.videoWidth) return; savePhoto(toJpeg(v, v.videoWidth, v.videoHeight)); }
+function photoFromFile(inp){
+  const f = inp.files && inp.files[0]; if (!f) return;
+  const img = new Image();
+  img.onload = () => { savePhoto(toJpeg(img, img.naturalWidth, img.naturalHeight)); URL.revokeObjectURL(img.src); };
+  img.src = URL.createObjectURL(f);
+}
+
+/* ---------- staff accounts (admin) ---------- */
+async function staffLoad(){
+  try {
+    const d = await api("/api/staff/staff");
+    $("staffRows").innerHTML = `<table><thead><tr><th>Staff ID</th><th>Name</th><th>Role</th><th>Status</th><th>Added</th><th></th></tr></thead><tbody>`
+      + d.staff.map(s => `<tr><td>${esc(s.staff_id)}</td><td>${esc(s.name)}</td><td>${esc(s.role)}</td><td>${s.active ? "Active" : "Disabled"}</td>
+        <td>${esc(fmtT(s.created_at))} by ${esc(s.created_by || "")}</td>
+        <td><button class="btn alt" style="margin:0;padding:6px 10px;width:auto;font-size:13px" onclick="staffActive('${esc(s.staff_id)}', ${s.active ? "false" : "true"})">${s.active ? "Disable" : "Enable"}</button></td></tr>`).join("")
+      + `</tbody></table>`;
+  } catch(e) { $("staffRows").innerHTML = `<div class="msg err">${esc(e.message)}</div>`; }
+}
+async function staffAddNew(){
+  try {
+    await api("/api/staff/staff_add", {staff_id:$("sId").value.trim(), name:$("sName").value.trim(), role:$("sRole").value, pin:$("sPin").value});
+    $("staffMsg").innerHTML = `<div class="msg good">Added. They log in with their staff ID and PIN.</div>`;
+    ["sId","sName","sPin"].forEach(id => $(id).value = ""); staffLoad();
+  } catch(e) { $("staffMsg").innerHTML = `<div class="msg err">${esc(e.message)}</div>`; }
+}
+async function staffActive(id, active){
+  if (!confirm(`${active ? "Enable" : "Disable"} ${id}?`)) return;
+  try { await api("/api/staff/staff_active", {staff_id:id, active}); staffLoad(); }
+  catch(e) { $("staffMsg").innerHTML = `<div class="msg err">${esc(e.message)}</div>`; }
+}
+
+/* ---------- register in advance (public) ---------- */
+let reg = null;          // last registration reply shown
+function regSaved(){ try { return JSON.parse(localStorage.getItem("regSaved") || "null"); } catch(e) { return null; } }
+function regSave(cid, mobile){ try { localStorage.setItem("regSaved", JSON.stringify({cid, mobile})); } catch(e) {} }
+function regOpen(){ const s = regSaved(); if (s && !reg) regLoad(s.mobile, s.cid, "rMsg"); else regRender(); }
+function regRender(){
+  const has = !!reg;
+  $("regForm").classList.toggle("hidden", has);
+  $("regLook").classList.toggle("hidden", has);
+  $("regResult").classList.toggle("hidden", !has);
+  if (!has) return;
+  $("rCid").textContent = reg.customer_id;
+  const st = ["PENDING","APPROVED","REJECTED"].includes(reg.status) ? reg.status : "PENDING";
+  $("rStatus").className = "stat " + st; $("rStatus").textContent = t("st_" + st);
+  const mobKey = reg.mobile_verified ? "mobOtp" : (/confirmed at the shop/i.test(reg.mobile_status || "") ? "mobStaff" : "mobNone");
+  $("rMob").textContent = t(mobKey);
+  $("otpBox").classList.toggle("hidden", !!reg.mobile_verified || !reg.sms_available);
+}
+async function regLoad(mobile, cid, msgEl){
+  try {
+    const d = await api(`/api/register/status?mobile=${encodeURIComponent(mobile)}&customer_id=${encodeURIComponent(cid)}`);
+    reg = Object.assign(d, {mobile}); regSave(d.customer_id, mobile); regRender(); msg(msgEl);
+  } catch(e) { msg(msgEl, "err", e.status === 404 ? t("regNotFound") : (e.message || t("offline"))); regRender(); }
+}
+$("regForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const body = {name: $("rName").value.trim(), mobile: $("rMobile").value.replace(/\D/g,"").slice(-10),
+    address_line: $("rAddr").value.trim(), town: $("rTown").value.trim(), pincode: $("rPin").value.replace(/\D/g,""),
+    language: LANG, consent: $("rConsent").checked, source: SOURCE === "APP" ? "APP" : "WEB"};
+  if (body.name.length < 2) return msg("rMsg","err",t("rErrName"));
+  if (!/^[6-9]\d{9}$/.test(body.mobile)) return msg("rMsg","err",t("rErrMobile"));
+  if (body.address_line.length < 5) return msg("rMsg","err",t("rErrAddr"));
+  if (body.town.length < 2) return msg("rMsg","err",t("rErrTown"));
+  if (!/^[1-9]\d{5}$/.test(body.pincode)) return msg("rMsg","err",t("rErrPin"));
+  if (!body.consent) return msg("rMsg","err",t("rErrConsent"));
+  $("rBtn").disabled = true;
+  try {
+    const d = await api("/api/register", body);
+    reg = Object.assign(d, {mobile: body.mobile}); regSave(d.customer_id, body.mobile); msg("rMsg");
+    regRender();
+    if (d.already) msg("otpMsg","info",t("regAlready"));
+  } catch(err) { msg("rMsg","err", err.message || t("offline")); }
+  finally { $("rBtn").disabled = false; }
+});
+$("regLook").addEventListener("submit", e => {
+  e.preventDefault();
+  const m = $("lMobile").value.replace(/\D/g,"").slice(-10), c = $("lCid").value.trim().toUpperCase();
+  if (!/^[6-9]\d{9}$/.test(m)) return msg("lMsg","err",t("rErrMobile"));
+  if (c.length < 2) return msg("lMsg","err",t("rErrCid"));
+  regLoad(m, c, "lMsg");
+});
+function regRefresh(){ if (reg) regLoad(reg.mobile, reg.customer_id, "otpMsg"); }
+function regForget(){ try { localStorage.removeItem("regSaved"); } catch(e) {} reg = null; regRender(); msg("otpMsg"); }
+async function otpSend(){
+  if (!reg) return;
+  $("otpSendBtn").disabled = true;
+  try { await api("/api/otp/send", {mobile: reg.mobile}); $("otpEnter").classList.remove("hidden"); msg("otpMsg","info",t("otpSent")); }
+  catch(e) { msg("otpMsg","err", e.message); }
+  finally { $("otpSendBtn").disabled = false; }
+}
+async function otpVerify(){
+  if (!reg) return;
+  try { await api("/api/otp/verify", {mobile: reg.mobile, code: $("otpCode").value.replace(/\D/g,"")});
+    msg("otpMsg","good",t("mobOtp")); $("otpEnter").classList.add("hidden"); regRefresh(); }
+  catch(e) { msg("otpMsg","err", e.message); }
+}
+
 applyLang();
-showTab("map");
+if (STAFF) staffStart();
+if (!STAFF && location.hash === "#reg"){ showTab("reg"); loadCabinet(); } else showTab("map");
 /* Back from a bank page after a Cashfree payment (?cf_order=...): show that booking's status again. */
 (async () => {
   if (STAFF || !new URLSearchParams(location.search).get("cf_order")) return;
