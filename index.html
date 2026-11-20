@@ -55,6 +55,10 @@
   /* hero */
   .banner{background:#1a0f0c}
   .banner img{display:block;width:100%;max-width:980px;height:auto;margin:0 auto}
+  .vwrap{position:relative;max-width:980px;margin:0 auto}
+  .banner video{display:block;width:100%;max-width:980px;height:auto;aspect-ratio:16/9;margin:0 auto;background:#efe4d4}
+  .vidBtn{position:absolute;right:12px;bottom:12px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(26,15,12,.7);color:#fff;font-size:15px;cursor:pointer}
+  .vidBtn:focus-visible{outline:3px solid var(--saffron);outline-offset:2px}
   .hero{background:var(--maroon);color:#fff;position:relative;overflow:hidden}
   .hero::after{content:"";position:absolute;inset:auto -10% -60% auto;width:420px;height:420px;border-radius:50%;
     background:radial-gradient(circle,rgba(244,185,66,.28),transparent 65%);pointer-events:none}
@@ -167,7 +171,13 @@
   </div>
 </header>
 
-<div class="banner"><img src="hero.webp" width="900" height="600" fetchpriority="high" alt="Arunachala Temple Lockers – pilgrims storing luggage in lockers near Arunachaleswarar Temple, Tiruvannamalai"></div>
+<div class="banner"><div class="vwrap">
+  <video id="heroVid" autoplay muted loop playsinline preload="auto" poster="locker-opening.jpg" width="1280" height="720"
+         aria-label="Animation: a locker at Arunachala Temple Luggage Lockers opens after check-in, bags are stored and the locker locks">
+    <source src="locker-opening.mp4" type="video/mp4">
+  </video>
+  <button type="button" id="heroVidBtn" class="vidBtn" aria-label="Pause video">❚❚</button>
+</div></div>
 
 <div class="hero">
   <div class="wrap">
@@ -511,6 +521,15 @@
   else { try { start = localStorage.getItem('lang') || 'en'; } catch(e) {} }
   setLang(start);
 })();
+</script>
+
+<script>
+(function(){var v=document.getElementById("heroVid"),b=document.getElementById("heroVidBtn");if(!v||!b)return;
+function upd(){var p=v.paused;b.textContent=p?"▶":"❚❚";b.setAttribute("aria-label",p?"Play video":"Pause video");}
+b.addEventListener("click",function(){if(v.paused){v.play();}else{v.pause();}upd();});
+v.addEventListener("play",upd);v.addEventListener("pause",upd);
+if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){v.removeAttribute("autoplay");v.pause();}
+upd();})();
 </script>
 </body>
 </html>
