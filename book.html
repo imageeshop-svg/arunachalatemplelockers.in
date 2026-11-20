@@ -146,7 +146,7 @@
       <div class="small"><span data-t="lockerLbl">Locker:</span> <b id="bLocker">tap a locker on the map</b></div>
       <button type="button" class="btn alt" id="pickBtn" onclick="showTab('map')" data-t="pickBtn">🗺 Choose a locker on the map</button>
       <div id="custPick" class="hidden">
-        <label for="cpQuery">Customer – mobile number or customer ID</label>
+        <label for="cpQuery">Registered repeat customer? (optional) – mobile number or customer ID</label>
         <div class="row2"><input id="cpQuery" maxlength="12" autocomplete="off"><button class="btn" type="button" style="width:auto;margin:0" onclick="cpFind()">Find</button></div>
         <div id="cpInfo"></div>
       </div>
@@ -204,11 +204,11 @@
   <!-- REGISTER IN ADVANCE (public website only; staff register customers in their own tab) -->
   <section id="t-reg" class="hidden" role="tabpanel">
     <div class="card">
-      <h2 data-t="regTitle">Register in advance</h2>
-      <ol class="rsteps"><li data-t="rs1">Send your details here (one time).</li>
-        <li data-t="rs2">Visit the shop with your Aadhaar card. Staff look at it, compare its photo with you and take a recent photo.</li>
-        <li data-t="rs3">When staff approve your registration, you can be given a free locker at the shop.</li></ol>
-      <p class="small" data-t="rsNote">Registration does not reserve a locker.</p>
+      <h2 data-t="regTitle">Register – optional, for regular visitors</h2>
+      <ol class="rsteps"><li data-t="rs1">Registration is optional. You can book a locker without it.</li>
+        <li data-t="rs2">If you visit often: send your details here once, then bring your Aadhaar card on your next visit. Staff check it, compare its photo with you and take a recent photo.</li>
+        <li data-t="rs3">After approval, staff find you by mobile number and check your saved photo – quicker at the counter on every visit.</li></ol>
+      <p class="small" data-t="rsNote">Registration does not reserve a locker. To book now, use the ✔ Book Locker tab.</p>
     </div>
     <form class="card" id="regForm" novalidate>
       <label for="rName" data-t="rName">Full name</label>
@@ -406,9 +406,9 @@ const I18N = {
   expired:"This booking has expired. If you already paid, come to the shop or call 8838075040 with ref {ref} – the shop can still confirm it.",
   cancelled:"This booking was cancelled. If you already paid, come to the shop or call 8838075040 with ref {ref} – the shop can still confirm it.",
   scriptFail:"Could not load the payment window. Check your internet and try again.",
-  tab_reg:"📝 Register / status", regTitle:"Register in advance",
-  rs1:"Send your details here (one time).", rs2:"Visit the shop with your Aadhaar card. Staff look at it, compare its photo with you and take a recent photo.",
-  rs3:"When staff approve your registration, you can be given a free locker at the shop.", rsNote:"Registration does not reserve a locker.",
+  tab_reg:"📝 Regular visitor? Register", regTitle:"Register – optional, for regular visitors",
+  rs1:"Registration is optional. You can book a locker without it.", rs2:"If you visit often: send your details here once, then bring your Aadhaar card on your next visit. Staff check it, compare its photo with you and take a recent photo.",
+  rs3:"After approval, staff find you by mobile number and check your saved photo – quicker at the counter on every visit.", rsNote:"Registration does not reserve a locker. To book now, use the ✔ Book Locker tab.",
   rName:"Full name", rAddr:"Address (house / street / area)", rTown:"Town / city", rPin:"PIN code",
   rConsent:"I agree that the shop may keep these details and my photo for the locker service.",
   rNoAadhaar:"Do not type or upload your Aadhaar here. Just bring the card to the shop – staff check it there.",
@@ -425,7 +425,7 @@ const I18N = {
   rErrTown:"Please enter your town or city.", rErrPin:"Please enter a valid 6-digit PIN code.", rErrConsent:"Please tick the box to agree that the shop may keep these details.",
   rErrCid:"Please enter your customer ID (for example C1042).",
   freeSeeOnly:"{locker} is free right now. Lockers are given at the shop: come to 52 A Car Street – staff check your registration and photo, give you a free locker and take payment by UPI.",
-  regBtn:"📝 Register in advance", mapTitleS:"Free lockers right now",
+  regBtn:"📝 Regular visitor? Register", mapTitleS:"Free lockers right now",
   gs1:"<b>1.</b> See which lockers are free", gs2:"<b>2.</b> Register in advance (one time)", gs3:"<b>3.</b> Visit the shop with your Aadhaar card", gs4:"<b>4.</b> Staff give you a locker &amp; take UPI payment",
   footHelp:"Need help? Call", footHome:"Home", footFaq:"FAQ"},
  ta:{skip:"உள்ளடக்கத்திற்குச் செல்ல", brand:"அருணாசல டிஜிட்டல் லக்கேஜ் லாக்கர்கள்", sub:"லாக்கர் வரைபடம் &amp; முன்பதிவு · 52 A கார் தெரு, திருவண்ணாமலை",
@@ -467,9 +467,9 @@ const I18N = {
   expired:"இந்த முன்பதிவு காலாவதியாகிவிட்டது. நீங்கள் ஏற்கனவே பணம் செலுத்தியிருந்தால், கடைக்கு வாருங்கள் அல்லது முன்பதிவு எண் {ref}-உடன் 8838075040-ஐ அழைக்கவும் – கடை இன்னும் உறுதிசெய்ய முடியும்.",
   cancelled:"இந்த முன்பதிவு ரத்து செய்யப்பட்டது. நீங்கள் ஏற்கனவே பணம் செலுத்தியிருந்தால், கடைக்கு வாருங்கள் அல்லது முன்பதிவு எண் {ref}-உடன் 8838075040-ஐ அழைக்கவும் – கடை இன்னும் உறுதிசெய்ய முடியும்.",
   scriptFail:"கட்டணச் சாளரத்தைத் திறக்க முடியவில்லை. இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.",
-  tab_reg:"📝 பதிவு / நிலை", regTitle:"முன்கூட்டியே பதிவு செய்யுங்கள்",
-  rs1:"உங்கள் விவரங்களை இங்கே அனுப்புங்கள் (ஒரே ஒரு முறை).", rs2:"உங்கள் ஆதார் அட்டையுடன் கடைக்கு வாருங்கள். ஊழியர்கள் அதைப் பார்த்து, அதிலுள்ள புகைப்படத்தை உங்களுடன் ஒப்பிட்டு, சமீபத்திய புகைப்படம் எடுப்பார்கள்.",
-  rs3:"ஊழியர்கள் உங்கள் பதிவை அங்கீகரித்த பிறகு, கடையில் உங்களுக்குக் காலி லாக்கர் வழங்கப்படும்.", rsNote:"பதிவு செய்வதால் லாக்கர் ஒதுக்கப்படாது.",
+  tab_reg:"📝 அடிக்கடி வருபவரா? பதிவு", regTitle:"பதிவு – விருப்பத்திற்குரியது, அடிக்கடி வருபவர்களுக்கு",
+  rs1:"பதிவு கட்டாயமில்லை. பதிவு செய்யாமலேயே லாக்கரை முன்பதிவு செய்யலாம்.", rs2:"நீங்கள் அடிக்கடி வருபவர் என்றால்: உங்கள் விவரங்களை இங்கே ஒருமுறை அனுப்பி, அடுத்த முறை வரும்போது ஆதார் அட்டையைக் கொண்டு வாருங்கள். ஊழியர்கள் அதைச் சரிபார்த்து, அதிலுள்ள புகைப்படத்தை உங்களுடன் ஒப்பிட்டு, சமீபத்திய புகைப்படம் எடுப்பார்கள்.",
+  rs3:"அங்கீகாரத்திற்குப் பிறகு, ஊழியர்கள் உங்கள் மொபைல் எண் மூலம் உங்களைக் கண்டறிந்து சேமித்த புகைப்படத்தைச் சரிபார்ப்பார்கள் – ஒவ்வொரு முறையும் கவுண்டரில் விரைவாக முடியும்.", rsNote:"பதிவு செய்வதால் லாக்கர் ஒதுக்கப்படாது. இப்போது முன்பதிவு செய்ய ✔ லாக்கர் முன்பதிவு தாவலைப் பயன்படுத்துங்கள்.",
   rName:"முழுப் பெயர்", rAddr:"முகவரி (வீடு / தெரு / பகுதி)", rTown:"ஊர் / நகரம்", rPin:"அஞ்சல் குறியீடு (PIN)",
   rConsent:"லாக்கர் சேவைக்காக இந்த விவரங்களையும் என் புகைப்படத்தையும் கடை வைத்திருக்க ஒப்புக்கொள்கிறேன்.",
   rNoAadhaar:"உங்கள் ஆதாரை இங்கே தட்டச்சு செய்யவோ பதிவேற்றவோ வேண்டாம். அட்டையைக் கடைக்குக் கொண்டு வாருங்கள் – ஊழியர்கள் அங்கே சரிபார்ப்பார்கள்.",
@@ -486,7 +486,7 @@ const I18N = {
   rErrTown:"உங்கள் ஊர் அல்லது நகரத்தை உள்ளிடுங்கள்.", rErrPin:"சரியான 6 இலக்க அஞ்சல் குறியீட்டை உள்ளிடுங்கள்.", rErrConsent:"விவரங்களைக் கடை வைத்திருக்க ஒப்புக்கொள்ள பெட்டியில் டிக் செய்யுங்கள்.",
   rErrCid:"உங்கள் வாடிக்கையாளர் எண்ணை உள்ளிடுங்கள் (எ.கா. C1042).",
   freeSeeOnly:"{locker} இப்போது காலியாக உள்ளது. லாக்கர்கள் கடையில் வழங்கப்படும்: 52 A கார் தெருவுக்கு வாருங்கள் – ஊழியர்கள் உங்கள் பதிவையும் புகைப்படத்தையும் சரிபார்த்து, காலி லாக்கர் வழங்கி, UPI மூலம் கட்டணம் பெறுவார்கள்.",
-  regBtn:"📝 முன்கூட்டியே பதிவு", mapTitleS:"இப்போது காலியாக உள்ள லாக்கர்கள்",
+  regBtn:"📝 அடிக்கடி வருபவரா? பதிவு", mapTitleS:"இப்போது காலியாக உள்ள லாக்கர்கள்",
   gs1:"<b>1.</b> காலி லாக்கர்களைப் பாருங்கள்", gs2:"<b>2.</b> முன்கூட்டியே பதிவு செய்யுங்கள் (ஒரு முறை)", gs3:"<b>3.</b> ஆதார் அட்டையுடன் கடைக்கு வாருங்கள்", gs4:"<b>4.</b> ஊழியர்கள் லாக்கர் வழங்கி UPI கட்டணம் பெறுவார்கள்",
   footHelp:"உதவி வேண்டுமா? அழைக்கவும்", footHome:"முகப்பு", footFaq:"கேள்வி-பதில்"},
  te:{skip:"విషయానికి వెళ్ళండి", brand:"అరుణాచల డిజిటల్ లగేజ్ లాకర్లు", sub:"లాకర్ మ్యాప్ &amp; బుకింగ్ · 52 A కార్ స్ట్రీట్, తిరువణ్ణామలై",
@@ -528,9 +528,9 @@ const I18N = {
   expired:"ఈ బుకింగ్ గడువు ముగిసింది. మీరు ఇప్పటికే చెల్లించి ఉంటే, దుకాణానికి రండి లేదా బుకింగ్ నంబర్ {ref}తో 8838075040కు కాల్ చేయండి – దుకాణం ఇంకా నిర్ధారించగలదు.",
   cancelled:"ఈ బుకింగ్ రద్దు చేయబడింది. మీరు ఇప్పటికే చెల్లించి ఉంటే, దుకాణానికి రండి లేదా బుకింగ్ నంబర్ {ref}తో 8838075040కు కాల్ చేయండి – దుకాణం ఇంకా నిర్ధారించగలదు.",
   scriptFail:"చెల్లింపు విండో తెరవలేకపోయాము. మీ ఇంటర్నెట్ చూసి మళ్లీ ప్రయత్నించండి.",
-  tab_reg:"📝 నమోదు / స్థితి", regTitle:"ముందుగానే నమోదు చేసుకోండి",
-  rs1:"మీ వివరాలను ఇక్కడ పంపండి (ఒక్కసారి మాత్రమే).", rs2:"మీ ఆధార్ కార్డుతో దుకాణానికి రండి. సిబ్బంది దాన్ని చూసి, అందులోని ఫోటోను మీతో పోల్చి, ఇటీవలి ఫోటో తీస్తారు.",
-  rs3:"సిబ్బంది మీ నమోదును ఆమోదించిన తర్వాత, దుకాణంలో మీకు ఖాళీ లాకర్ ఇవ్వబడుతుంది.", rsNote:"నమోదు చేయడం వల్ల లాకర్ రిజర్వ్ కాదు.",
+  tab_reg:"📝 తరచూ వస్తారా? నమోదు", regTitle:"నమోదు – ఐచ్ఛికం, తరచూ వచ్చేవారి కోసం",
+  rs1:"నమోదు తప్పనిసరి కాదు. నమోదు లేకుండానే లాకర్ బుక్ చేసుకోవచ్చు.", rs2:"మీరు తరచూ వస్తే: మీ వివరాలను ఇక్కడ ఒక్కసారి పంపండి, తర్వాత వచ్చినప్పుడు ఆధార్ కార్డు తీసుకురండి. సిబ్బంది దాన్ని తనిఖీ చేసి, అందులోని ఫోటోను మీతో పోల్చి, ఇటీవలి ఫోటో తీస్తారు.",
+  rs3:"ఆమోదం తర్వాత, సిబ్బంది మీ మొబైల్ నంబర్‌తో మిమ్మల్ని కనుగొని, సేవ్ చేసిన ఫోటోను తనిఖీ చేస్తారు – ప్రతిసారి కౌంటర్‌లో త్వరగా అవుతుంది.", rsNote:"నమోదు చేయడం వల్ల లాకర్ రిజర్వ్ కాదు. ఇప్పుడు బుక్ చేయడానికి ✔ లాకర్ బుకింగ్ ట్యాబ్ ఉపయోగించండి.",
   rName:"పూర్తి పేరు", rAddr:"చిరునామా (ఇల్లు / వీధి / ప్రాంతం)", rTown:"ఊరు / నగరం", rPin:"పిన్ కోడ్",
   rConsent:"లాకర్ సేవ కోసం ఈ వివరాలను మరియు నా ఫోటోను దుకాణం ఉంచుకోవడానికి నేను అంగీకరిస్తున్నాను.",
   rNoAadhaar:"మీ ఆధార్‌ను ఇక్కడ టైప్ చేయవద్దు లేదా అప్‌లోడ్ చేయవద్దు. కార్డును దుకాణానికి తీసుకురండి – సిబ్బంది అక్కడ చూస్తారు.",
@@ -547,7 +547,7 @@ const I18N = {
   rErrTown:"దయచేసి మీ ఊరు లేదా నగరం నమోదు చేయండి.", rErrPin:"దయచేసి సరైన 6 అంకెల పిన్ కోడ్ నమోదు చేయండి.", rErrConsent:"వివరాలను దుకాణం ఉంచుకోవడానికి అంగీకరించడానికి బాక్స్‌లో టిక్ చేయండి.",
   rErrCid:"దయచేసి మీ కస్టమర్ ID నమోదు చేయండి (ఉదా. C1042).",
   freeSeeOnly:"{locker} ఇప్పుడు ఖాళీగా ఉంది. లాకర్లు దుకాణంలో ఇవ్వబడతాయి: 52 A కార్ స్ట్రీట్‌కు రండి – సిబ్బంది మీ నమోదు మరియు ఫోటోను తనిఖీ చేసి, ఖాళీ లాకర్ ఇచ్చి, UPI ద్వారా చెల్లింపు తీసుకుంటారు.",
-  regBtn:"📝 ముందుగానే నమోదు", mapTitleS:"ఇప్పుడు ఖాళీగా ఉన్న లాకర్లు",
+  regBtn:"📝 తరచూ వస్తారా? నమోదు", mapTitleS:"ఇప్పుడు ఖాళీగా ఉన్న లాకర్లు",
   gs1:"<b>1.</b> ఖాళీ లాకర్లు చూడండి", gs2:"<b>2.</b> ముందుగానే నమోదు చేసుకోండి (ఒక్కసారి)", gs3:"<b>3.</b> ఆధార్ కార్డుతో దుకాణానికి రండి", gs4:"<b>4.</b> సిబ్బంది లాకర్ ఇచ్చి UPI చెల్లింపు తీసుకుంటారు",
   footHelp:"సహాయం కావాలా? కాల్ చేయండి", footHome:"హోమ్", footFaq:"ప్రశ్నలు-జవాబులు"}
 };
@@ -623,8 +623,8 @@ function applyMode(){
 if (STAFF){
   ["bookTitle","sub"].forEach(id => $(id).removeAttribute("data-t"));
   $("aadhaarBox").classList.remove("hidden"); $("bookTitle").textContent = "CHECK-IN (SHOP)"; $("sub").textContent = "Staff screen · 23 Lockers · Shop / App / Web bookings in one list";
-  ["langs","guide","foot","mobHint","nameBox","mobileBox"].forEach(id => $(id).classList.add("hidden"));
-  $("name").required = false; $("mobile").required = false;
+  ["langs","guide","foot","mobHint"].forEach(id => $(id).classList.add("hidden"));
+  $("name").required = false; $("mobile").required = false;      // checked in JS: not needed for a registered customer
   $("custPick").classList.remove("hidden"); $("staffBar").classList.remove("hidden");
   $("tab-staff").classList.add("hidden");
   document.querySelector("header .home").removeAttribute("href");
@@ -742,18 +742,20 @@ document.querySelectorAll(".step button").forEach(b => b.addEventListener("click
 $("bookForm").addEventListener("submit", async ev => {
   ev.preventDefault();
   if (!selected){ msg("bookMsg","err",t("pickFirst")); return; }
-  if (STAFF){
-    if (!cpSel){ msg("bookMsg","err","Find the customer first (mobile number or customer ID)."); return; }
-    if (cpSel.status !== "APPROVED" || cpSel.needs_review){ msg("bookMsg","err",`Customer ${cpSel.customer_id} is not approved for a locker. Open 👤 Customers to complete the registration check.`); return; }
+  if (STAFF && cpSel){          // registered repeat customer (optional)
     if (!$("cpOk") || !$("cpOk").checked){ msg("bookMsg","err","Compare the customer with the saved photo and tick “Photo checked”."); return; }
+  } else if (STAFF){            // regular walk-in booking
+    if ($("name").value.trim().length < 2){ msg("bookMsg","err","Enter the customer's name."); return; }
+    if (!/^[6-9]\d{9}$/.test($("mobile").value.replace(/\D/g,"").slice(-10))){ msg("bookMsg","err","Enter a valid 10-digit mobile number."); return; }
   }
   $("bookBtn").disabled = true; msg("bookMsg");
   try {
-    const body = STAFF ? {locker_no:selected, customer_id:cpSel.customer_id, photo_checked:true,
-                          aadhaar_last4:$("aadhaar").value.trim(), ...counts}
-                       : {locker_no:selected, name:$("name").value.trim(), mobile:$("mobile").value.trim(), source: SOURCE, ...counts};
+    const body = (STAFF && cpSel) ? {locker_no:selected, customer_id:cpSel.customer_id, photo_checked:true,
+                                     aadhaar_last4:$("aadhaar").value.trim(), ...counts}
+               : {locker_no:selected, name:$("name").value.trim(), mobile:$("mobile").value.trim(),
+                  aadhaar_last4: STAFF ? $("aadhaar").value.trim() : "", source: SOURCE, ...counts};
     const d = await api("/api/book", body);
-    showPay(d, STAFF ? cpSel.phone : $("mobile").value.trim());
+    showPay(d, (STAFF && cpSel) ? cpSel.phone : $("mobile").value.trim());
   } catch(e) { msg("bookMsg","err", e.message); loadCabinet(); }
   $("bookBtn").disabled = false;
 });
@@ -927,8 +929,6 @@ async function staffCheckin(ref, retried){
   catch(e){
     if (e.data && e.data.need_photo_check && !retried){
       if (await photoCheck(ref, "CHECKIN", e.data.customer_id)) return staffCheckin(ref, true);
-    } else if (e.data && e.data.need_registration){
-      alertMsg(e.message, false); $("cQuery").value = e.data.phone || ""; showTab("cust"); custSearch();
     } else alertMsg(e.message, false);
   }
   await loadCabinet(); if ($("outMobile").value) findForCheckout();
@@ -938,12 +938,17 @@ async function staffCancel(ref){
   try { await api("/api/staff/cancel", {ref}); alertMsg(`Booking ${ref} cancelled.`, true); poll(); } catch(e){ alertMsg(e.message, false); }
   loadCabinet();
 }
-async function staffCheckout(ref, extra, cid){
-  // Compare the customer with the saved photo BEFORE handing back the luggage (recorded on the server).
-  if (!(await photoCheck(ref, "CHECKOUT", cid))) return;
-  if (extra > 0 && !confirm(`Collect extra ₹${extra} from the customer, then press OK.`)) return;
+async function staffCheckout(ref, extra, cid, checked){
+  // Registered customers only: compare with the saved photo BEFORE handing back the luggage (server asks for it).
+  if (!checked && extra > 0 && !confirm(`Collect extra ₹${extra} from the customer, then press OK.`)) return;
   try { const d = await api("/api/staff/checkout", {ref, collect_extra: extra > 0}); alertMsg(`Checked out. Locker ${d.locker_no} ${d.lock_opened ? "opened" : "– open command FAILED, open manually"}.`, d.lock_opened); }
-  catch(e){ alertMsg(e.message, false); }
+  catch(e){
+    if (e.data && e.data.need_photo_check && !checked){
+      if (await photoCheck(ref, "CHECKOUT", e.data.customer_id || cid)) return staffCheckout(ref, extra, cid, true);
+      return;
+    }
+    alertMsg(e.message, false);
+  }
   loadCabinet(); $("outResult").innerHTML = "";
 }
 async function staffOpen(locker_no){
@@ -1079,22 +1084,26 @@ async function loadPhoto(cid, img){
 
 /* ---------- customer for the booking at the counter ---------- */
 let cpSel = null;
-function cpClear(){ cpSel = null; $("cpQuery").value = ""; $("cpInfo").innerHTML = ""; }
+function cpClear(){ cpSel = null; $("cpQuery").value = ""; $("cpInfo").innerHTML = "";
+  ["nameBox","mobileBox"].forEach(id => $(id).classList.remove("hidden")); }
 async function cpFind(q){
   q = (q || $("cpQuery").value).trim();
   if (!q){ $("cpInfo").innerHTML = `<div class="msg err">Type the customer's mobile number or customer ID.</div>`; return; }
   try {
     const d = await api(`/api/staff/customers?q=${encodeURIComponent(q)}`);
     const exact = d.customers.find(c => c.customer_id === q.toUpperCase() || c.phone === q.replace(/\D/g,"").slice(-10)) || (d.customers.length === 1 ? d.customers[0] : null);
-    if (!exact){ $("cpInfo").innerHTML = `<div class="msg info">No single match. ${d.customers.length ? "Type the full mobile number." : "Not registered yet –"} <a href="#" onclick="event.preventDefault();custNew('${esc(q.replace(/\D/g,""))}')">register a new customer</a>.</div>`; cpSel = null; return; }
+    if (!exact){ $("cpInfo").innerHTML = `<div class="msg info">${d.customers.length ? "No single match – type the full mobile number." : "Not registered – just enter name and mobile below (regular booking)."}</div>`; cpSel = null; return; }
     const full = (await api(`/api/staff/customer?customer_id=${exact.customer_id}`)).customer;
-    cpSel = full; $("cpQuery").value = full.customer_id;
-    const ok = full.status === "APPROVED" && !full.needs_review;
+    const ok = full.status === "APPROVED" && !full.needs_review && full.has_photo;
+    cpSel = ok ? full : null; $("cpQuery").value = full.customer_id;
+    ["nameBox","mobileBox"].forEach(id => $(id).classList.toggle("hidden", ok));
+    if (!ok){ $("name").value = full.full_name; $("mobile").value = full.phone; }
     $("cpInfo").innerHTML = `<div class="crow" style="margin-top:8px"><img id="cpPhoto" class="cphoto" alt="">
       <div style="flex:1;min-width:160px"><b>${esc(full.full_name)}</b> <span class="pill ${full.needs_review ? "REVIEW" : esc(full.status)}">${full.needs_review ? "REVIEW" : esc(full.status)}</span>
         <div class="small">${esc(full.customer_id)} · ${esc(full.phone)} · ${esc(full.town)}</div>
         ${ok ? `<label class="check"><input type="checkbox" id="cpOk"> Photo checked – this is the same person</label>`
-             : `<div class="msg err">Not approved for a locker${full.needs_review ? " (manual review: " + esc(full.review_note || "") + ")" : ""}. <a href="#" onclick="event.preventDefault();custOpen('${esc(full.customer_id)}');showTab('cust')">Open profile</a></div>`}
+             : `<div class="msg info">Registration not approved yet${full.needs_review ? " (manual review: " + esc(full.review_note || "") + ")" : ""} – book as a regular customer below (name and mobile filled in). <a href="#" onclick="event.preventDefault();custOpen('${esc(full.customer_id)}');showTab('cust')">Open profile</a></div>`}
+        <button class="btn alt" type="button" style="width:auto;padding:6px 12px" onclick="cpClear()">✖ Clear – regular booking</button>
       </div></div>`;
     loadPhoto(full.customer_id, $("cpPhoto"));
   } catch(e) { $("cpInfo").innerHTML = `<div class="msg err">${esc(e.message)}</div>`; }
