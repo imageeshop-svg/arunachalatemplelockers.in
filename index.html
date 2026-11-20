@@ -86,6 +86,9 @@
   body.ta h2, body.te h2{font-family:inherit;font-weight:600}
   .lead{color:var(--muted);margin:0 0 18px}
   section[id]{scroll-margin-top:100px}
+  .whyQ{font-size:18px;margin:6px 0 10px;color:var(--ink,#2b1a12)}
+  .whyList{margin:0;padding-left:22px;display:grid;gap:8px;font-size:17px;line-height:1.5}
+  .whyList li::marker{color:var(--maroon)}
 
   .steps{list-style:none;padding:0;margin:0;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
   .steps li{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
@@ -202,6 +205,19 @@
     <div><b data-i18n="f3T">₹50 per item</b><span data-i18n="f3">for 10 hours · jumbo suitcase ₹100</span></div>
     <div><b data-i18n="f4T">📲 Pay by UPI</b><span data-i18n="f4">Google Pay · PhonePe · Paytm</span></div>
   </div>
+
+  <section id="why">
+    <h2 data-i18n="whyTitle">Travel light in Tiruvannamalai</h2>
+    <p class="lead" data-i18n="whyLead">Why carry heavy bags everywhere? Leave them in a secure locker near the temple and enjoy your visit in comfort.</p>
+    <h3 class="whyQ" data-i18n="whyQ">Why do travellers need luggage storage in Tiruvannamalai?</h3>
+    <ul class="whyList">
+      <li data-i18n="why1"><b>Coming for the day? No hotel room needed.</b> Leave your bags with us, visit the temple, walk around the hill, and travel home the same day.</li>
+      <li data-i18n="why2">Your hotel check-in is later in the day</li>
+      <li data-i18n="why3">You have checked out early and your bus or train leaves late at night</li>
+      <li data-i18n="why4">You want to visit the temple and the ashrams hands-free</li>
+      <li data-i18n="why5">You are walking the 14 km Girivalam around Arunachala hill</li>
+    </ul>
+  </section>
 
   <section id="how">
     <h2 data-i18n="howTitle">How it works</h2>
@@ -418,7 +434,8 @@
       addressLbl:"முகவரி", phoneLbl:"தொலைபேசி", emailLbl:"மின்னஞ்சல்", hoursLbl:"நேரம்",
       hoursVal:"தினமும், காலை 7 – இரவு 9", ownerLbl:"உரிமையாளர்",
       bandText:"தயாரா? இப்போது எந்த லாக்கர்கள் காலியாக உள்ளன என்று பாருங்கள்.",
-      regCta:"அடிக்கடி வருபவரா? பதிவு (விருப்பம்)"
+      regCta:"அடிக்கடி வருபவரா? பதிவு (விருப்பம்)",
+      whyTitle:"திருவண்ணாமலையில் சுமையின்றி பயணம் செய்யுங்கள்", whyLead:"கனமான பைகளை எல்லா இடத்துக்கும் ஏன் சுமக்க வேண்டும்? கோயில் அருகே உள்ள பாதுகாப்பான லாக்கரில் வைத்துவிட்டு, உங்கள் பயணத்தை நிம்மதியாக அனுபவியுங்கள்.", whyQ:"திருவண்ணாமலையில் பயணிகளுக்கு லாக்கர் ஏன் தேவை?", why1:"<b>ஒரு நாள் பயணமா? ஹோட்டல் அறை தேவையில்லை.</b> உங்கள் பைகளை எங்களிடம் வைத்துவிட்டு, கோயிலில் தரிசனம் செய்து, கிரிவலம் சுற்றி, அதே நாளில் ஊருக்குத் திரும்புங்கள்.", why2:"ஹோட்டல் செக்-இன் நேரம் தாமதமாக உள்ளது", why3:"ஹோட்டலிலிருந்து முன்கூட்டியே வெளியேறிவிட்டீர்கள், உங்கள் பேருந்து அல்லது ரயில் இரவு தாமதமாகப் புறப்படுகிறது", why4:"கைகளில் சுமையின்றி கோயிலுக்கும் ஆசிரமங்களுக்கும் செல்ல விரும்புகிறீர்கள்", why5:"அருணாசல மலையைச் சுற்றி 14 கி.மீ. கிரிவலம் செல்கிறீர்கள்"
     },
     te: {
       skip:"విషయానికి వెళ్ళండి",
@@ -492,7 +509,8 @@
       addressLbl:"చిరునామా", phoneLbl:"ఫోన్", emailLbl:"ఇమెయిల్", hoursLbl:"సమయం",
       hoursVal:"ప్రతిరోజూ, ఉదయం 7 – రాత్రి 9", ownerLbl:"యజమాని",
       bandText:"సిద్ధమా? ఇప్పుడు ఏ లాకర్లు ఖాళీగా ఉన్నాయో చూడండి.",
-      regCta:"తరచూ వస్తారా? నమోదు (ఐచ్ఛికం)"
+      regCta:"తరచూ వస్తారా? నమోదు (ఐచ్ఛికం)",
+      whyTitle:"తిరువణ్ణామలైలో భారం లేకుండా ప్రయాణించండి", whyLead:"బరువైన బ్యాగులను ప్రతిచోటికీ ఎందుకు మోయాలి? ఆలయం సమీపంలోని సురక్షిత లాకర్‌లో ఉంచి, మీ యాత్రను హాయిగా ఆస్వాదించండి.", whyQ:"తిరువణ్ణామలైలో ప్రయాణికులకు లగేజ్ లాకర్ ఎందుకు అవసరం?", why1:"<b>ఒక్క రోజు యాత్రా? హోటల్ గది అవసరం లేదు.</b> మీ బ్యాగులను మా దగ్గర ఉంచి, ఆలయ దర్శనం చేసి, గిరి ప్రదక్షిణ పూర్తి చేసి, అదే రోజు ఇంటికి తిరిగి వెళ్ళండి.", why2:"హోటల్ చెక్-ఇన్ సమయం ఆలస్యంగా ఉంది", why3:"హోటల్ నుండి ముందుగానే ఖాళీ చేశారు, మీ బస్సు లేదా రైలు రాత్రి ఆలస్యంగా బయలుదేరుతుంది", why4:"చేతుల్లో భారం లేకుండా ఆలయాన్ని, ఆశ్రమాలను సందర్శించాలనుకుంటున్నారు", why5:"అరుణాచల కొండ చుట్టూ 14 కి.మీ. గిరి ప్రదక్షిణ చేస్తున్నారు"
     }
   };
   var nodes = document.querySelectorAll('[data-i18n]');
