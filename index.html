@@ -133,6 +133,18 @@
 
   .contact{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
   .contact div{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .mapBox{margin-top:18px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);background:#eee;position:relative;aspect-ratio:16/10;min-height:280px}
+  .mapBox iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .mapBtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .mapBtns a{flex:1 1 180px;text-align:center;text-decoration:none;font-weight:700;padding:12px 14px;border-radius:12px;background:#efe3d4;color:#7b1e2b}
+  .mapBtns a.main{background:#7b1e2b;color:#fff}
+  .svTitle{margin:24px 0 8px;font-size:20px}
+  .streetPic{display:block;position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);text-decoration:none}
+  .streetPic img{display:block;width:100%;height:auto}
+  .streetPic > span{position:absolute;left:50%;bottom:44px;transform:translateX(-50%);background:rgba(123,30,43,.9);color:#fff;font-weight:700;padding:10px 16px;border-radius:999px;font-size:15px;width:max-content;max-width:90%;text-align:center;line-height:1.35}
+  @media (max-width:520px){.streetPic > span{font-size:13px;bottom:30px;padding:8px 12px}}
+  .svNote{font-size:13px;color:var(--muted);margin-top:6px}
+  .streetPic[hidden],.mapBox[hidden]{display:none}
   .contact b{display:block;color:var(--muted);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
   body.ta .contact b, body.te .contact b{text-transform:none;letter-spacing:0}
 
@@ -339,6 +351,27 @@
       <div><b data-i18n="hoursLbl">Hours</b><span data-i18n="hoursVal">Every day, 7 AM – 9 PM</span></div>
       <div><b data-i18n="ownerLbl">Proprietor</b>M N Sridhar</div>
     </div>
+
+    <h3 class="svTitle" data-i18n="mapTitle">Find us on the map</h3>
+    <div class="mapBox">
+      <iframe title="Map: Arunachala Temple Luggage Lockers, 52 A Car Street, Tiruvannamalai"
+        src="https://www.google.com/maps?q=12.230218,79.0706879&amp;z=17&amp;hl=en&amp;output=embed"
+        loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+    </div>
+    <div class="mapBtns">
+      <a class="main" href="https://www.google.com/maps/dir/?api=1&amp;destination=12.230218,79.0706879" target="_blank" rel="noopener">📍 <span data-i18n="directions">Get directions</span></a>
+      <a href="#streetView" class="svOpen">🧍 <span data-i18n="svBtn">Street View</span></a>
+      <a href="https://www.google.com/maps/place/52A,+Car+St,+Tiruvannamalai,+Tamil+Nadu+606601/@12.230218,79.0706879,17z" target="_blank" rel="noopener" data-i18n="openMaps">Open in Google Maps</a>
+    </div>
+
+    <h3 class="svTitle" data-i18n="svTitle">Street View – look around our shop</h3>
+    <a class="streetPic svOpen" id="streetView" href="#streetView">
+      <img src="shop-streetview.jpg" width="1015" height="730" loading="lazy" alt="Street View of 52 A Car Street, Tiruvannamalai, where the locker shop is">
+      <span>🧍 <span data-i18n="svTap">Tap to look around in Street View</span></span>
+    </a>
+    <div class="mapBox" id="streetLive" hidden></div>
+    <div class="svNote"><span data-i18n="svNote">Street View: Google, Dec 2022. The shop front may look different today.</span>
+      <a id="svFallback" href="https://www.google.com/maps/@?api=1&amp;map_action=pano&amp;viewpoint=12.230218,79.0706879" target="_blank" rel="noopener" hidden data-i18n="svFallback">Not loading? Open in Google Maps</a></div>
   </section>
 
   <section>
@@ -428,6 +461,7 @@
       privacyTitle:"தனியுரிமைக் கொள்கை",
       privacy:"லாக்கர் சேவைக்காக உங்கள் பெயர், மொபைல் (WhatsApp) எண்ணை வைத்திருக்கிறோம். செக்-இன் போது ஊழியர்கள் உங்கள் ஆதார் எண்ணின் கடைசி 4 இலக்கங்களைக் குறித்துக்கொள்வார்கள் – அட்டையின் படமோ QR குறியீடோ ஒருபோதும் வைக்கப்படாது. நீங்கள் அடிக்கடி வருபவராகப் பதிவு செய்தால், உங்கள் முகவரியும் சமீபத்திய புகைப்படமும் வைக்கப்படும்; அங்கீகரிக்கப்பட்ட கடை ஊழியர்கள் மட்டுமே அவற்றைப் பார்க்க முடியும், ஆதார் அட்டை அதிலுள்ள புகைப்படத்தை உங்களுடன் ஒப்பிட மட்டுமே காட்டப்படும். உங்கள் விவரங்களை லாக்கர் வழங்க, உங்கள் முன்பதிவு பற்றித் தொடர்புகொள்ள, வணிகப் பதிவுகளுக்கு மட்டுமே பயன்படுத்துகிறோம். இந்தச் சேவையை நடத்தும் சேவை வழங்குநர்களுடன் தேவையானதை மட்டுமே பகிர்கிறோம்: ஆன்லைன் பணம் செலுத்துதலைச் செயல்படுத்த எங்கள் பேமெண்ட் கேட்வே (Cashfree Payments) உங்கள் மொபைல் எண்ணையும் பணத்தையும் பெறும்; உங்கள் ரசீதுகளை அனுப்ப WhatsApp பயன்படுத்தப்படுகிறது; மொபைல் சரிபார்ப்புக் குறியீடு பயன்படுத்தப்பட்டால் SMS சேவை வழங்குநர் அதை அனுப்பும். உங்கள் விவரங்களை ஒருபோதும் விற்பதில்லை; சட்டப்படி தேவைப்படும் இடங்களைத் தவிர வேறு யாருடனும் பகிர்வதில்லை.",
       contactTitle:"தொடர்புக்கு",
+      mapTitle:"வரைபடத்தில் எங்களைக் கண்டறியுங்கள்", svBtn:"ஸ்ட்ரீட் வியூ", openMaps:"கூகுள் மேப்ஸில் திறக்க", svTitle:"ஸ்ட்ரீட் வியூ – எங்கள் கடையைச் சுற்றிப் பாருங்கள்", svTap:"ஸ்ட்ரீட் வியூவில் சுற்றிப் பார்க்கத் தொடவும்", svNote:"ஸ்ட்ரீட் வியூ: கூகுள், டிசம்பர் 2022. இன்று கடையின் தோற்றம் மாறியிருக்கலாம்.", svFallback:"திறக்கவில்லையா? கூகுள் மேப்ஸில் திறக்கவும்",
       addressLbl:"முகவரி", phoneLbl:"தொலைபேசி", emailLbl:"மின்னஞ்சல்", hoursLbl:"நேரம்",
       hoursVal:"தினமும், காலை 7 – இரவு 9", ownerLbl:"உரிமையாளர்",
       bandText:"தயாரா? இப்போது எந்த லாக்கர்கள் காலியாக உள்ளன என்று பாருங்கள்.",
@@ -503,6 +537,7 @@
       privacyTitle:"గోప్యతా విధానం",
       privacy:"లాకర్ సేవ కోసం మీ పేరు, మొబైల్ (WhatsApp) నంబర్‌ను ఉంచుతాము. చెక్-ఇన్ సమయంలో సిబ్బంది మీ ఆధార్ నంబర్ చివరి 4 అంకెలను నమోదు చేస్తారు – కార్డు చిత్రం లేదా QR కోడ్ ఎప్పుడూ ఉంచబడదు. మీరు తరచూ వచ్చేవారిగా నమోదు చేసుకుంటే, మీ చిరునామా, ఇటీవలి ఫోటో కూడా ఉంచుతాము; అధీకృత షాపు సిబ్బంది మాత్రమే వాటిని చూడగలరు, ఆధార్ కార్డు అందులోని ఫోటోను మీతో పోల్చడానికి మాత్రమే చూపబడుతుంది. మీ వివరాలను లాకర్ ఇవ్వడానికి, మీ బుకింగ్ గురించి సంప్రదించడానికి, వ్యాపార రికార్డుల కోసం మాత్రమే ఉపయోగిస్తాము. ఈ సేవను నడిపే సేవా ప్రదాతలతో అవసరమైనంత మాత్రమే పంచుకుంటాము: ఆన్‌లైన్ చెల్లింపులను ప్రాసెస్ చేయడానికి మా పేమెంట్ గేట్‌వే (Cashfree Payments) మీ మొబైల్ నంబర్, చెల్లింపును పొందుతుంది; మీ రసీదులు పంపడానికి WhatsApp ఉపయోగిస్తాము; మొబైల్ ధృవీకరణ కోడ్ ఉపయోగిస్తే SMS సేవా ప్రదాత దాన్ని పంపుతుంది. మీ వివరాలను ఎప్పుడూ అమ్మము; చట్టప్రకారం అవసరమైన చోట తప్ప ఇతరులెవరితోనూ పంచుకోము.",
       contactTitle:"సంప్రదించండి",
+      mapTitle:"మ్యాప్‌లో మమ్మల్ని కనుగొనండి", svBtn:"స్ట్రీట్ వ్యూ", openMaps:"గూగుల్ మ్యాప్స్‌లో తెరవండి", svTitle:"స్ట్రీట్ వ్యూ – మా షాపు చుట్టూ చూడండి", svTap:"స్ట్రీట్ వ్యూలో చుట్టూ చూడటానికి తాకండి", svNote:"స్ట్రీట్ వ్యూ: గూగుల్, డిసెంబర్ 2022. ఈరోజు షాపు రూపం వేరుగా ఉండవచ్చు.", svFallback:"తెరుచుకోవడం లేదా? గూగుల్ మ్యాప్స్‌లో తెరవండి",
       addressLbl:"చిరునామా", phoneLbl:"ఫోన్", emailLbl:"ఇమెయిల్", hoursLbl:"సమయం",
       hoursVal:"ప్రతిరోజూ, ఉదయం 7 – రాత్రి 9", ownerLbl:"యజమాని",
       bandText:"సిద్ధమా? ఇప్పుడు ఏ లాకర్లు ఖాళీగా ఉన్నాయో చూడండి.",
@@ -545,6 +580,26 @@ b.addEventListener("click",function(){if(v.paused){v.play();}else{v.pause();}upd
 v.addEventListener("play",upd);v.addEventListener("pause",upd);
 if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){v.removeAttribute("autoplay");v.pause();}
 upd();})();
+</script>
+<script>
+(function(){
+  function showStreetView(e){
+    if (e) e.preventDefault();
+    var box = document.getElementById("streetLive");
+    if (!box.firstChild){
+      var f = document.createElement("iframe");
+      f.title = "Street View near Arunachala Temple Luggage Lockers, 52 A Car Street";
+      f.src = "https://maps.google.com/maps?layer=c&cbll=12.230218,79.0706879&cbp=11,0,0,0,0&output=svembed";
+      f.setAttribute("allowfullscreen", "");
+      box.appendChild(f);
+    }
+    document.getElementById("streetView").hidden = true;
+    box.hidden = false;
+    document.getElementById("svFallback").hidden = false;
+    box.scrollIntoView({behavior:"smooth", block:"center"});
+  }
+  document.querySelectorAll(".svOpen").forEach(function(a){ a.addEventListener("click", showStreetView); });
+})();
 </script>
 </body>
 </html>
